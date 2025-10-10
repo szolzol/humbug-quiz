@@ -140,7 +140,10 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               {question.question}
             </h3>
             <div className="mt-5 md:mt-6 text-primary-foreground/60 !text-base md:!text-lg">
-              Nyomj rá a helyes válaszokért!
+              <div>Nyomj rá a válaszokért!</div>
+              <div className="mt-2 text-sm md:text-base">
+                Összesen {question.answers.length} helyes válasz
+              </div>
             </div>
           </CardContent>
         </Card>

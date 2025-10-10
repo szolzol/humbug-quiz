@@ -221,6 +221,6 @@
 /* Mobile background positioning - shift image up more to hide text */
 @media (max-width: 768px) {
   .hero-background {
-    background-position: center 95% !important;
+    background-position: center bottom !important;
   }
 }

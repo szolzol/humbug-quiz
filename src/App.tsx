@@ -16,7 +16,8 @@ import {
   CaretDown,
   CaretUp,
 } from "@phosphor-icons/react";
-import gameRulesAudio from "@/assets/audio/humbug-rules.mp3";
+import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
+import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 
 const sampleQuestions = [
@@ -411,7 +412,7 @@ const sampleQuestions = [
 ];
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
   // Load questions from translations
@@ -601,7 +602,10 @@ function App() {
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
               className="max-w-4xl mx-auto">
-              <AudioPlayer src={gameRulesAudio} title={t("rules.audioTitle")} />
+              <AudioPlayer 
+                src={i18n.language === 'hu' ? gameRulesAudioHu : gameRulesAudioEn} 
+                title={t("rules.audioTitle")} 
+              />
 
               <Button
                 onClick={() => setIsRulesOpen(!isRulesOpen)}

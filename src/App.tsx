@@ -463,8 +463,8 @@ function App() {
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
                 className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-                Egy kísérleti kvízes partyjáték, ahol a tudás és a blöff
-                találkozik. Legyél okos, légy bátor, és fogd le a hazugot!
+                Egy kvízes partyjáték, ahol a tudás, a bátorság és a
+                megtévesztés találkozik!
               </motion.p>
 
               <motion.div
@@ -529,7 +529,7 @@ function App() {
               className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-6">Játékszabályok</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Hallgasd meg a részletes szabályokat, vagy olvasd el lentebb
+                Hallgasd meg a szabályokat, vagy olvasd el lentebb
               </p>
             </motion.div>
 
@@ -551,7 +551,7 @@ function App() {
                   <div className="space-y-6 text-card-foreground">
                     <div>
                       <h3 className="text-xl font-semibold mb-3 text-primary">
-                        1. A játék menete
+                        1. A játék kezdete
                       </h3>
                       <p className="leading-relaxed">
                         A játékmester feltesz egy kvízkérdést a teljes
@@ -566,13 +566,15 @@ function App() {
 
                     <div>
                       <h3 className="text-xl font-semibold mb-3 text-primary">
-                        2. Válaszadás
+                        2. Játékosok válaszai
                       </h3>
                       <p className="leading-relaxed">
                         A játékosoknak sorban haladva mondaniuk kell egy-egy
                         lehetséges választ, amelyik szerintük helyes válasz
-                        lehet az adott kérdésre. A játékmester nem kommentálja
-                        az elhangzott válaszokat!
+                        lehet az adott kérdésre (például: "Ferenc"). A
+                        játékmester nem kommentálja az elhangzott válaszokat,
+                        mert nem az a lényeg, hogy a válasz jó-e vagy sem,
+                        hanem, hogy lesz-e aki lefüleli a blöfföt!
                       </p>
                     </div>
 
@@ -580,13 +582,13 @@ function App() {
 
                     <div>
                       <h3 className="text-xl font-semibold mb-3 text-primary">
-                        3. A "Humbug!" hívás
+                        3. A "Humbug!"
                       </h3>
                       <p className="leading-relaxed">
                         Egy fordulónak akkor van vége, ha egy játékos
                         megkérdőjelezi egy előtte megszólaló válaszát azzal,
-                        hogy hangosan "Humbug!!" szót mond rá. A játékmester
-                        ekkor ellenőrzi a válasz helyességét.
+                        hogy hangosan „Humbug!” szót mond rá. A játékmester
+                        ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem.
                       </p>
                     </div>
 
@@ -597,10 +599,15 @@ function App() {
                         4. Győzelem és vereség
                       </h3>
                       <p className="leading-relaxed">
-                        Ha a válasz helyes volt, a blöfföt hívó játékos veszít
-                        egy életet. Ha rossz volt, akkor az veszít, aki a hibás
-                        választ mondta. Helyes blöff esetén a hívó egy
-                        passzolási lehetőséget kap.
+                        Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha
+                        viszont rossz, akkor értelemszerűen az veszít, aki a
+                        hibás választ mondta. Ha helyes volt a blöff bemondása,
+                        akkor az azt bemondó játékos egy passzolási lehetőséggel
+                        is gazdagodik, amit később bármikor felhasználhat.
+                        Vagyis amikor rákerül a sor, mondhat passzt is, és
+                        átugorjuk a körét. A játékosok előzetes megegyezés
+                        alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki
+                        utoljára „életben marad”.
                       </p>
                     </div>
 
@@ -608,12 +615,15 @@ function App() {
 
                     <div>
                       <h3 className="text-xl font-semibold mb-3 text-primary">
-                        5. Győztes
+                        5. Alternatív játékmód
                       </h3>
                       <p className="leading-relaxed">
-                        A játékosok 1-3 élettel indulnak. Az nyer, aki utoljára
-                        "életben marad". A játék játszható úgy is, hogy több
-                        blöff is történhet egy fordulóban.
+                        Játszható a játék úgy is, hogy egy adott forduló nem ér
+                        véget az első blöff bemondásánál. Ekkor a még aktív
+                        játékosok - azaz a megkérdőjelezett választ adó és a
+                        blöfföt behívó játékos kivételével mindenki - mennek
+                        tovább a második blöff bemondásáig. Ebben az esetben 2
+                        különböző játékos is életet veszít az adott körben.
                       </p>
                     </div>
                   </div>
@@ -647,25 +657,25 @@ function App() {
                 icon: <Brain size={48} weight="fill" />,
                 title: "Tudás vs. Blöff",
                 description:
-                  "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét",
+                  "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod",
               },
               {
                 icon: <Users size={48} weight="fill" />,
                 title: "Társas Élmény",
                 description:
-                  "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre",
+                  "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is",
               },
               {
                 icon: <Target size={48} weight="fill" />,
                 title: "Stratégiai Mélység",
                 description:
-                  "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz",
+                  "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít",
               },
               {
                 icon: <Crown size={48} weight="fill" />,
                 title: "Egyszerű Szabályok",
                 description:
-                  "5 perc alatt megtanulható, de mégis végtelen élményt nyújt",
+                  "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd",
               },
             ].map((feature, index) => (
               <motion.div
@@ -704,10 +714,10 @@ function App() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">Játék Kérdések</h2>
+            <h2 className="text-4xl font-bold mb-6">Feladványok</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Böngéssz a játékban szereplő kérdések között! Kattints a kártyákra
-              a helyes válaszok megtekintéséhez!
+              Böngéssz a kérdések között! Kattints a kártyákra a helyes válaszok
+              megtekintéséhez!
             </p>
           </motion.div>
 

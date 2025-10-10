@@ -1,10 +1,19 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Brain, Users, Target, Crown, Play } from "@phosphor-icons/react";
+import {
+  Brain,
+  Users,
+  Target,
+  Crown,
+  Play,
+  CaretDown,
+  CaretUp,
+} from "@phosphor-icons/react";
 import gameRulesAudio from "@/assets/audio/humbug-rules.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 
@@ -400,8 +409,45 @@ const sampleQuestions = [
 ];
 
 function App() {
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Studio Light Animations */}
+      <motion.div
+        animate={{
+          background: [
+            "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
+            "radial-gradient(circle at 80% 60%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
+            "radial-gradient(circle at 50% 80%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
+            "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
+          ],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="fixed inset-0 pointer-events-none z-0"
+      />
+      <motion.div
+        animate={{
+          background: [
+            "radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
+            "radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
+            "radial-gradient(circle at 70% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
+            "radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
+          ],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="fixed inset-0 pointer-events-none z-0"
+      />
+
       {/* Combined Hero + Game Rules Section with Shared Background */}
       <div className="relative overflow-hidden">
         {/* Shared Background Image - covers both hero and game rules */}
@@ -410,21 +456,19 @@ function App() {
           style={{
             backgroundImage: `url(${humbugMoodImage})`,
             backgroundSize: "cover",
-            backgroundPosition: "center 70%",
-            minHeight: "100%",
+            backgroundPosition: "center center",
+            backgroundAttachment: "fixed",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background/90" />
 
         {/* Hero Section */}
         <motion.section
-          className="relative min-h-[50vh] flex items-center"
+          className="relative min-h-[35vh] flex items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--accent)_0%,_transparent_50%)] opacity-20" />
-
-          <div className="container mx-auto px-6 py-16 relative z-10">
+          <div className="container mx-auto px-6 py-8 relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
@@ -519,7 +563,7 @@ function App() {
         </motion.section>
 
         {/* Game Rules */}
-        <section className="relative py-4">
+        <section className="relative py-14">
           <div className="container mx-auto px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -527,12 +571,8 @@ function App() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6">Játékszabályok</h2>
+              {/* <h2 className="text-4xl font-bold mb-6">Játékszabályok</h2> */}
             </motion.div>
-
-            <div className="max-w-4xl mx-auto mb-12">
-              <AudioPlayer src={gameRulesAudio} title="Hogyan játsszuk?" />
-            </div>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -540,168 +580,253 @@ function App() {
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
               className="max-w-4xl mx-auto">
-              <Card className="bg-card/30 border-border/30">
-                <CardContent className="p-8">
-                  <div className="space-y-6 text-card-foreground">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-primary">
-                        1. A játék kezdete
-                      </h3>
-                      <p className="leading-relaxed">
-                        A játékmester feltesz egy kvízkérdést a teljes
-                        csapatnak, melynek általában legalább egy tucat helyes
-                        megoldása van. Például: "Soroljatok fel olyan
-                        keresztneveket, amelyeket a történelem során magyar
-                        kormányfő viselt!"
-                      </p>
-                    </div>
+              <AudioPlayer src={gameRulesAudio} title="Hogyan játsszuk?" />
 
-                    <Separator className="bg-border/50" />
+              <Button
+                onClick={() => setIsRulesOpen(!isRulesOpen)}
+                className="w-full flex items-center justify-between text-sm font-medium py-2 h-auto mt-0 rounded-t-none border-t-0 bg-yellow-500/20 hover:bg-muted/50 text-foreground"
+                variant="ghost">
+                <span>Részletes szabályok</span>
+                <motion.div
+                  animate={{ rotate: isRulesOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}>
+                  {isRulesOpen ? (
+                    <CaretUp size={20} />
+                  ) : (
+                    <CaretDown size={20} />
+                  )}
+                </motion.div>
+              </Button>
 
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-primary">
-                        2. Játékosok válaszai
-                      </h3>
-                      <p className="leading-relaxed">
-                        A játékosoknak sorban haladva mondaniuk kell egy-egy
-                        lehetséges választ, amelyik szerintük helyes válasz
-                        lehet az adott kérdésre (például: "Ferenc"). A
-                        játékmester nem kommentálja az elhangzott válaszokat,
-                        mert nem az a lényeg, hogy a válasz jó-e vagy sem,
-                        hanem, hogy lesz-e aki lefüleli a blöfföt!
-                      </p>
-                    </div>
+              <AnimatePresence>
+                {isRulesOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="overflow-hidden">
+                    <Card className="bg-card/30 border-border/30 rounded-t-none border-t-0 mt-0">
+                      <CardContent className="p-8 pt-4">
+                        <div className="space-y-6 text-card-foreground">
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              1. A játék kezdete
+                            </h3>
+                            <p className="leading-relaxed">
+                              A játékmester feltesz egy kvízkérdést a teljes
+                              csapatnak, melynek általában legalább egy tucat
+                              helyes megoldása van. Például: "Soroljatok fel
+                              olyan keresztneveket, amelyeket a történelem során
+                              magyar kormányfő viselt!"
+                            </p>
+                          </div>
 
-                    <Separator className="bg-border/50" />
+                          <Separator className="bg-border/50" />
 
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-primary">
-                        3. A "Humbug!"
-                      </h3>
-                      <p className="leading-relaxed">
-                        Egy fordulónak akkor van vége, ha egy játékos
-                        megkérdőjelezi egy előtte megszólaló válaszát azzal,
-                        hogy hangosan „Humbug!” szót mond rá. A játékmester
-                        ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem.
-                      </p>
-                    </div>
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              2. Játékosok válaszai
+                            </h3>
+                            <p className="leading-relaxed">
+                              A játékosoknak sorban haladva mondaniuk kell
+                              egy-egy lehetséges választ, amelyik szerintük
+                              helyes válasz lehet az adott kérdésre (például:
+                              "Ferenc"). A játékmester nem kommentálja az
+                              elhangzott válaszokat, mert nem az a lényeg, hogy
+                              a válasz jó-e vagy sem, hanem, hogy lesz-e aki
+                              lefüleli a blöfföt!
+                            </p>
+                          </div>
 
-                    <Separator className="bg-border/50" />
+                          <Separator className="bg-border/50" />
 
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-primary">
-                        4. Győzelem és vereség
-                      </h3>
-                      <p className="leading-relaxed">
-                        Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha
-                        viszont rossz, akkor értelemszerűen az veszít, aki a
-                        hibás választ mondta. Ha helyes volt a blöff bemondása,
-                        akkor az azt bemondó játékos egy passzolási lehetőséggel
-                        is gazdagodik, amit később bármikor felhasználhat.
-                        Vagyis amikor rákerül a sor, mondhat passzt is, és
-                        átugorjuk a körét. A játékosok előzetes megegyezés
-                        alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki
-                        utoljára „életben marad”.
-                      </p>
-                    </div>
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              3. A "Humbug!"
+                            </h3>
+                            <p className="leading-relaxed">
+                              Egy fordulónak akkor van vége, ha egy játékos
+                              megkérdőjelezi egy előtte megszólaló válaszát
+                              azzal, hogy hangosan „Humbug!” szót mond rá. A
+                              játékmester ekkor ellenőrzi, hogy a kérdéses
+                              válasz jó-e vagy sem.
+                            </p>
+                          </div>
 
-                    <Separator className="bg-border/50" />
+                          <Separator className="bg-border/50" />
 
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-primary">
-                        5. Alternatív játékmód
-                      </h3>
-                      <p className="leading-relaxed">
-                        Játszható a játék úgy is, hogy egy adott forduló nem ér
-                        véget az első blöff bemondásánál. Ekkor a még aktív
-                        játékosok - azaz a megkérdőjelezett választ adó és a
-                        blöfföt behívó játékos kivételével mindenki - mennek
-                        tovább a második blöff bemondásáig. Ebben az esetben 2
-                        különböző játékos is életet veszít az adott körben.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              4. Győzelem és vereség
+                            </h3>
+                            <p className="leading-relaxed">
+                              Ha jó volt, a blöfföt hívó játékos veszít egy
+                              életet, ha viszont rossz, akkor értelemszerűen az
+                              veszít, aki a hibás választ mondta. Ha helyes volt
+                              a blöff bemondása, akkor az azt bemondó játékos
+                              egy passzolási lehetőséggel is gazdagodik, amit
+                              később bármikor felhasználhat. Vagyis amikor
+                              rákerül a sor, mondhat passzt is, és átugorjuk a
+                              körét. A játékosok előzetes megegyezés alapján 1,
+                              2 vagy 3 élettel indulnak. Az nyer, aki utoljára
+                              „életben marad”.
+                            </p>
+                          </div>
+
+                          <Separator className="bg-border/50" />
+
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              5. Alternatív játékmód
+                            </h3>
+                            <p className="leading-relaxed">
+                              Játszható a játék úgy is, hogy egy adott forduló
+                              nem ér véget az első blöff bemondásánál. Ekkor a
+                              még aktív játékosok - azaz a megkérdőjelezett
+                              választ adó és a blöfföt behívó játékos
+                              kivételével mindenki - mennek tovább a második
+                              blöff bemondásáig. Ebben az esetben 2 különböző
+                              játékos is életet veszít az adott körben.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         </section>
-      </div>
-      {/* End of Combined Hero + Game Rules Section */}
 
-      {/* Game Features */}
-      <section className="py-24 bg-gradient-to-b from-muted/50 to-background">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">Mi teszi különlegessé?</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a pszichológiai
-              taktikázással
-            </p>
-          </motion.div>
+        {/* Game Features */}
+        <section className="relative py-24">
+          <div className="container mx-auto px-6 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-6">
+                Mi teszi különlegessé?
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a
+                pszichológiai megtévesztés művészetével.
+              </p>
+            </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <Brain size={48} weight="fill" />,
-                title: "Tudás vs. Blöff",
-                description:
-                  "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod",
-              },
-              {
-                icon: <Users size={48} weight="fill" />,
-                title: "Társas Élmény",
-                description:
-                  "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is",
-              },
-              {
-                icon: <Target size={48} weight="fill" />,
-                title: "Stratégiai Mélység",
-                description:
-                  "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít",
-              },
-              {
-                icon: <Crown size={48} weight="fill" />,
-                title: "Egyszerű Szabályok",
-                description:
-                  "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}>
-                <Card className="h-full bg-card/50 border-border/50 hover:bg-card/80 transition-all duration-300 hover:scale-105">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-primary mb-4 flex justify-center">
-                      {feature.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold mb-3">
-                      {feature.title}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                {
+                  icon: <Brain size={48} weight="fill" />,
+                  title: "Tudás vs. Blöff",
+                  description:
+                    "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod",
+                },
+                {
+                  icon: <Users size={48} weight="fill" />,
+                  title: "Bárhányan és bárhol",
+                  description:
+                    "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is",
+                },
+                {
+                  icon: <Target size={48} weight="fill" />,
+                  title: "Taktikázz és nyerj",
+                  description:
+                    "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít",
+                },
+                {
+                  icon: <Crown size={48} weight="fill" />,
+                  title: "Könnyed és tartalmas",
+                  description:
+                    "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd",
+                },
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}>
+                  <Card className="h-full bg-card/50 border-border/50 hover:bg-card/80 transition-all duration-300 hover:scale-105">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-primary mb-4 flex justify-center">
+                        {feature.icon}
+                      </div>
+                      <h3 className="text-xl font-semibold mb-3">
+                        {feature.title}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {feature.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+      {/* End of Combined Hero + Game Rules + Features Section */}
 
       {/* Sample Questions */}
       <section
         id="questions-section"
-        className="py-24 bg-gradient-to-b from-background to-muted/50">
-        <div className="container mx-auto px-6">
+        className="py-24 bg-gradient-to-b from-background to-muted/50 relative overflow-hidden">
+        {/* Studio Light Effects */}
+        <motion.div
+          animate={{
+            background: [
+              "radial-gradient(circle at 10% 20%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
+              "radial-gradient(circle at 90% 30%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
+              "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
+              "radial-gradient(circle at 10% 20%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
+            ],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute inset-0 pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            background: [
+              "radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
+              "radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
+              "radial-gradient(circle at 70% 50%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
+              "radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
+            ],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="absolute inset-0 pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            background: [
+              "radial-gradient(circle at 50% 10%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
+              "radial-gradient(circle at 50% 90%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
+              "radial-gradient(circle at 50% 10%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
+            ],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute inset-0 pointer-events-none"
+        />
+        <div className="container mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -710,8 +835,9 @@ function App() {
             className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-6">Feladványok</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Böngéssz a kérdések között! Kattints a kártyákra a helyes válaszok
-              megtekintéséhez!
+              Böngéssz a kérdések között! Ha játékmester vagy, kattints a
+              kártyákra a helyes válaszok megtekintéséhez és jelöld be az
+              elhangzott helyes válaszokat.
             </p>
           </motion.div>
 

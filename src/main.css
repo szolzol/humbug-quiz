@@ -218,9 +218,9 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Mobile background positioning - shift image up more to hide text */
+/* Mobile background positioning - shift image down slightly to hide text */
 @media (max-width: 768px) {
   .hero-background {
-    background-position: center bottom !important;
+    background-position: center 60% !important;
   }
 }

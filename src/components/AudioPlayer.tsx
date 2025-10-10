@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
-import { Play, Pause, SpeakerHigh } from "@phosphor-icons/react";
+import {
+  Play,
+  Pause,
+  SpeakerHigh,
+  SpeakerX,
+  SpeakerLow,
+} from "@phosphor-icons/react";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +18,10 @@ export function AudioPlayer({ src, title }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -43,6 +52,52 @@ export function AudioPlayer({ src, title }: AudioPlayerProps) {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (progressRef.current && audioRef.current) {
+      const rect = progressRef.current.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = clickX / rect.width;
+      const newTime = percentage * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
+      setIsMuted(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current.volume = volume;
+        setIsMuted(false);
+      } else {
+        audioRef.current.volume = 0;
+        setIsMuted(true);
+      }
+    }
+  };
+
+  const getVolumeIcon = () => {
+    if (isMuted || volume === 0) {
+      return <SpeakerX size={20} weight="fill" />;
+    } else if (volume < 0.5) {
+      return <SpeakerLow size={20} weight="fill" />;
+    } else {
+      return <SpeakerHigh size={20} weight="fill" />;
+    }
+  };
+
   return (
     <motion.div
       className="bg-card border border-border rounded-xl p-6 shadow-lg"
@@ -62,17 +117,41 @@ export function AudioPlayer({ src, title }: AudioPlayerProps) {
         </Button>
 
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-card-foreground mb-2">
-            <SpeakerHigh className="inline mr-2" size={20} />
-            {title}
-          </h3>
+          {/* Title with inline volume control */}
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-lg font-semibold text-card-foreground">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={toggleMute}
+                className="text-muted-foreground hover:text-foreground transition-colors">
+                {getVolumeIcon()}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+                className="w-20 h-1 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+              />
+              <span className="text-xs text-muted-foreground w-8 text-right">
+                {Math.round((isMuted ? 0 : volume) * 100)}%
+              </span>
+            </div>
+          </div>
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
               {formatTime(currentTime)}
             </span>
 
-            <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+            <div
+              ref={progressRef}
+              className="flex-1 bg-muted rounded-full h-2 overflow-hidden cursor-pointer hover:h-3 transition-all"
+              onClick={handleProgressClick}>
               <div
                 className="bg-primary h-full transition-all duration-150"
                 style={{

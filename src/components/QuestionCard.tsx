@@ -35,11 +35,12 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
   // Determine number of columns based on answer count
   const answerCount = question.answers.length;
-  const columns = answerCount > 15 ? 3 : answerCount > 8 ? 2 : 1;
+  const columns =
+    answerCount > 20 ? 4 : answerCount > 12 ? 3 : answerCount > 6 ? 2 : 1;
 
   return (
     <motion.div
-      className="relative w-full aspect-[9/16] md:aspect-video perspective-1000"
+      className="relative w-full aspect-[9/16] md:aspect-[4/3] perspective-1000"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -59,7 +60,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               {question.question}
             </h3>
             <div className="mt-5 md:mt-6 text-primary-foreground/60 !text-base md:!text-lg">
-              Kattints a válaszokért!
+              Nyomj rá a helyes válaszokért!
             </div>
           </CardContent>
         </Card>
@@ -68,20 +69,22 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
         <Card className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden">
           <CardContent className="flex flex-col h-full p-3 md:p-4">
             <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
-              Lehetséges válaszok
+              Helyes válaszok
             </div>
             <div
               className={`flex-1 overflow-y-auto pr-1 grid ${
-                columns === 3
-                  ? "grid-cols-3"
+                columns === 4
+                  ? "grid-cols-2 md:grid-cols-4"
+                  : columns === 3
+                  ? "grid-cols-2 md:grid-cols-3"
                   : columns === 2
-                  ? "grid-cols-2"
+                  ? "grid-cols-1 md:grid-cols-2"
                   : "grid-cols-1"
               } gap-1.5 md:gap-2 scrollbar-thin scrollbar-thumb-secondary-foreground/20 scrollbar-track-transparent`}>
               {question.answers.map((answer, answerIndex) => (
                 <motion.div
                   key={answerIndex}
-                  className={`rounded-md px-2 md:px-3 py-2 md:py-2.5 text-center text-sm md:text-xs cursor-pointer transition-all duration-200 ${
+                  className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 ${
                     selectedAnswers.has(answerIndex)
                       ? "bg-green-500/30 border border-green-500/50"
                       : "bg-secondary-foreground/10 hover:bg-secondary-foreground/20"
@@ -97,7 +100,8 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               ))}
             </div>
             <div className="mt-2 text-secondary-foreground/60 text-[10px] md:text-xs text-center leading-tight">
-              Kattints a válaszokra • Kártyára kattintva vissza a kérdéshez
+              Kattints a válaszokra, hogy jelöld a már elhangzott helyes
+              válaszokat
             </div>
           </CardContent>
         </Card>

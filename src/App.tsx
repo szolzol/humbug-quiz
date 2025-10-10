@@ -495,7 +495,7 @@ function App() {
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
                 className="text-xl md:text-3xl font-bold text-foreground/90 mb-6 tracking-wide">
-                FAKE IT TILL YOU WIN IT
+                FAKE IT TILL YOU WIN IT!
               </motion.p>
 
               <motion.p
@@ -506,8 +506,8 @@ function App() {
                   delay: 0.9,
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
-                className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-                Egy kvízes partyjáték, ahol a tudás, a bátorság és a
+                className="text-lg md:text-xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed">
+                Egy új, kvízes partyjáték, ahol a tudás, a bátorság és a
                 megtévesztés találkozik!
               </motion.p>
 
@@ -527,7 +527,7 @@ function App() {
                       .getElementById("questions-section")
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}>
-                  <Play className="mr-2" size={24} weight="fill" />
+                  <CaretDown className="mr-2" size={24} weight="fill" />
                   Kezdjük a játékot!
                 </Button>
               </motion.div>
@@ -611,14 +611,15 @@ function App() {
                         <div className="space-y-6 text-card-foreground">
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              1. A játék kezdete
+                              1. Előkészületek
                             </h3>
                             <p className="leading-relaxed">
-                              A játékmester feltesz egy kvízkérdést a teljes
-                              csapatnak, melynek általában legalább egy tucat
-                              helyes megoldása van. Például: "Soroljatok fel
-                              olyan keresztneveket, amelyeket a történelem során
-                              magyar kormányfő viselt!"
+                              A játék semmilyen kiegészítőt, előkészületet nem
+                              igényel, egyedül a játékmesternek van szüksége a
+                              telefonjára, hogy felolvassa a kérdéseket és
+                              ellenőrizze a válaszokat. A játékosok száma 3 és 8
+                              fő között lehet, de akár többen is játszhatják, ha
+                              van elég hely és idő.
                             </p>
                           </div>
 
@@ -626,11 +627,17 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              2. Játékosok válaszai
+                              2. A játék menete
                             </h3>
                             <p className="leading-relaxed">
-                              A játékosoknak sorban haladva mondaniuk kell
-                              egy-egy lehetséges választ, amelyik szerintük
+                              A játék menete körökre oszlik, minden kör egy
+                              kérdésből áll. A játékmester feltesz egy
+                              kvízkérdést a teljes csapatnak, melynek általában
+                              legalább egy tucat helyes megoldása van. Például:
+                              "Soroljatok fel olyan keresztneveket, amelyeket a
+                              történelem során magyar kormányfő viselt! <br />{" "}
+                              <br /> A játékosoknak sorban haladva mondaniuk
+                              kell egy-egy lehetséges választ, amelyik szerintük
                               helyes válasz lehet az adott kérdésre (például:
                               "Ferenc"). A játékmester nem kommentálja az
                               elhangzott válaszokat, mert nem az a lényeg, hogy
@@ -643,24 +650,14 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              3. A "Humbug!"
+                              3. A "Humbug!" és a pontozás
                             </h3>
                             <p className="leading-relaxed">
                               Egy fordulónak akkor van vége, ha egy játékos
                               megkérdőjelezi egy előtte megszólaló válaszát
                               azzal, hogy hangosan „Humbug!” szót mond rá. A
                               játékmester ekkor ellenőrzi, hogy a kérdéses
-                              válasz jó-e vagy sem.
-                            </p>
-                          </div>
-
-                          <Separator className="bg-border/50" />
-
-                          <div>
-                            <h3 className="text-xl font-semibold mb-3 text-primary">
-                              4. Győzelem és vereség
-                            </h3>
-                            <p className="leading-relaxed">
+                              válasz jó-e vagy sem. <br /> <br />
                               Ha jó volt, a blöfföt hívó játékos veszít egy
                               életet, ha viszont rossz, akkor értelemszerűen az
                               veszít, aki a hibás választ mondta. Ha helyes volt
@@ -669,8 +666,9 @@ function App() {
                               később bármikor felhasználhat. Vagyis amikor
                               rákerül a sor, mondhat passzt is, és átugorjuk a
                               körét. A játékosok előzetes megegyezés alapján 1,
-                              2 vagy 3 élettel indulnak. Az nyer, aki utoljára
-                              „életben marad”.
+                              2 vagy 3 élettel indulnak. <br />
+                              <br />
+                              Az nyer, aki utoljára „életben marad”.
                             </p>
                           </div>
 
@@ -678,7 +676,7 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              5. Alternatív játékmód
+                              4. Alternatív játékmód
                             </h3>
                             <p className="leading-relaxed">
                               Játszható a játék úgy is, hogy egy adott forduló
@@ -714,7 +712,8 @@ function App() {
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                 A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a
-                pszichológiai megtévesztés művészetével.
+                pszichológiai megtévesztés művészetével. Játszhatod kicsi vagy
+                nagy társaságban, bárhol és bármikor!
               </p>
             </motion.div>
 
@@ -730,19 +729,19 @@ function App() {
                   icon: <Users size={48} weight="fill" />,
                   title: "Bárhányan és bárhol",
                   description:
-                    "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is",
+                    "3-8 játékos számára tervezve, akár utazás közben is, mivel nincs szükség semmilyen kiegészítőre",
                 },
                 {
-                  icon: <Target size={48} weight="fill" />,
+                  icon: <Crown size={48} weight="fill" />,
                   title: "Taktikázz és nyerj",
                   description:
                     "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít",
                 },
                 {
-                  icon: <Crown size={48} weight="fill" />,
+                  icon: <Target size={48} weight="fill" />,
                   title: "Könnyed és tartalmas",
                   description:
-                    "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd",
+                    "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy órákig játszd",
                 },
               ].map((feature, index) => (
                 <motion.div

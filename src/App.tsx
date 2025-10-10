@@ -519,7 +519,7 @@ function App() {
         </motion.section>
 
         {/* Game Rules */}
-        <section className="relative py-24">
+        <section className="relative py-4">
           <div className="container mx-auto px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -528,16 +528,10 @@ function App() {
               viewport={{ once: true }}
               className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-6">Játékszabályok</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Hallgasd meg a szabályokat, vagy olvasd el lentebb
-              </p>
             </motion.div>
 
             <div className="max-w-4xl mx-auto mb-12">
-              <AudioPlayer
-                src={gameRulesAudio}
-                title="HUMBUG! Játékszabályok"
-              />
+              <AudioPlayer src={gameRulesAudio} title="Hogyan játsszuk?" />
             </div>
 
             <motion.div
@@ -742,9 +736,6 @@ function App() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}>
             <h3 className="text-2xl font-bold mb-4 text-primary">HUMBUG!</h3>
-            <p className="text-muted-foreground mb-4">
-              Kísérleti kvízes partyjáték - Fake it till you win it
-            </p>
             <p className="text-sm text-muted-foreground mb-2">
               Készítette:{" "}
               <span className="font-semibold">Szoleczki Zoltán</span> és{" "}

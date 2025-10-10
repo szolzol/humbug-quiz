@@ -218,9 +218,11 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Mobile background positioning - shift image down slightly to hide text */
+/* Mobile background positioning - shift image upward to show people/table */
 @media (max-width: 768px) {
   .hero-background {
-    background-position: center 60% !important;
+    background-position: center 0% !important;
+    background-attachment: scroll !important;
+    background-size: 150% auto !important;
   }
 }

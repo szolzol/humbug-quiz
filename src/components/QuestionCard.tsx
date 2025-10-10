@@ -51,8 +51,20 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
         transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
         onClick={() => setIsFlipped(!isFlipped)}>
         {/* Front of card */}
-        <Card className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl">
-          <CardContent className="flex flex-col justify-center items-center h-full p-4 md:p-6 text-center">
+        <Card className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden">
+          {/* Diagonal HUMBUG! Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <div
+              className="text-primary-foreground/[0.07] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
+              style={{
+                transform: "rotate(-45deg)",
+                fontFamily: "Poppins, sans-serif",
+              }}>
+              HUMBUG!
+            </div>
+          </div>
+
+          <CardContent className="flex flex-col justify-center items-center h-full p-4 md:p-6 text-center relative z-10">
             <div className="text-primary-foreground/80 !text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide">
               {question.category}
             </div>
@@ -67,7 +79,19 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
         {/* Back of card */}
         <Card className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden">
-          <CardContent className="flex flex-col h-full p-3 md:p-4">
+          {/* Diagonal HUMBUG! Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <div
+              className="text-secondary-foreground/[0.05] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
+              style={{
+                transform: "rotate(-45deg)",
+                fontFamily: "Poppins, sans-serif",
+              }}>
+              HUMBUG!
+            </div>
+          </div>
+
+          <CardContent className="flex flex-col h-full p-3 md:p-4 relative z-10">
             <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
               Helyes válaszok
             </div>

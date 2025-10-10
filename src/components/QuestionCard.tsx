@@ -52,13 +52,13 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
         {/* Front of card */}
         <Card className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl">
           <CardContent className="flex flex-col justify-center items-center h-full p-4 md:p-6 text-center">
-            <div className="text-primary-foreground/80 text-sm md:text-base font-semibold mb-2 md:mb-3 uppercase tracking-wide">
+            <div className="text-primary-foreground/80 !text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide">
               {question.category}
             </div>
-            <h3 className="text-primary-foreground font-bold text-lg md:text-xl leading-tight px-2 md:px-4">
+            <h3 className="text-primary-foreground font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4">
               {question.question}
             </h3>
-            <div className="mt-4 md:mt-6 text-primary-foreground/60 text-sm md:text-base">
+            <div className="mt-5 md:mt-6 text-primary-foreground/60 !text-base md:!text-lg">
               Kattints a válaszokért!
             </div>
           </CardContent>
@@ -67,7 +67,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
         {/* Back of card */}
         <Card className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden">
           <CardContent className="flex flex-col h-full p-3 md:p-4">
-            <div className="text-secondary-foreground/80 text-xs md:text-sm font-medium mb-2 uppercase tracking-wide text-center">
+            <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
               Lehetséges válaszok
             </div>
             <div

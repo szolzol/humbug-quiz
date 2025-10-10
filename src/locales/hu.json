@@ -1,0 +1,458 @@
+{
+    "hero": {
+        "title": "HUMBUG!",
+        "subtitle": "FAKE IT TILL YOU WIN IT",
+        "description": "Egy kvízes partyjáték, ahol a tudás, a bátorság és a megtévesztés találkozik!",
+        "ctaButton": "Kezdjük a játékot!"
+    },
+    "rules": {
+        "audioTitle": "Hogyan játsszuk?",
+        "detailedRules": "Részletes szabályok",
+        "section1": {
+            "title": "1. A játék kezdete",
+            "content": "A játékmester feltesz egy kvízkérdést a teljes csapatnak, melynek általában legalább egy tucat helyes megoldása van. Például: \"Soroljatok fel olyan keresztneveket, amelyeket a történelem során magyar kormányfő viselt!\""
+        },
+        "section2": {
+            "title": "2. Játékosok válaszai",
+            "content": "A játékosoknak sorban haladva mondaniuk kell egy-egy lehetséges választ, amelyik szerintük helyes válasz lehet az adott kérdésre (például: \"Ferenc\"). A játékmester nem kommentálja az elhangzott válaszokat, mert nem az a lényeg, hogy a válasz jó-e vagy sem, hanem, hogy lesz-e aki lefüleli a blöfföt!"
+        },
+        "section3": {
+            "title": "3. A \"Humbug!\"",
+            "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \\\"Humbug!\\\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
+        },
+        "section4": {
+            "title": "4. Győzelem és vereség",
+            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \\\"életben marad\\\"."
+        },
+        "section5": {
+            "title": "5. Alternatív játékmód",
+            "content": "Játszható a játék úgy is, hogy egy adott forduló nem ér véget az első blöff bemondásánál. Ekkor a még aktív játékosok - azaz a megkérdőjelezett választ adó és a blöfföt behívó játékos kivételével mindenki - mennek tovább a második blöff bemondásáig. Ebben az esetben 2 különböző játékos is életet veszít az adott körben."
+        }
+    },
+    "features": {
+        "title": "Mi teszi különlegessé?",
+        "subtitle": "A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a pszichológiai megtévesztés művészetével.",
+        "feature1": {
+            "title": "Tudás vs. Blöff",
+            "description": "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod"
+        },
+        "feature2": {
+            "title": "Bárhányan és bárhol",
+            "description": "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is"
+        },
+        "feature3": {
+            "title": "Taktikázz és nyerj",
+            "description": "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít"
+        },
+        "feature4": {
+            "title": "Könnyed és tartalmas",
+            "description": "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd"
+        }
+    },
+    "questions": {
+        "title": "Feladványok",
+        "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a helyes válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
+        "flipCard": "Nyomj rá a helyes válaszokért!",
+        "totalAnswers": "Összesen {{count}} helyes válasz",
+        "correctAnswers": "Helyes válaszok",
+        "clickToMark": "Kattints a válaszokra a jelöléshez"
+    },
+    "footer": {
+        "title": "HUMBUG!",
+        "creators": "Készítette: <strong>Szoleczki Zoltán</strong> és <strong>Beró Zsolt</strong>",
+        "copyright": "© 2025 HUMBUG! Minden jog fenntartva."
+    },
+    "categories": {
+        "tourism": "Turizmus",
+        "socialMedia": "Közösségi média",
+        "literature": "Irodalom",
+        "videoGames": "Videójátékok",
+        "carBrands": "Autómárkák",
+        "airports": "Repülőterek",
+        "movies": "Filmek",
+        "football": "Futball",
+        "music": "Zene",
+        "names": "Keresztnevek",
+        "gastronomy": "Gasztronómia",
+        "technology": "Technológia",
+        "marvel": "Marvel",
+        "television": "Televízió",
+        "history": "Történelem"
+    },
+    "allQuestions": [
+        {
+            "id": "1",
+            "category": "tourism",
+            "question": "Melyek a legkedveltebb hazai turisztikai úticélok a magyarok körében, a belföldi vendégéjszakák száma alapján?",
+            "answers": [
+                "Budapest",
+                "Siófok",
+                "Balatonfüred",
+                "Hajdúszoboszló",
+                "Zalakaros",
+                "Hévíz",
+                "Gyula",
+                "Eger",
+                "Miskolc",
+                "Bük",
+                "Szeged",
+                "Nyíregyháza",
+                "Sárvár",
+                "Debrecen",
+                "Győr"
+            ]
+        },
+        {
+            "id": "2",
+            "category": "socialMedia",
+            "question": "Mely hírességek oldalai találhatóak meg az Instagram 15 legtöbb követővel rendelkező oldala között?",
+            "answers": [
+                "Cristiano Ronaldo",
+                "Lionel Messi",
+                "Selena Gomez",
+                "Kylie Jenner",
+                "Dwayne Johnson",
+                "Ariana Grande",
+                "Kim Kardashian",
+                "Beyoncé",
+                "Khloé Kardashian",
+                "Kendall Jenner",
+                "Justin Bieber",
+                "Taylor Swift"
+            ]
+        },
+        {
+            "id": "3",
+            "category": "literature",
+            "question": "Nevezzetek meg olyan szerzőket, akiknek legalább egy művük szerepel a jelenleg érvényes Nemzeti Alaptantervben felsorolt kötelező olvasmányok közt!",
+            "answers": [
+                "Petőfi Sándor",
+                "Molnár Ferenc",
+                "Arany János",
+                "Gárdonyi Géza",
+                "Jókai Mór",
+                "Mikszáth Kálmán",
+                "Móricz Zsigmond",
+                "William Shakespeare",
+                "Molière",
+                "Szabó Magda",
+                "Homérosz",
+                "Szophoklész",
+                "Dante Alighieri",
+                "François Villon",
+                "Boccaccio",
+                "Zrínyi Miklós",
+                "Mikes Kelemen",
+                "Katona József",
+                "Vörösmarty Mihály",
+                "Honoré de Balzac",
+                "Stendhal",
+                "Henrik Ibsen",
+                "Anton Pavlovics Csehov",
+                "Lev Nyikolajevics Tolsztoj",
+                "Samuel B. Beckett",
+                "Friedrich Dürrenmatt",
+                "Madách Imre",
+                "Herczeg Ferenc",
+                "Babits Mihály",
+                "Wass Albert",
+                "Örkény István"
+            ]
+        },
+        {
+            "id": "4",
+            "category": "videoGames",
+            "question": "Nevezzetek meg olyan videójáték-franchiseokat, amelyekből legalább 100 millió példányt adtak el a világon!",
+            "answers": [
+                "Mario",
+                "Tetris",
+                "Pokémon",
+                "Call of Duty",
+                "Grand Theft Auto",
+                "FIFA",
+                "Minecraft",
+                "Wii",
+                "Lego",
+                "The Sims",
+                "Assassin's Creed",
+                "Final Fantasy",
+                "Sonic the Hedgehog",
+                "The Legend of Zelda",
+                "Need for Speed",
+                "Resident Evil",
+                "Madden NFL",
+                "NBA 2K",
+                "Star Wars",
+                "Pro Evolution Soccer"
+            ]
+        },
+        {
+            "id": "5",
+            "category": "carBrands",
+            "question": "Melyik a 10 leggyakoribb autómárka Magyarországon útjain?",
+            "answers": [
+                "Opel",
+                "Suzuki",
+                "Volkswagen",
+                "Ford",
+                "Toyota",
+                "Skoda",
+                "Renault",
+                "Peugeot",
+                "BMW",
+                "Mercedes",
+                "Audi",
+                "Fiat",
+                "Citroen",
+                "Honda",
+                "KIA"
+            ]
+        },
+        {
+            "id": "6",
+            "category": "airports",
+            "question": "Melyek azok a városok, amelyeknek legalább 1 reptere szerepel Európa 15 legforgalmasabb repülőtere között?",
+            "answers": [
+                "London",
+                "Isztanbul",
+                "Párizs",
+                "Amszterdam",
+                "Madrid",
+                "Frankfurt",
+                "Barcelona",
+                "Róma",
+                "München",
+                "Moszkva",
+                "Lisszabon",
+                "Palma de Mallorca",
+                "Dublin"
+            ]
+        },
+        {
+            "id": "7",
+            "category": "movies",
+            "question": "Nevezzetek meg filmeket, amelyeknek legalább 8,7-es értékelésük van IMDb-n!",
+            "answers": [
+                "A remény rabjai",
+                "A keresztapa",
+                "A sötét lovag",
+                "A keresztapa II",
+                "Tizenkét dühös ember",
+                "Schindler listája",
+                "A Gyűrűk Ura: A király visszatér",
+                "Ponyvaregény",
+                "A Gyűrűk Ura: A gyűrű szövetsége",
+                "A Jó, a Rossz és a Csúf",
+                "Forrest Gump",
+                "Harcosok klubja",
+                "A Gyűrűk Ura: A két torony",
+                "Eredet",
+                "A Birodalom visszavág",
+                "Mátrix",
+                "Nagymenők",
+                "Száll a kakukk fészkére",
+                "Csillagok között",
+                "Hetedik"
+            ]
+        },
+        {
+            "id": "8",
+            "category": "football",
+            "question": "A Bajnokok Ligája indulása óta (1992) melyik 10 klubcsapat szerzett a legtöbb pontot a sorozatban?",
+            "answers": [
+                "Real Madrid",
+                "Bayern München",
+                "Barcelona",
+                "Manchester United",
+                "Juventus",
+                "Milan",
+                "Liverpool",
+                "Porto",
+                "Benfica",
+                "Chelsea",
+                "Ajax",
+                "Inter",
+                "Arsenal",
+                "Atletico Madrid",
+                "Dortmund"
+            ]
+        },
+        {
+            "id": "9",
+            "category": "music",
+            "question": "Soroljatok fel zenei előadókat, akik karrierjük során legalább 200 millió lemezt adtak el!",
+            "answers": [
+                "The Beatles",
+                "Elvis Presley",
+                "Michael Jackson",
+                "Elton John",
+                "Queen",
+                "Madonna",
+                "Led Zeppelin",
+                "Rihanna",
+                "Pink Floyd",
+                "Eminem",
+                "Mariah Carey",
+                "Taylor Swift",
+                "Beyoncé",
+                "Whitney Houston",
+                "Eagles",
+                "Céline Dion",
+                "AC/DC",
+                "The Rolling Stones"
+            ]
+        },
+        {
+            "id": "10",
+            "category": "names",
+            "question": "Melyik a 15 leggyakoribb női keresztnév Magyarországon a teljes népesség körében?",
+            "answers": [
+                "Mária",
+                "Erzsébet",
+                "Katalin",
+                "Éva",
+                "Ilona",
+                "Anna",
+                "Zsuzsanna",
+                "Margit",
+                "Andrea",
+                "Judit",
+                "Ágnes",
+                "Ildikó",
+                "Erika",
+                "Julianna",
+                "Krisztina"
+            ]
+        },
+        {
+            "id": "11",
+            "category": "gastronomy",
+            "question": "Milyen hozzávalókat tartalmazott Dalnoki Bence nyertes Bocuse d'Or halászlé receptje?",
+            "answers": [
+                "ponty",
+                "víz",
+                "vöröshagyma",
+                "fokhagyma",
+                "paradicsom",
+                "hegyes erős paprika",
+                "fehérbor",
+                "édes fűszerpaprika",
+                "csípős fűszerpaprika",
+                "tésztaliszt",
+                "durumliszt",
+                "tojássárgája",
+                "tojásfehérje",
+                "olívaolaj",
+                "só",
+                "ecet",
+                "tej",
+                "ikra",
+                "tejföl",
+                "bors",
+                "salotta hagyma",
+                "savanyított almapaprika",
+                "capri gyümölcs",
+                "snidling",
+                "marokkói citrom"
+            ]
+        },
+        {
+            "id": "12",
+            "category": "technology",
+            "question": "Melyik volt az okostelefonokra legtöbbször letöltött 10 alkalmazás 2023-ban, globálisan?",
+            "answers": [
+                "TikTok",
+                "Instagram",
+                "Facebook",
+                "WhatsApp",
+                "CapCut",
+                "Snapchat",
+                "Telegram",
+                "Facebook Messenger",
+                "WhatsApp Business",
+                "Spotify"
+            ]
+        },
+        {
+            "id": "13",
+            "category": "marvel",
+            "question": "Melyek azok a Marvel-karakterek, amelyek legalább 7 Marvel Cinematic Universe-filmben feltűntek?",
+            "answers": [
+                "Winter Soldier",
+                "Bucky Barnes",
+                "Black Widow",
+                "Pepper Potts",
+                "J.A.R.V.I.S.",
+                "Vision",
+                "James Rhodes",
+                "War Machine",
+                "Thor",
+                "Steve Rogers",
+                "Captain America",
+                "Nick Fury",
+                "Tony Stark",
+                "Iron Man"
+            ]
+        },
+        {
+            "id": "14",
+            "category": "television",
+            "question": "Soroljatok fel tévésorozatokat vagy talk show-kat, amelyek történetük során több mint 20 Emmy-díjat kaptak!",
+            "answers": [
+                "Gengszterkorzó",
+                "A káprázatos Mrs. Maisel",
+                "24",
+                "New York rendőrei",
+                "A korona",
+                "Maffiózók",
+                "All in the Family",
+                "Modern család",
+                "Vészhelyzet",
+                "The Carol Burnett Show",
+                "The Daily Show",
+                "RuPaul",
+                "John Oliver-show",
+                "Az elnök emberei",
+                "Külvárosi Körzet",
+                "American Masters",
+                "Cheers",
+                "Mary Tyler Moore",
+                "A Simpson család",
+                "Frasier",
+                "Trónok harca",
+                "Saturday Night Live"
+            ]
+        },
+        {
+            "id": "15",
+            "category": "history",
+            "question": "Soroljatok fel keresztneveket, amelyeket a történelem során legalább 1 magyar kormányfő viselt!",
+            "answers": [
+                "István",
+                "Gyula",
+                "Sándor",
+                "Dénes",
+                "Pál",
+                "Károly",
+                "Miklós",
+                "László",
+                "Imre",
+                "András",
+                "Ferenc",
+                "József",
+                "János",
+                "Kálmán",
+                "Béla",
+                "Frigyes",
+                "Géza",
+                "Lajos",
+                "Viktor",
+                "Tibor",
+                "Jenő",
+                "Péter",
+                "Mihály",
+                "Gyula"
+            ]
+        }
+    ]
+}

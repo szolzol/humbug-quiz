@@ -1,0 +1,458 @@
+{
+    "hero": {
+        "title": "HUMBUG!",
+        "subtitle": "FAKE IT TILL YOU WIN IT",
+        "description": "A quiz party game where knowledge, courage, and deception collide!",
+        "ctaButton": "Let's Start Playing!"
+    },
+    "rules": {
+        "audioTitle": "How to Play?",
+        "detailedRules": "Detailed Rules",
+        "section1": {
+            "title": "1. Starting the Game",
+            "content": "The game master asks a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \\\"Name first names that have been held by Hungarian prime ministers throughout history!\\\""
+        },
+        "section2": {
+            "title": "2. Players' Answers",
+            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \\\"Ferenc\\\"). The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the bluff!"
+        },
+        "section3": {
+            "title": "3. The \\\"Humbug!\\\"",
+            "content": "A round ends when a player challenges the answer of the person before them by loudly saying \\\"Humbug!\\\" The game master then checks whether the questioned answer is correct or not."
+        },
+        "section4": {
+            "title": "4. Victory and Defeat",
+            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \\\"alive\\\" last."
+        },
+        "section5": {
+            "title": "5. Alternative Game Mode",
+            "content": "The game can also be played so that a round does not end at the first bluff call. In this case, the still active players - meaning everyone except the player who gave the challenged answer and the player who called the bluff - continue until the second bluff call. In this case, 2 different players lose a life in that round."
+        }
+    },
+    "features": {
+        "title": "What Makes It Special?",
+        "subtitle": "HUMBUG combines the excitement of classic quiz games with the art of psychological deception.",
+        "feature1": {
+            "title": "Knowledge vs. Bluff",
+            "description": "It's not just about what you know, but also whether you can expose others' bluffs and keep your poker face"
+        },
+        "feature2": {
+            "title": "Any Number, Anywhere",
+            "description": "Designed for 3-8 players, perfect for friendly gatherings, even while traveling"
+        },
+        "feature3": {
+            "title": "Strategize and Win",
+            "description": "Decide when to bluff, when to call someone out, and when to pass; every point counts"
+        },
+        "feature4": {
+            "title": "Simple Yet Deep",
+            "description": "Learnable in 5 minutes, but deep enough to play again and again"
+        }
+    },
+    "questions": {
+        "title": "Quiz Questions",
+        "subtitle": "Browse through the questions! If you're the game master, click on the cards to view the correct answers and mark the correct answers that have been given.",
+        "flipCard": "Click for correct answers!",
+        "totalAnswers": "Total of {{count}} correct answers",
+        "correctAnswers": "Correct Answers",
+        "clickToMark": "Click on answers to mark them"
+    },
+    "footer": {
+        "title": "HUMBUG!",
+        "creators": "Created by <strong>Zoltán Szoleczki</strong> and <strong>Zsolt Beró</strong>",
+        "copyright": "© 2025 HUMBUG! All rights reserved."
+    },
+    "categories": {
+        "tourism": "Tourism",
+        "socialMedia": "Social Media",
+        "literature": "Literature",
+        "videoGames": "Video Games",
+        "carBrands": "Car Brands",
+        "airports": "Airports",
+        "movies": "Movies",
+        "football": "Football",
+        "music": "Music",
+        "names": "First Names",
+        "gastronomy": "Gastronomy",
+        "technology": "Technology",
+        "marvel": "Marvel",
+        "television": "Television",
+        "history": "History"
+    },
+    "allQuestions": [
+        {
+            "id": "1",
+            "category": "tourism",
+            "question": "What are the most popular domestic tourist destinations among Hungarians, based on the number of domestic guest nights?",
+            "answers": [
+                "Budapest",
+                "Siófok",
+                "Balatonfüred",
+                "Hajdúszoboszló",
+                "Zalakaros",
+                "Hévíz",
+                "Gyula",
+                "Eger",
+                "Miskolc",
+                "Bük",
+                "Szeged",
+                "Nyíregyháza",
+                "Sárvár",
+                "Debrecen",
+                "Győr"
+            ]
+        },
+        {
+            "id": "2",
+            "category": "socialMedia",
+            "question": "Which celebrities' pages are among Instagram's top 15 accounts with the most followers?",
+            "answers": [
+                "Cristiano Ronaldo",
+                "Lionel Messi",
+                "Selena Gomez",
+                "Kylie Jenner",
+                "Dwayne Johnson",
+                "Ariana Grande",
+                "Kim Kardashian",
+                "Beyoncé",
+                "Khloé Kardashian",
+                "Kendall Jenner",
+                "Justin Bieber",
+                "Taylor Swift"
+            ]
+        },
+        {
+            "id": "3",
+            "category": "literature",
+            "question": "Name authors who have at least one work listed in the currently valid National Core Curriculum's required reading list!",
+            "answers": [
+                "Sándor Petőfi",
+                "Ferenc Molnár",
+                "János Arany",
+                "Géza Gárdonyi",
+                "Mór Jókai",
+                "Kálmán Mikszáth",
+                "Zsigmond Móricz",
+                "William Shakespeare",
+                "Molière",
+                "Magda Szabó",
+                "Homer",
+                "Sophocles",
+                "Dante Alighieri",
+                "François Villon",
+                "Boccaccio",
+                "Miklós Zrínyi",
+                "Kelemen Mikes",
+                "József Katona",
+                "Mihály Vörösmarty",
+                "Honoré de Balzac",
+                "Stendhal",
+                "Henrik Ibsen",
+                "Anton Chekhov",
+                "Leo Tolstoy",
+                "Samuel B. Beckett",
+                "Friedrich Dürrenmatt",
+                "Imre Madách",
+                "Ferenc Herczeg",
+                "Mihály Babits",
+                "Albert Wass",
+                "István Örkény"
+            ]
+        },
+        {
+            "id": "4",
+            "category": "videoGames",
+            "question": "Name video game franchises that have sold at least 100 million copies worldwide!",
+            "answers": [
+                "Mario",
+                "Tetris",
+                "Pokémon",
+                "Call of Duty",
+                "Grand Theft Auto",
+                "FIFA",
+                "Minecraft",
+                "Wii",
+                "Lego",
+                "The Sims",
+                "Assassin's Creed",
+                "Final Fantasy",
+                "Sonic the Hedgehog",
+                "The Legend of Zelda",
+                "Need for Speed",
+                "Resident Evil",
+                "Madden NFL",
+                "NBA 2K",
+                "Star Wars",
+                "Pro Evolution Soccer"
+            ]
+        },
+        {
+            "id": "5",
+            "category": "carBrands",
+            "question": "What are the 10 most common car brands on Hungarian roads?",
+            "answers": [
+                "Opel",
+                "Suzuki",
+                "Volkswagen",
+                "Ford",
+                "Toyota",
+                "Skoda",
+                "Renault",
+                "Peugeot",
+                "BMW",
+                "Mercedes",
+                "Audi",
+                "Fiat",
+                "Citroen",
+                "Honda",
+                "KIA"
+            ]
+        },
+        {
+            "id": "6",
+            "category": "airports",
+            "question": "Which cities have at least one airport among Europe's 15 busiest airports?",
+            "answers": [
+                "London",
+                "Istanbul",
+                "Paris",
+                "Amsterdam",
+                "Madrid",
+                "Frankfurt",
+                "Barcelona",
+                "Rome",
+                "Munich",
+                "Moscow",
+                "Lisbon",
+                "Palma de Mallorca",
+                "Dublin"
+            ]
+        },
+        {
+            "id": "7",
+            "category": "movies",
+            "question": "Name movies that have at least an 8.7 rating on IMDb!",
+            "answers": [
+                "The Shawshank Redemption",
+                "The Godfather",
+                "The Dark Knight",
+                "The Godfather Part II",
+                "12 Angry Men",
+                "Schindler's List",
+                "The Lord of the Rings: The Return of the King",
+                "Pulp Fiction",
+                "The Lord of the Rings: The Fellowship of the Ring",
+                "The Good, the Bad and the Ugly",
+                "Forrest Gump",
+                "Fight Club",
+                "The Lord of the Rings: The Two Towers",
+                "Inception",
+                "The Empire Strikes Back",
+                "The Matrix",
+                "Goodfellas",
+                "One Flew Over the Cuckoo's Nest",
+                "Interstellar",
+                "Se7en"
+            ]
+        },
+        {
+            "id": "8",
+            "category": "football",
+            "question": "Since the start of the Champions League (1992), which 10 club teams have earned the most points in the competition?",
+            "answers": [
+                "Real Madrid",
+                "Bayern Munich",
+                "Barcelona",
+                "Manchester United",
+                "Juventus",
+                "Milan",
+                "Liverpool",
+                "Porto",
+                "Benfica",
+                "Chelsea",
+                "Ajax",
+                "Inter",
+                "Arsenal",
+                "Atletico Madrid",
+                "Dortmund"
+            ]
+        },
+        {
+            "id": "9",
+            "category": "music",
+            "question": "Name musical artists who have sold at least 200 million records during their career!",
+            "answers": [
+                "The Beatles",
+                "Elvis Presley",
+                "Michael Jackson",
+                "Elton John",
+                "Queen",
+                "Madonna",
+                "Led Zeppelin",
+                "Rihanna",
+                "Pink Floyd",
+                "Eminem",
+                "Mariah Carey",
+                "Taylor Swift",
+                "Beyoncé",
+                "Whitney Houston",
+                "Eagles",
+                "Céline Dion",
+                "AC/DC",
+                "The Rolling Stones"
+            ]
+        },
+        {
+            "id": "10",
+            "category": "names",
+            "question": "What are the 15 most common female first names in Hungary among the entire population?",
+            "answers": [
+                "Mária",
+                "Erzsébet",
+                "Katalin",
+                "Éva",
+                "Ilona",
+                "Anna",
+                "Zsuzsanna",
+                "Margit",
+                "Andrea",
+                "Judit",
+                "Ágnes",
+                "Ildikó",
+                "Erika",
+                "Julianna",
+                "Krisztina"
+            ]
+        },
+        {
+            "id": "11",
+            "category": "gastronomy",
+            "question": "What ingredients were in Bence Dalnoki's winning Bocuse d'Or fish soup recipe?",
+            "answers": [
+                "carp",
+                "water",
+                "red onion",
+                "garlic",
+                "tomato",
+                "hot pointed pepper",
+                "white wine",
+                "sweet paprika",
+                "hot paprika",
+                "pasta flour",
+                "durum flour",
+                "egg yolk",
+                "egg white",
+                "olive oil",
+                "salt",
+                "vinegar",
+                "milk",
+                "caviar",
+                "sour cream",
+                "pepper",
+                "shallot",
+                "pickled apple pepper",
+                "cape gooseberry",
+                "chives",
+                "preserved lemon"
+            ]
+        },
+        {
+            "id": "12",
+            "category": "technology",
+            "question": "What were the 10 most downloaded smartphone apps globally in 2023?",
+            "answers": [
+                "TikTok",
+                "Instagram",
+                "Facebook",
+                "WhatsApp",
+                "CapCut",
+                "Snapchat",
+                "Telegram",
+                "Facebook Messenger",
+                "WhatsApp Business",
+                "Spotify"
+            ]
+        },
+        {
+            "id": "13",
+            "category": "marvel",
+            "question": "Which Marvel characters have appeared in at least 7 Marvel Cinematic Universe films?",
+            "answers": [
+                "Winter Soldier",
+                "Bucky Barnes",
+                "Black Widow",
+                "Pepper Potts",
+                "J.A.R.V.I.S.",
+                "Vision",
+                "James Rhodes",
+                "War Machine",
+                "Thor",
+                "Steve Rogers",
+                "Captain America",
+                "Nick Fury",
+                "Tony Stark",
+                "Iron Man"
+            ]
+        },
+        {
+            "id": "14",
+            "category": "television",
+            "question": "Name TV series or talk shows that have received more than 20 Emmy awards throughout their history!",
+            "answers": [
+                "Boardwalk Empire",
+                "The Marvelous Mrs. Maisel",
+                "24",
+                "NYPD Blue",
+                "The Crown",
+                "The Sopranos",
+                "All in the Family",
+                "Modern Family",
+                "ER",
+                "The Carol Burnett Show",
+                "The Daily Show",
+                "RuPaul's Drag Race",
+                "Last Week Tonight with John Oliver",
+                "The West Wing",
+                "The Wire",
+                "American Masters",
+                "Cheers",
+                "The Mary Tyler Moore Show",
+                "The Simpsons",
+                "Frasier",
+                "Game of Thrones",
+                "Saturday Night Live"
+            ]
+        },
+        {
+            "id": "15",
+            "category": "history",
+            "question": "Name first names that have been held by at least one Hungarian prime minister throughout history!",
+            "answers": [
+                "István",
+                "Gyula",
+                "Sándor",
+                "Dénes",
+                "Pál",
+                "Károly",
+                "Miklós",
+                "László",
+                "Imre",
+                "András",
+                "Ferenc",
+                "József",
+                "János",
+                "Kálmán",
+                "Béla",
+                "Frigyes",
+                "Géza",
+                "Lajos",
+                "Viktor",
+                "Tibor",
+                "Jenő",
+                "Péter",
+                "Mihály",
+                "Gyula"
+            ]
+        }
+    ]
+}

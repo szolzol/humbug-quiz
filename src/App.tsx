@@ -1,7 +1,9 @@
-import { motion, AnimatePresence } from "framer-motion";
+﻿import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -409,7 +411,22 @@ const sampleQuestions = [
 ];
 
 function App() {
+  const { t } = useTranslation();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+
+  // Load questions from translations
+  const questions = t("allQuestions", { returnObjects: true }) as Array<{
+    id: string;
+    category: string;
+    question: string;
+    answers: string[];
+  }>;
+
+  // Map questions with translated categories
+  const translatedQuestions = questions.map((q) => ({
+    ...q,
+    category: t(`categories.${q.category}`),
+  }));
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
@@ -469,6 +486,11 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}>
           <div className="container mx-auto px-6 py-8 relative z-10">
+            {/* Language Switcher - Top Right */}
+            <div className="absolute top-4 right-6 z-20">
+              <LanguageSwitcher />
+            </div>
+
             <div className="text-center max-w-3xl mx-auto">
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
@@ -481,7 +503,7 @@ function App() {
                 className="mb-4">
                 <h1 className="text-6xl md:text-8xl font-black tracking-tight">
                   <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-2xl">
-                    HUMBUG!
+                    {t("hero.title")}
                   </span>
                 </h1>
               </motion.div>
@@ -495,7 +517,7 @@ function App() {
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
                 className="text-xl md:text-3xl font-bold text-foreground/90 mb-6 tracking-wide">
-                FAKE IT TILL YOU WIN IT!
+                {t("hero.subtitle")}
               </motion.p>
 
               <motion.p
@@ -507,8 +529,7 @@ function App() {
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
                 className="text-lg md:text-xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed">
-                Egy új, kvízes partyjáték, ahol a tudás, a bátorság és a
-                megtévesztés találkozik!
+                {t("hero.description")}
               </motion.p>
 
               <motion.div
@@ -527,8 +548,8 @@ function App() {
                       .getElementById("questions-section")
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}>
-                  <CaretDown className="mr-2" size={24} weight="fill" />
-                  Kezdjük a játékot!
+                  <Play className="mr-2" size={24} weight="fill" />
+                  {t("hero.ctaButton")}
                 </Button>
               </motion.div>
             </div>
@@ -580,13 +601,13 @@ function App() {
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
               className="max-w-4xl mx-auto">
-              <AudioPlayer src={gameRulesAudio} title="Hogyan játsszuk?" />
+              <AudioPlayer src={gameRulesAudio} title={t("rules.audioTitle")} />
 
               <Button
                 onClick={() => setIsRulesOpen(!isRulesOpen)}
                 className="w-full flex items-center justify-between text-sm font-medium py-2 h-auto mt-0 rounded-t-none border-t-0 bg-yellow-500/20 hover:bg-muted/50 text-foreground"
                 variant="ghost">
-                <span>Részletes szabályok</span>
+                <span>{t("rules.detailedRules")}</span>
                 <motion.div
                   animate={{ rotate: isRulesOpen ? 180 : 0 }}
                   transition={{ duration: 0.3 }}>
@@ -611,15 +632,10 @@ function App() {
                         <div className="space-y-6 text-card-foreground">
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              1. Előkészületek
+                              {t("rules.section1.title")}
                             </h3>
                             <p className="leading-relaxed">
-                              A játék semmilyen kiegészítőt, előkészületet nem
-                              igényel, egyedül a játékmesternek van szüksége a
-                              telefonjára, hogy felolvassa a kérdéseket és
-                              ellenőrizze a válaszokat. A játékosok száma 3 és 8
-                              fő között lehet, de akár többen is játszhatják, ha
-                              van elég hely és idő.
+                              {t("rules.section1.content")}
                             </p>
                           </div>
 
@@ -627,22 +643,10 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              2. A játék menete
+                              {t("rules.section2.title")}
                             </h3>
                             <p className="leading-relaxed">
-                              A játék menete körökre oszlik, minden kör egy
-                              kérdésből áll. A játékmester feltesz egy
-                              kvízkérdést a teljes csapatnak, melynek általában
-                              legalább egy tucat helyes megoldása van. Például:
-                              "Soroljatok fel olyan keresztneveket, amelyeket a
-                              történelem során magyar kormányfő viselt! <br />{" "}
-                              <br /> A játékosoknak sorban haladva mondaniuk
-                              kell egy-egy lehetséges választ, amelyik szerintük
-                              helyes válasz lehet az adott kérdésre (például:
-                              "Ferenc"). A játékmester nem kommentálja az
-                              elhangzott válaszokat, mert nem az a lényeg, hogy
-                              a válasz jó-e vagy sem, hanem, hogy lesz-e aki
-                              lefüleli a blöfföt!
+                              {t("rules.section2.content")}
                             </p>
                           </div>
 
@@ -650,25 +654,10 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              3. A "Humbug!" és a pontozás
+                              {t("rules.section3.title")}
                             </h3>
                             <p className="leading-relaxed">
-                              Egy fordulónak akkor van vége, ha egy játékos
-                              megkérdőjelezi egy előtte megszólaló válaszát
-                              azzal, hogy hangosan „Humbug!” szót mond rá. A
-                              játékmester ekkor ellenőrzi, hogy a kérdéses
-                              válasz jó-e vagy sem. <br /> <br />
-                              Ha jó volt, a blöfföt hívó játékos veszít egy
-                              életet, ha viszont rossz, akkor értelemszerűen az
-                              veszít, aki a hibás választ mondta. Ha helyes volt
-                              a blöff bemondása, akkor az azt bemondó játékos
-                              egy passzolási lehetőséggel is gazdagodik, amit
-                              később bármikor felhasználhat. Vagyis amikor
-                              rákerül a sor, mondhat passzt is, és átugorjuk a
-                              körét. A játékosok előzetes megegyezés alapján 1,
-                              2 vagy 3 élettel indulnak. <br />
-                              <br />
-                              Az nyer, aki utoljára „életben marad”.
+                              {t("rules.section3.content")}
                             </p>
                           </div>
 
@@ -676,16 +665,21 @@ function App() {
 
                           <div>
                             <h3 className="text-xl font-semibold mb-3 text-primary">
-                              4. Alternatív játékmód
+                              {t("rules.section5.title")}
                             </h3>
                             <p className="leading-relaxed">
-                              Játszható a játék úgy is, hogy egy adott forduló
-                              nem ér véget az első blöff bemondásánál. Ekkor a
-                              még aktív játékosok - azaz a megkérdőjelezett
-                              választ adó és a blöfföt behívó játékos
-                              kivételével mindenki - mennek tovább a második
-                              blöff bemondásáig. Ebben az esetben 2 különböző
-                              játékos is életet veszít az adott körben.
+                              {t("rules.section5.content")}
+                            </p>
+                          </div>
+
+                          <Separator className="bg-border/50" />
+
+                          <div>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">
+                              {t("rules.section4.title")}
+                            </h3>
+                            <p className="leading-relaxed">
+                              {t("rules.section4.content")}
                             </p>
                           </div>
                         </div>
@@ -707,13 +701,9 @@ function App() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6">
-                Mi teszi különlegessé?
-              </h2>
+              <h2 className="text-4xl font-bold mb-6">{t("features.title")}</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a
-                pszichológiai megtévesztés művészetével. Játszhatod kicsi vagy
-                nagy társaságban, bárhol és bármikor!
+                {t("features.subtitle")}
               </p>
             </motion.div>
 
@@ -721,27 +711,23 @@ function App() {
               {[
                 {
                   icon: <Brain size={48} weight="fill" />,
-                  title: "Tudás vs. Blöff",
-                  description:
-                    "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod",
+                  title: t("features.feature1.title"),
+                  description: t("features.feature1.description"),
                 },
                 {
                   icon: <Users size={48} weight="fill" />,
-                  title: "Bárhányan és bárhol",
-                  description:
-                    "3-8 játékos számára tervezve, akár utazás közben is, mivel nincs szükség semmilyen kiegészítőre",
+                  title: t("features.feature2.title"),
+                  description: t("features.feature2.description"),
                 },
                 {
                   icon: <Crown size={48} weight="fill" />,
-                  title: "Taktikázz és nyerj",
-                  description:
-                    "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít",
+                  title: t("features.feature3.title"),
+                  description: t("features.feature3.description"),
                 },
                 {
                   icon: <Target size={48} weight="fill" />,
-                  title: "Könnyed és tartalmas",
-                  description:
-                    "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy órákig játszd",
+                  title: t("features.feature4.title"),
+                  description: t("features.feature4.description"),
                 },
               ].map((feature, index) => (
                 <motion.div
@@ -832,16 +818,14 @@ function App() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">Feladványok</h2>
+            <h2 className="text-4xl font-bold mb-6">{t("questions.title")}</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Böngéssz a kérdések között! Ha játékmester vagy, kattints a
-              kártyákra a helyes válaszok megtekintéséhez és jelöld be az
-              elhangzott helyes válaszokat.
+              {t("questions.subtitle")}
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {sampleQuestions.map((question, index) => (
+            {translatedQuestions.map((question, index) => (
               <QuestionCard
                 key={question.id}
                 question={question}
@@ -860,14 +844,14 @@ function App() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}>
-            <h3 className="text-2xl font-bold mb-4 text-primary">HUMBUG!</h3>
+            <h3 className="text-2xl font-bold mb-4 text-primary">
+              {t("footer.title")}
+            </h3>
             <p className="text-sm text-muted-foreground mb-2">
-              Készítette:{" "}
-              <span className="font-semibold">Szoleczki Zoltán</span> és{" "}
-              <span className="font-semibold">Beró Zsolt</span>
+              {t("footer.creators")}
             </p>
             <p className="text-sm text-muted-foreground">
-              © 2025 HUMBUG! Minden jog fenntartva.
+              {t("footer.copyright")}
             </p>
           </motion.div>
         </div>

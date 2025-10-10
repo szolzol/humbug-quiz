@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowsClockwise } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 interface QuizQuestion {
   id: string;
@@ -57,6 +58,7 @@ const setStoredAnswers = (questionId: string, answers: Set<number>) => {
 };
 
 export function QuestionCard({ question, index }: QuestionCardProps) {
+  const { t } = useTranslation();
   const [isFlipped, setIsFlipped] = useState(() =>
     getStoredFlipState(question.id)
   );
@@ -140,9 +142,11 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               {question.question}
             </h3>
             <div className="mt-5 md:mt-6 text-primary-foreground/60 !text-base md:!text-lg">
-              <div>Nyomj rá a válaszokért!</div>
+              <div>{t("questions.flipCard")}</div>
               <div className="mt-2 text-sm md:text-base">
-                Összesen {question.answers.length} helyes válasz
+                {t("questions.totalAnswers", {
+                  count: question.answers.length,
+                })}
               </div>
             </div>
           </CardContent>
@@ -168,7 +172,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             className="flex flex-col h-full p-3 md:p-4 relative z-10"
             onClick={(e) => e.stopPropagation()}>
             <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
-              Helyes válaszok
+              {t("questions.correctAnswers")}
             </div>
             <div
               className={`flex-1 overflow-y-auto pr-1 grid ${
@@ -196,7 +200,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               ))}
             </div>
             <div className="mt-2 text-secondary-foreground/60 text-[10px] md:text-xs text-center leading-tight">
-              Kattints a válaszokra a jelöléshez
+              {t("questions.clickToMark")}
             </div>
           </CardContent>
         </Card>

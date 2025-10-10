@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ArrowsClockwise } from "@phosphor-icons/react";
 
 interface QuizQuestion {
   id: string;
@@ -14,11 +15,64 @@ interface QuestionCardProps {
   index: number;
 }
 
+// Helper functions for localStorage
+const getStoredFlipState = (questionId: string): boolean => {
+  try {
+    const stored = localStorage.getItem(`flip_${questionId}`);
+    return stored === "true";
+  } catch {
+    return false;
+  }
+};
+
+const setStoredFlipState = (questionId: string, isFlipped: boolean) => {
+  try {
+    localStorage.setItem(`flip_${questionId}`, String(isFlipped));
+  } catch {
+    // Ignore localStorage errors
+  }
+};
+
+const getStoredAnswers = (questionId: string): Set<number> => {
+  try {
+    const stored = localStorage.getItem(`answers_${questionId}`);
+    if (stored) {
+      return new Set(JSON.parse(stored));
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return new Set();
+};
+
+const setStoredAnswers = (questionId: string, answers: Set<number>) => {
+  try {
+    localStorage.setItem(
+      `answers_${questionId}`,
+      JSON.stringify(Array.from(answers))
+    );
+  } catch {
+    // Ignore localStorage errors
+  }
+};
+
 export function QuestionCard({ question, index }: QuestionCardProps) {
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [selectedAnswers, setSelectedAnswers] = useState<Set<number>>(
-    new Set()
+  const [isFlipped, setIsFlipped] = useState(() =>
+    getStoredFlipState(question.id)
   );
+  const [selectedAnswers, setSelectedAnswers] = useState<Set<number>>(() =>
+    getStoredAnswers(question.id)
+  );
+
+  // Persist flip state to localStorage
+  useEffect(() => {
+    setStoredFlipState(question.id, isFlipped);
+  }, [isFlipped, question.id]);
+
+  // Persist selected answers to localStorage
+  useEffect(() => {
+    setStoredAnswers(question.id, selectedAnswers);
+  }, [selectedAnswers, question.id]);
 
   const handleAnswerClick = (e: React.MouseEvent, answerIndex: number) => {
     e.stopPropagation();
@@ -46,12 +100,26 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
       transition={{ duration: 0.6, delay: index * 0.1 }}
       whileHover={{ scale: 1.02 }}>
       <motion.div
-        className="relative w-full h-full cursor-pointer preserve-3d"
+        className="relative w-full h-full preserve-3d"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
-        onClick={() => setIsFlipped(!isFlipped)}>
+        transition={{ duration: 0.6, type: "spring", stiffness: 120 }}>
+        {/* Flip Button - Always visible on top */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsFlipped(!isFlipped);
+          }}
+          className="absolute top-3 right-3 z-50 bg-background/90 hover:bg-background text-foreground rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
+          style={{ transform: isFlipped ? "rotateY(180deg)" : "none" }}
+          aria-label="Flip card">
+          <ArrowsClockwise size={24} weight="bold" />
+        </button>
+
         {/* Front of card */}
-        <Card className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden">
+        <Card
+          className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden cursor-pointer"
+          style={{ pointerEvents: isFlipped ? "none" : "auto" }}
+          onClick={() => setIsFlipped(true)}>
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
@@ -78,7 +146,9 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
         </Card>
 
         {/* Back of card */}
-        <Card className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden">
+        <Card
+          className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden"
+          style={{ pointerEvents: isFlipped ? "auto" : "none" }}>
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
@@ -91,7 +161,9 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             </div>
           </div>
 
-          <CardContent className="flex flex-col h-full p-3 md:p-4 relative z-10">
+          <CardContent
+            className="flex flex-col h-full p-3 md:p-4 relative z-10"
+            onClick={(e) => e.stopPropagation()}>
             <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
               Helyes válaszok
             </div>
@@ -106,26 +178,22 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                   : "grid-cols-1"
               } gap-1.5 md:gap-2 scrollbar-thin scrollbar-thumb-secondary-foreground/20 scrollbar-track-transparent`}>
               {question.answers.map((answer, answerIndex) => (
-                <motion.div
+                <button
                   key={answerIndex}
-                  className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 ${
+                  className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 w-full ${
                     selectedAnswers.has(answerIndex)
                       ? "bg-green-500/30 border border-green-500/50"
                       : "bg-secondary-foreground/10 hover:bg-secondary-foreground/20"
                   }`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + answerIndex * 0.03 }}
                   onClick={(e) => handleAnswerClick(e, answerIndex)}>
                   <span className="text-secondary-foreground font-medium">
                     {answer}
                   </span>
-                </motion.div>
+                </button>
               ))}
             </div>
             <div className="mt-2 text-secondary-foreground/60 text-[10px] md:text-xs text-center leading-tight">
-              Kattints a válaszokra, hogy jelöld a már elhangzott helyes
-              válaszokat
+              Kattints a válaszokra a jelöléshez
             </div>
           </CardContent>
         </Card>

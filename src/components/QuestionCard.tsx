@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowsClockwise } from "@phosphor-icons/react";
+import { ArrowsClockwise, ArrowUpRight } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 
 interface QuizQuestion {
@@ -134,20 +134,41 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             </div>
           </div>
 
-          <CardContent className="flex flex-col justify-center items-center h-full p-4 md:p-6 text-center relative z-10">
-            <div className="text-primary-foreground/80 !text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide">
-              {question.category}
-            </div>
-            <h3 className="text-primary-foreground font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4">
-              {question.question}
-            </h3>
-            <div className="mt-5 md:mt-6 text-primary-foreground/60 !text-base md:!text-lg">
-              <div>{t("questions.flipCard")}</div>
-              <div className="mt-2 text-sm md:text-base">
-                {t("questions.totalAnswers", {
-                  count: question.answers.length,
-                })}
+          <CardContent className="flex flex-col justify-between h-full p-4 md:p-6 relative z-10">
+            {/* Top section with flip instruction and arrow - aligned with button */}
+            <div className="flex items-center justify-end pr-14 md:pr-16 text-primary-foreground/80 text-sm md:text-sm">
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium whitespace-nowrap">{t("questions.flipCard")}</span>
+                <motion.div
+                  animate={{ 
+                    x: [0, 5, 0],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}>
+                  <ArrowUpRight size={18} weight="bold" className="flex-shrink-0" />
+                </motion.div>
               </div>
+            </div>
+
+            {/* Center section with question */}
+            <div className="flex-1 flex flex-col justify-center items-center text-center">
+              <div className="text-primary-foreground/80 !text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide">
+                {question.category}
+              </div>
+              <h3 className="text-primary-foreground font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4">
+                {question.question}
+              </h3>
+            </div>
+
+            {/* Bottom section with answer count */}
+            <div className="text-center text-primary-foreground/80 text-base md:text-base font-medium">
+              {t("questions.totalAnswers", {
+                count: question.answers.length,
+              })}
             </div>
           </CardContent>
         </Card>
@@ -173,6 +194,9 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             onClick={(e) => e.stopPropagation()}>
             <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
               {t("questions.correctAnswers")}
+              <span className="ml-2 text-xs md:text-sm font-normal">
+                ({selectedAnswers.size} / {question.answers.length})
+              </span>
             </div>
             <div
               className={`flex-1 overflow-y-auto pr-1 grid ${

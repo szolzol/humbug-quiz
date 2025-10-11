@@ -1,7 +1,7 @@
 {
     "hero": {
         "title": "HUMBUG!",
-        "subtitle": "FAKE IT TILL YOU WIN IT",
+        "subtitle": "KNOW IT TILL YOU BLUFF IT!",
         "description": "A quiz party game where knowledge, courage, and deception collide!",
         "ctaButton": "Let's Start Playing!"
     },
@@ -10,19 +10,19 @@
         "detailedRules": "Detailed Rules",
         "section1": {
             "title": "1. Starting the Game",
-            "content": "The game master asks a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \\\"Name first names that have been held by Hungarian prime ministers throughout history!\\\""
+            "content": "The game master asks a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \"Name first names that have been held by Hungarian prime ministers throughout history!\""
         },
         "section2": {
             "title": "2. Players' Answers",
-            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \\\"Ferenc\\\"). The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the bluff!"
+            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \"Ferenc\"). The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the bluff!"
         },
         "section3": {
-            "title": "3. The \\\"Humbug!\\\"",
-            "content": "A round ends when a player challenges the answer of the person before them by loudly saying \\\"Humbug!\\\" The game master then checks whether the questioned answer is correct or not."
+            "title": "3. The \"Humbug!\"",
+            "content": "A round ends when a player challenges the answer of the person before them by loudly saying \"Humbug!\" The game master then checks whether the questioned answer is correct or not."
         },
         "section4": {
             "title": "4. Victory and Defeat",
-            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \\\"alive\\\" last."
+            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \"alive\" last."
         },
         "section5": {
             "title": "5. Alternative Game Mode",
@@ -30,29 +30,29 @@
         }
     },
     "features": {
-        "title": "What Makes It Special?",
-        "subtitle": "HUMBUG combines the excitement of classic quiz games with the art of psychological deception.",
+        "title": "What Makes HUMBUG! Special?",
+        "subtitle": "HUMBUG! combines the excitement of classic quiz games with the art of psychological deception.",
         "feature1": {
             "title": "Knowledge vs. Bluff",
             "description": "It's not just about what you know, but also whether you can expose others' bluffs and keep your poker face"
         },
         "feature2": {
-            "title": "Any Number, Anywhere",
-            "description": "Designed for 3-8 players, perfect for friendly gatherings, even while traveling"
+            "title": "Any Player, Anywhere",
+            "description": "Designed for 3-8 players, age 12+, perfect for friendly gatherings, even while traveling"
         },
         "feature3": {
             "title": "Strategize and Win",
-            "description": "Decide when to bluff, when to call someone out, and when to pass; every point counts"
+            "description": "Decide when to risk it, when to bluff, when to call someone out, and when to pass; every point counts"
         },
         "feature4": {
             "title": "Simple Yet Deep",
-            "description": "Learnable in 5 minutes, but deep enough to play again and again"
+            "description": "Learnable in 5 minutes, but deep enough to play \"just another round...\""
         }
     },
     "questions": {
         "title": "Quiz Questions",
         "subtitle": "Browse through the questions! If you're the game master, click on the cards to view the correct answers and mark the correct answers that have been given.",
-        "flipCard": "Click for correct answers!",
+        "flipCard": "Game master? Click for the answers!",
         "totalAnswers": "Total of {{count}} correct answers",
         "correctAnswers": "Correct Answers",
         "clickToMark": "Click on answers to mark them"
@@ -105,7 +105,7 @@
         {
             "id": "2",
             "category": "socialMedia",
-            "question": "Which celebrities' pages are among Instagram's top 15 accounts with the most followers?",
+            "question": "Which celebrities' pages are among Instagram's top accounts with the most followers?",
             "answers": [
                 "Cristiano Ronaldo",
                 "Lionel Messi",
@@ -124,7 +124,7 @@
         {
             "id": "3",
             "category": "literature",
-            "question": "Name authors who have at least one work listed in the currently valid National Core Curriculum's required reading list!",
+            "question": "Name authors who have at least one work listed in the currently valid Hungarian Literature Curriculum's required reading list!",
             "answers": [
                 "Sándor Petőfi",
                 "Ferenc Molnár",
@@ -189,7 +189,7 @@
         {
             "id": "5",
             "category": "carBrands",
-            "question": "What are the 10 most common car brands on Hungarian roads?",
+            "question": "What are the most common car brands on Hungarian roads?",
             "answers": [
                 "Opel",
                 "Suzuki",
@@ -211,7 +211,7 @@
         {
             "id": "6",
             "category": "airports",
-            "question": "Which cities have at least one airport among Europe's 15 busiest airports?",
+            "question": "Which cities have at least one airport among Europe's busiest airports?",
             "answers": [
                 "London",
                 "Istanbul",
@@ -258,7 +258,7 @@
         {
             "id": "8",
             "category": "football",
-            "question": "Since the start of the Champions League (1992), which 10 club teams have earned the most points in the competition?",
+            "question": "Since the start of the Champions League (1992), which club teams have earned the most points in the competition?",
             "answers": [
                 "Real Madrid",
                 "Bayern Munich",
@@ -305,7 +305,7 @@
         {
             "id": "10",
             "category": "names",
-            "question": "What are the 15 most common female first names in Hungary among the entire population?",
+            "question": "What are the most common female first names in Hungary among the entire population?",
             "answers": [
                 "Mária",
                 "Erzsébet",
@@ -327,7 +327,7 @@
         {
             "id": "11",
             "category": "gastronomy",
-            "question": "What ingredients were in Bence Dalnoki's winning Bocuse d'Or fish soup recipe?",
+            "question": "What ingredients were in Hungarian Master Chef, Bence Dalnoki's winning Bocuse d'Or fish soup recipe?",
             "answers": [
                 "carp",
                 "water",
@@ -359,7 +359,7 @@
         {
             "id": "12",
             "category": "technology",
-            "question": "What were the 10 most downloaded smartphone apps globally in 2023?",
+            "question": "What were the most downloaded smartphone apps globally in 2023?",
             "answers": [
                 "TikTok",
                 "Instagram",

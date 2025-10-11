@@ -1,7 +1,7 @@
 {
     "hero": {
         "title": "HUMBUG!",
-        "subtitle": "FAKE IT TILL YOU WIN IT",
+        "subtitle": "TÖRPÖLSZ VAGY BLÖFFÖLSZ!",
         "description": "Egy kvízes partyjáték, ahol a tudás, a bátorság és a megtévesztés találkozik!",
         "ctaButton": "Kezdjük a játékot!"
     },
@@ -30,29 +30,29 @@
         }
     },
     "features": {
-        "title": "Mi teszi különlegessé?",
-        "subtitle": "A HUMBUG ötvözi a klasszikus kvízjátékok izgalmát a pszichológiai megtévesztés művészetével.",
+        "title": "Mitől különleges a HUMBUG!?",
+        "subtitle": "A HUMBUG! ötvözi a klasszikus kvízjátékok izgalmát a pszichológiai megtévesztés művészetével.",
         "feature1": {
             "title": "Tudás vs. Blöff",
             "description": "Nem csak a tudásod számít, hanem az is, hogy képes vagy-e leleplezni mások blöffjét és tartod-e a pókerarcod"
         },
         "feature2": {
             "title": "Bárhányan és bárhol",
-            "description": "3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, akár utazás közben is"
+            "description": "12 éves kortól, 3-8 játékos számára tervezve, tökéletes baráti összejövetelekre, utazás közben is, mivel semmit nem igényel"
         },
         "feature3": {
             "title": "Taktikázz és nyerj",
-            "description": "Döntsd el mikor blöffolsz, mikor hívod le a másikat, és mikor passzolsz; minden pont számít"
+            "description": "Döntsd el mikor vagy magabiztos, mikor blöffölsz, mikor passzolsz és mikor mersz 'Humbug!'-ot mondani a másik játékosra!"
         },
         "feature4": {
             "title": "Könnyed és tartalmas",
-            "description": "5 perc alatt megtanulható, de mégis elég mély ahhoz, hogy újra és újra játszd"
+            "description": "5 perc alatt megtanulható, de mégis annyira behúz, hogy mindig \"csak még egy kört játszunk...\""
         }
     },
     "questions": {
         "title": "Feladványok",
         "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a helyes válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
-        "flipCard": "Nyomj rá a helyes válaszokért!",
+        "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
         "totalAnswers": "Összesen {{count}} helyes válasz",
         "correctAnswers": "Helyes válaszok",
         "clickToMark": "Kattints a válaszokra a jelöléshez"
@@ -105,7 +105,7 @@
         {
             "id": "2",
             "category": "socialMedia",
-            "question": "Mely hírességek oldalai találhatóak meg az Instagram 15 legtöbb követővel rendelkező oldala között?",
+            "question": "Mely hírességek oldalai találhatóak meg az Instagram legtöbb követővel rendelkező oldala között?",
             "answers": [
                 "Cristiano Ronaldo",
                 "Lionel Messi",
@@ -124,7 +124,7 @@
         {
             "id": "3",
             "category": "literature",
-            "question": "Nevezzetek meg olyan szerzőket, akiknek legalább egy művük szerepel a jelenleg érvényes Nemzeti Alaptantervben felsorolt kötelező olvasmányok közt!",
+            "question": "Nevezzetek meg olyan szerzőket, akiknek legalább egy művük szerepel a Nemzeti Alaptantervben lévő kötelező olvasmányok közt!",
             "answers": [
                 "Petőfi Sándor",
                 "Molnár Ferenc",
@@ -189,7 +189,7 @@
         {
             "id": "5",
             "category": "carBrands",
-            "question": "Melyik a 10 leggyakoribb autómárka Magyarországon útjain?",
+            "question": "Melyek a leggyakoribb autómárkák Magyarország útjain?",
             "answers": [
                 "Opel",
                 "Suzuki",
@@ -211,7 +211,7 @@
         {
             "id": "6",
             "category": "airports",
-            "question": "Melyek azok a városok, amelyeknek legalább 1 reptere szerepel Európa 15 legforgalmasabb repülőtere között?",
+            "question": "Melyek azok a városok, amelyeknek legalább 1 reptere szerepel Európa legforgalmasabb repülőterei között?",
             "answers": [
                 "London",
                 "Isztanbul",
@@ -258,7 +258,7 @@
         {
             "id": "8",
             "category": "football",
-            "question": "A Bajnokok Ligája indulása óta (1992) melyik 10 klubcsapat szerzett a legtöbb pontot a sorozatban?",
+            "question": "A Bajnokok Ligája indulása óta (1992) mely klubcsapatok szerezték a legtöbb pontot a sorozatban?",
             "answers": [
                 "Real Madrid",
                 "Bayern München",
@@ -305,7 +305,7 @@
         {
             "id": "10",
             "category": "names",
-            "question": "Melyik a 15 leggyakoribb női keresztnév Magyarországon a teljes népesség körében?",
+            "question": "Melyek a leggyakoribb női keresztnevek Magyarországon a teljes népesség körében?",
             "answers": [
                 "Mária",
                 "Erzsébet",
@@ -359,7 +359,7 @@
         {
             "id": "12",
             "category": "technology",
-            "question": "Melyik volt az okostelefonokra legtöbbször letöltött 10 alkalmazás 2023-ban, globálisan?",
+            "question": "Melyek voltak az okostelefonokra legtöbbször letöltött alkalmazások globálisan?",
             "answers": [
                 "TikTok",
                 "Instagram",

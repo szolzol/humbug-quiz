@@ -177,7 +177,7 @@ function App() {
           transition={{ duration: 1 }}>
           <div className="container mx-auto px-6 py-8 relative z-10">
             {/* Language Switcher - Top Right */}
-            <div className="absolute top-4 right-6 z-20">
+            <div className="absolute top-2 right-2 md:top-4 md:right-6 z-20">
               <LanguageSwitcher />
             </div>
 
@@ -291,9 +291,9 @@ function App() {
 
               <Button
                 onClick={() => setIsRulesOpen(!isRulesOpen)}
-                className="w-full flex items-center justify-between text-sm font-medium py-2 h-auto mt-0 rounded-t-none border-t-0 bg-yellow-500/20 hover:bg-muted/50 text-foreground"
+                className="w-full flex items-center justify-between text-sm font-medium py-2 h-auto mt-0 rounded-t-none border-t-0 bg-yellow-500/20 hover:bg-muted/50"
                 variant="ghost">
-                <span>{t("rules.detailedRules")}</span>
+                <span className="text-foreground">{t("rules.detailedRules")}</span>
                 <motion.div
                   animate={{ rotate: isRulesOpen ? 180 : 0 }}
                   transition={{ duration: 0.3 }}>

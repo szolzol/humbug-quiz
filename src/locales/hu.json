@@ -1,7 +1,7 @@
 {
     "hero": {
         "title": "HUMBUG!",
-        "subtitle": "TÖRPÖLSZ VAGY BLÖFFÖLSZ!",
+        "subtitle": "TÖRPÖLSZ VAGY BLÖFFÖLSZ",
         "description": "Egy kvízes partyjáték, ahol a tudás, a bátorság és a megtévesztés találkozik!",
         "ctaButton": "Kezdjük a játékot!"
     },
@@ -21,12 +21,12 @@
             "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \\\"Humbug!\\\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
         },
         "section4": {
-            "title": "4. Győzelem és vereség",
-            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \\\"életben marad\\\"."
+            "title": "4. Alternatív játékmód",
+            "content": "Játszható a játék úgy is, hogy egy adott forduló nem ér véget az első blöff bemondásánál. Ekkor a még aktív játékosok - azaz a megkérdőjelezett választ adó és a blöfföt behívó játékos kivételével mindenki - mennek tovább a második blöff bemondásáig. Ebben az esetben 2 különböző játékos is életet veszít az adott körben."
         },
         "section5": {
-            "title": "5. Alternatív játékmód",
-            "content": "Játszható a játék úgy is, hogy egy adott forduló nem ér véget az első blöff bemondásánál. Ekkor a még aktív játékosok - azaz a megkérdőjelezett választ adó és a blöfföt behívó játékos kivételével mindenki - mennek tovább a második blöff bemondásáig. Ebben az esetben 2 különböző játékos is életet veszít az adott körben."
+            "title": "5. Győzelem és vereség",
+            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \\\"életben marad\\\"."
         }
     },
     "features": {

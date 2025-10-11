@@ -1,7 +1,7 @@
 {
     "hero": {
         "title": "HUMBUG!",
-        "subtitle": "KNOW IT TILL YOU BLUFF IT!",
+        "subtitle": "KNOW IT TILL YOU BLUFF IT",
         "description": "A quiz party game where knowledge, courage, and deception collide!",
         "ctaButton": "Let's Start Playing!"
     },
@@ -21,12 +21,12 @@
             "content": "A round ends when a player challenges the answer of the person before them by loudly saying \"Humbug!\" The game master then checks whether the questioned answer is correct or not."
         },
         "section4": {
-            "title": "4. Victory and Defeat",
-            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \"alive\" last."
+            "title": "4. Alternative Game Mode",
+            "content": "The game can also be played so that a round does not end at the first bluff call. In this case, the still active players - meaning everyone except the player who gave the challenged answer and the player who called the bluff - continue until the second bluff call. In this case, 2 different players lose a life in that round."
         },
         "section5": {
-            "title": "5. Alternative Game Mode",
-            "content": "The game can also be played so that a round does not end at the first bluff call. In this case, the still active players - meaning everyone except the player who gave the challenged answer and the player who called the bluff - continue until the second bluff call. In this case, 2 different players lose a life in that round."
+            "title": "5. Victory and Defeat",
+            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \"alive\" last."
         }
     },
     "features": {

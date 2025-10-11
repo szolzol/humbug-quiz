@@ -316,7 +316,7 @@ function App() {
                     <Card className="bg-card/30 border-border/30 rounded-t-none border-t-0 mt-0">
                       <CardContent className="p-8 pt-4">
                         <div className="space-y-6 text-card-foreground">
-                          {[1, 2, 3, 5, 4].map((section, idx) => (
+                          {[1, 2, 3, 4, 5].map((section, idx) => (
                             <div key={section}>
                               {idx > 0 && (
                                 <Separator className="bg-border/50 mb-6" />

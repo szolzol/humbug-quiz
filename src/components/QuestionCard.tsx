@@ -119,9 +119,8 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
         {/* Front of card */}
         <Card
-          className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden cursor-pointer"
-          style={{ pointerEvents: isFlipped ? "none" : "auto" }}
-          onClick={() => setIsFlipped(true)}>
+          className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden"
+          style={{ pointerEvents: isFlipped ? "none" : "auto" }}>
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
@@ -138,18 +137,24 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             {/* Top section with flip instruction and arrow - aligned with button */}
             <div className="flex items-center justify-end pr-14 md:pr-16 text-primary-foreground/80 text-sm md:text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="font-medium whitespace-nowrap">{t("questions.flipCard")}</span>
+                <span className="font-medium whitespace-nowrap">
+                  {t("questions.flipCard")}
+                </span>
                 <motion.div
-                  animate={{ 
+                  animate={{
                     x: [0, 5, 0],
-                    opacity: [0.7, 1, 0.7]
+                    opacity: [0.7, 1, 0.7],
                   }}
                   transition={{
                     duration: 2,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}>
-                  <ArrowUpRight size={18} weight="bold" className="flex-shrink-0" />
+                  <ArrowUpRight
+                    size={18}
+                    weight="bold"
+                    className="flex-shrink-0"
+                  />
                 </motion.div>
               </div>
             </div>

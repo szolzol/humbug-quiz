@@ -53,7 +53,7 @@
         "title": "Quiz Questions",
         "subtitle": "Browse through the questions! If you're the game master, click on the cards to view the correct answers and mark the correct answers that have been given.",
         "flipCard": "Game master? Click for the answers!",
-        "totalAnswers": "Total of {{count}} correct answers",
+        "totalAnswers": "Total of {{count}} possible answers",
         "correctAnswers": "Correct Answers",
         "clickToMark": "Click on answers to mark them"
     },

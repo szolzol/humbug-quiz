@@ -53,7 +53,7 @@
         "title": "Feladványok",
         "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a helyes válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
         "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
-        "totalAnswers": "Összesen {{count}} helyes válasz",
+        "totalAnswers": "Összesen {{count}} lehetséges válasz",
         "correctAnswers": "Helyes válaszok",
         "clickToMark": "Kattints a válaszokra a jelöléshez"
     },
@@ -100,7 +100,9 @@
                 "Sárvár",
                 "Debrecen",
                 "Győr"
-            ]
+            ],
+            "sourceName": "Index",
+            "sourceUrl": "https://index.hu/gazdasag/geocompass/2023/08/04/turizmus-vendegejszaka-belfold-ksh-szep-kartya/"
         },
         {
             "id": "2",
@@ -119,7 +121,9 @@
                 "Kendall Jenner",
                 "Justin Bieber",
                 "Taylor Swift"
-            ]
+            ],
+            "sourceName": "Wikipedia",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_most-followed_Instagram_accounts"
         },
         {
             "id": "3",
@@ -157,7 +161,9 @@
                 "Babits Mihály",
                 "Wass Albert",
                 "Örkény István"
-            ]
+            ],
+            "sourceName": "NLC",
+            "sourceUrl": "https://nlc.hu/ezvan/20200221/uj-kotelezo-olvasmanyok-nat/"
         },
         {
             "id": "4",
@@ -184,7 +190,9 @@
                 "NBA 2K",
                 "Star Wars",
                 "Pro Evolution Soccer"
-            ]
+            ],
+            "sourceName": "Wikipedia",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_best-selling_video_game_franchises"
         },
         {
             "id": "5",
@@ -206,7 +214,9 @@
                 "Citroen",
                 "Honda",
                 "KIA"
-            ]
+            ],
+            "sourceName": "KSH",
+            "sourceUrl": "https://www.ksh.hu/stadat_files/sza/hu/sza0025.html"
         },
         {
             "id": "6",
@@ -226,7 +236,9 @@
                 "Lisszabon",
                 "Palma de Mallorca",
                 "Dublin"
-            ]
+            ],
+            "sourceName": "Wikipedia",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_Europe"
         },
         {
             "id": "7",
@@ -253,7 +265,9 @@
                 "Száll a kakukk fészkére",
                 "Csillagok között",
                 "Hetedik"
-            ]
+            ],
+            "sourceName": "IMDb",
+            "sourceUrl": "https://www.imdb.com/chart/top/"
         },
         {
             "id": "8",
@@ -275,7 +289,9 @@
                 "Arsenal",
                 "Atletico Madrid",
                 "Dortmund"
-            ]
+            ],
+            "sourceName": "Transfermarkt",
+            "sourceUrl": "https://www.transfermarkt.com/uefa-championsleague/ewigeTabelle/pokalwettbewerb/CL"
         },
         {
             "id": "9",
@@ -300,7 +316,9 @@
                 "Céline Dion",
                 "AC/DC",
                 "The Rolling Stones"
-            ]
+            ],
+            "sourceName": "Wikipedia",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_best-selling_music_artists"
         },
         {
             "id": "10",
@@ -322,7 +340,9 @@
                 "Erika",
                 "Julianna",
                 "Krisztina"
-            ]
+            ],
+            "sourceName": "Névnaplap",
+            "sourceUrl": "https://nevnaplap.hu/leggyakoribb-keresztnevek-listaja-magyarorszagon-2018-ban/"
         },
         {
             "id": "11",
@@ -354,7 +374,9 @@
                 "capri gyümölcs",
                 "snidling",
                 "marokkói citrom"
-            ]
+            ],
+            "sourceName": "Hamu és Gyémánt",
+            "sourceUrl": "https://hamuesgyemant.hu/gasztronomia/nyertes-halaszle-recept"
         },
         {
             "id": "12",
@@ -371,7 +393,9 @@
                 "Facebook Messenger",
                 "WhatsApp Business",
                 "Spotify"
-            ]
+            ],
+            "sourceName": "RouteNote",
+            "sourceUrl": "https://routenote.com/blog/the-most-popular-app-in-the-world-revealed/"
         },
         {
             "id": "13",
@@ -392,7 +416,9 @@
                 "Nick Fury",
                 "Tony Stark",
                 "Iron Man"
-            ]
+            ],
+            "sourceName": "Men's Health",
+            "sourceUrl": "https://www.menshealth.com/entertainment/a27253878/marvel-characters-avengers-endgame-most-appearances-mcu/"
         },
         {
             "id": "14",
@@ -421,7 +447,9 @@
                 "Frasier",
                 "Trónok harca",
                 "Saturday Night Live"
-            ]
+            ],
+            "sourceName": "IMDb",
+            "sourceUrl": "https://www.imdb.com/list/ls083322620/"
         },
         {
             "id": "15",
@@ -452,7 +480,9 @@
                 "Péter",
                 "Mihály",
                 "Gyula"
-            ]
+            ],
+            "sourceName": "Wikipedia",
+            "sourceUrl": "https://hu.wikipedia.org/wiki/Magyarorsz%C3%A1g_korm%C3%A1nyf%C5%91inek_list%C3%A1ja"
         }
     ]
 }

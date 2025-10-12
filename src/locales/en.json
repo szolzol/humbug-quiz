@@ -14,11 +14,11 @@
         },
         "section2": {
             "title": "2. Starting the Game",
-            "content": "Each round begins with the game master asking a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \"Name first names that have been held by prime ministers throughout history!\". The game master may only reveal the number of possible answers and the source of the question."
+            "content": "Each round begins with the game master asking a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \"Name first names that have been held by US presidents throughout history!\". The game master may only reveal the number of possible answers and the source of the question."
         },
         "section3": {
             "title": "3. Players' Answers",
-            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \"Ferenc\"). Unless a player has a pass option (see later), they must give an answer. If they don't know the answer, they can naturally bluff. The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the (potential) bluff!"
+            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \"George\"). Unless a player has a pass option (see later), they must give an answer. If they don't know the answer, they can naturally bluff. The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the (potential) bluff!"
         },
         "section4": {
             "title": "4. The \"Humbug!\"",
@@ -64,32 +64,27 @@
         "correctAnswers": "Correct Answers",
         "clickToMark": "Click on answers to mark them"
     },
+    "categoryFilter": {
+        "all": "all",
+        "activeFilters": "{{count}} categories selected"
+    },
     "footer": {
         "title": "HUMBUG!",
         "creators": "Created by <strong>Zoltán Szoleczki</strong> and <strong>Zsolt Beró</strong>",
         "copyright": "© 2025 HUMBUG! All rights reserved."
     },
     "categories": {
-        "tourism": "Tourism",
-        "socialMedia": "Social Media",
-        "literature": "Literature",
-        "videoGames": "Video Games",
-        "carBrands": "Car Brands",
-        "airports": "Airports",
-        "movies": "Movies",
-        "football": "Football",
-        "music": "Music",
-        "names": "First Names",
-        "gastronomy": "Gastronomy",
+        "entertainment": "Entertainment",
+        "travel": "Travel",
+        "sports": "Sports",
         "technology": "Technology",
-        "marvel": "Marvel",
-        "television": "Television",
-        "history": "History"
+        "gastronomy": "Gastronomy",
+        "culture": "Culture & History"
     },
     "allQuestions": [
         {
             "id": "1",
-            "category": "tourism",
+            "category": "travel",
             "question": "What are the most visited cities in the United States by international tourists?",
             "answers": [
                 "1. New York City (9.5M)",
@@ -113,7 +108,7 @@
         },
         {
             "id": "2",
-            "category": "socialMedia",
+            "category": "technology",
             "question": "Which celebrities' pages are among Instagram's top accounts with the most followers?",
             "sourceName": "Wikipedia",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_most-followed_Instagram_accounts",
@@ -134,7 +129,7 @@
         },
         {
             "id": "3",
-            "category": "literature",
+            "category": "culture",
             "question": "Name authors whose works are commonly included in American high school literature curricula!",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_most_commonly_challenged_books_in_the_United_States",
             "sourceName": "Wikipedia",
@@ -158,7 +153,7 @@
         },
         {
             "id": "4",
-            "category": "videoGames",
+            "category": "entertainment",
             "question": "Name video game franchises that have sold at least 100 million copies worldwide!",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_best-selling_video_game_franchises",
             "sourceName": "Wikipedia",
@@ -187,7 +182,7 @@
         },
         {
             "id": "5",
-            "category": "carBrands",
+            "category": "travel",
             "question": "What are the top 10 most popular car brands sold in the United States?",
             "sourceName": "Accio",
             "sourceUrl": "https://www.accio.com/business/top-selling-car-brands-in-usa-2024",
@@ -206,7 +201,7 @@
         },
         {
             "id": "6",
-            "category": "airports",
+            "category": "travel",
             "question": "Which cities have at least one airport among Europe's busiest airports?",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_Europe",
             "sourceName": "Wikipedia",
@@ -228,7 +223,7 @@
         },
         {
             "id": "7",
-            "category": "movies",
+            "category": "entertainment",
             "question": "Name movies that have at least an 8.7 rating on IMDb!",
             "sourceUrl": "https://www.imdb.com/chart/top/",
             "sourceName": "IMDb",
@@ -257,7 +252,7 @@
         },
         {
             "id": "8",
-            "category": "football",
+            "category": "sports",
             "question": "Since the start of the Champions League (1992), which soccer club teams have earned the most points in the competition?",
             "sourceUrl": "https://www.transfermarkt.com/uefa-championsleague/ewigeTabelle/pokalwettbewerb/CL",
             "sourceName": "Transfermarkt",
@@ -281,7 +276,7 @@
         },
         {
             "id": "9",
-            "category": "music",
+            "category": "entertainment",
             "question": "Name musical artists who have sold at least 200 million records during their career!",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_best-selling_music_artists",
             "sourceName": "Wikipedia",
@@ -308,7 +303,7 @@
         },
         {
             "id": "10",
-            "category": "names",
+            "category": "culture",
             "question": "What are the most popular female first names in the United States over the past century?",
             "sourceUrl": "https://www.ssa.gov/oact/babynames/decades/century.html",
             "sourceName": "Social Security Administration",
@@ -375,7 +370,7 @@
         },
         {
             "id": "13",
-            "category": "marvel",
+            "category": "entertainment",
             "question": "Which Marvel characters have appeared in at least 7 Marvel Cinematic Universe films?",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films",
             "sourceName": "Wikipedia",
@@ -398,7 +393,7 @@
         },
         {
             "id": "14",
-            "category": "television",
+            "category": "entertainment",
             "question": "Name TV series or talk shows that have received more than 20 Emmy awards throughout their history!",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_most_awarded_shows_at_the_Primetime_Emmy_Awards",
             "sourceName": "Wikipedia",
@@ -429,7 +424,7 @@
         },
         {
             "id": "15",
-            "category": "history",
+            "category": "culture",
             "question": "Name first names (including middle/second names) that have been held by at least 2 different United States presidents throughout history!",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States",
             "sourceName": "Wikipedia",
@@ -460,6 +455,135 @@
                 "8. Domino's (5,876 US locations)",
                 "9. Sonic Drive-In (3,606 US locations)",
                 "10. Chick-fil-A (2,400 US locations)"
+            ]
+        },
+        {
+            "id": "17",
+            "category": "sports",
+            "question": "What are the richest sports leagues in the world by annual revenue?",
+            "sourceName": "TradeBrains",
+            "sourceUrl": "https://tradebrains.in/top-7-richest-sports-leagues-in-the-world-ranked-by-revenue-2025-update/",
+            "answers": [
+                "1. National Football League - NFL ($23.0 billion)",
+                "2. Indian Premier League - IPL ($16.4 billion)",
+                "3. Major League Baseball - MLB ($12.2 billion)",
+                "4. National Basketball Association - NBA ($11.3 billion)",
+                "5. English Premier League - EPL ($7.5 billion)",
+                "6. Bundesliga ($6.8 billion)",
+                "7. National Hockey League - NHL ($6.2 billion)",
+                "8. La Liga Santander ($5.8 billion)",
+                "9. Serie A ($2.5 billion)",
+                "10. Ligue 1 ($2.0 billion)"
+            ]
+        },
+        {
+            "id": "18",
+            "category": "entertainment",
+            "question": "What are the highest-grossing movies of 2025 in the United States?",
+            "sourceName": "Box Office Mojo",
+            "sourceUrl": "https://www.boxofficemojo.com/year/2025/",
+            "answers": [
+                "1. A Minecraft Movie ($423.9M)",
+                "2. Lilo & Stitch ($423.8M)",
+                "3. Superman ($354.2M)",
+                "4. Jurassic World: Rebirth ($339.6M)",
+                "5. Sinners ($278.6M)",
+                "6. The Fantastic Four: First Steps ($274.2M)",
+                "7. How to Train Your Dragon ($263.0M)",
+                "8. Captain America: Brave New World ($200.5M)",
+                "9. Mission: Impossible - The Final Reckoning ($197.4M)",
+                "10. Thunderbolts* ($190.3M)",
+                "11. F1: The Movie ($189.5M)",
+                "12. The Conjuring: Last Rites ($172.4M)",
+                "13. Weapons ($151.1M)",
+                "14. Final Destination: Bloodlines ($138.1M)",
+                "15. Demon Slayer: Infinity Castle ($128.6M)"
+            ]
+        },
+        {
+            "id": "19",
+            "category": "technology",
+            "question": "What are the largest companies in the world by market capitalization?",
+            "sourceName": "Capital.com",
+            "sourceUrl": "https://capital.com/en-int/markets/shares/largest-companies-by-market-cap",
+            "answers": [
+                "1. NVIDIA ($4.55 trillion)",
+                "2. Microsoft ($3.85 trillion)",
+                "3. Apple ($3.51 trillion)",
+                "4. Alphabet - Google ($3.09 trillion)",
+                "5. Amazon ($2.47 trillion)",
+                "6. Meta Platforms - Facebook ($1.92 trillion)",
+                "7. Broadcom ($1.72 trillion)",
+                "8. Saudi Aramco ($1.49 trillion)",
+                "9. TSMC ($1.36 trillion)",
+                "10. Tesla ($1.28 trillion)",
+                "11. Berkshire Hathaway ($835 billion)",
+                "12. Walmart ($828 billion)",
+                "13. JPMorgan Chase ($747 billion)",
+                "14. Visa ($667 billion)",
+                "15. Eli Lilly ($518 billion)"
+            ]
+        },
+        {
+            "id": "20",
+            "category": "travel",
+            "question": "What are the most populated countries in the world?",
+            "sourceName": "Worldometers",
+            "sourceUrl": "https://www.worldometers.info/world-population/population-by-country/",
+            "answers": [
+                "1. India (1.46 billion)",
+                "2. China (1.42 billion)",
+                "3. United States (347 million)",
+                "4. Indonesia (286 million)",
+                "5. Pakistan (255 million)",
+                "6. Nigeria (238 million)",
+                "7. Brazil (213 million)",
+                "8. Bangladesh (176 million)",
+                "9. Russia (144 million)",
+                "10. Ethiopia (135 million)",
+                "11. Mexico (132 million)",
+                "12. Japan (123 million)",
+                "13. Egypt (118 million)",
+                "14. Philippines (117 million)",
+                "15. DR Congo (113 million)"
+            ]
+        },
+        {
+            "id": "21",
+            "category": "travel",
+            "question": "What are the most spoken languages in the world by total speakers?",
+            "sourceName": "ICLS & Babbel",
+            "sourceUrl": "https://www.icls.edu/blog/most-spoken-languages-in-the-world",
+            "answers": [
+                "1. English (1.52 billion)",
+                "2. Mandarin Chinese (1.14 billion)",
+                "3. Hindi (609 million)",
+                "4. Spanish (559 million)",
+                "5. Arabic (332 million)",
+                "6. French (312 million)",
+                "7. Bengali (278 million)",
+                "8. Portuguese (264 million)",
+                "9. Russian (255 million)",
+                "10. Urdu (238 million)"
+            ]
+        },
+        {
+            "id": "22",
+            "category": "gastronomy",
+            "question": "What are the best-selling soft drinks in the United States by market share?",
+            "sourceName": "SmartBuy & Beverage Digest",
+            "sourceUrl": "https://www.beverage-digest.com/",
+            "answers": [
+                "1. Coca-Cola Classic (15.2%)",
+                "2. Dr Pepper (9.7%)",
+                "3. Sprite (8.3%)",
+                "4. Pepsi (7.9%)",
+                "5. Diet Coke (5.1%)",
+                "6. Mountain Dew (4.5%)",
+                "7. Coke Zero Sugar (3.8%)",
+                "8. Diet Pepsi (2.5%)",
+                "9. Fanta (2.2%)",
+                "10. Canada Dry Ginger Ale (1.8%)"
             ]
         }
     ]

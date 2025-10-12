@@ -64,32 +64,27 @@
         "correctAnswers": "Helyes válaszok",
         "clickToMark": "Kattints a válaszokra a jelöléshez"
     },
+    "categoryFilter": {
+        "all": "összes",
+        "activeFilters": "{{count}} kategória kiválasztva"
+    },
     "footer": {
         "title": "HUMBUG!",
         "creators": "Készítette: <strong>Szoleczki Zoltán</strong> és <strong>Beró Zsolt</strong>",
         "copyright": "© 2025 HUMBUG! Minden jog fenntartva."
     },
     "categories": {
-        "tourism": "Turizmus",
-        "socialMedia": "Közösségi média",
-        "literature": "Irodalom",
-        "videoGames": "Videójátékok",
-        "carBrands": "Autómárkák",
-        "airports": "Repülőterek",
-        "movies": "Filmek",
-        "football": "Futball",
-        "music": "Zene",
-        "names": "Keresztnevek",
-        "gastronomy": "Gasztronómia",
+        "entertainment": "Szórakozás",
+        "travel": "Utazás",
+        "sports": "Sport",
         "technology": "Technológia",
-        "marvel": "Marvel",
-        "television": "Televízió",
-        "history": "Történelem"
+        "gastronomy": "Gasztronómia",
+        "culture": "Kultúra & Történelem"
     },
     "allQuestions": [
         {
             "id": "1",
-            "category": "tourism",
+            "category": "travel",
             "question": "Melyek a legkedveltebb hazai turisztikai úticélok a magyarok körében, a belföldi vendégéjszakák száma alapján?",
             "answers": [
                 "1. Budapest",
@@ -113,7 +108,7 @@
         },
         {
             "id": "2",
-            "category": "socialMedia",
+            "category": "technology",
             "question": "Mely hírességek oldalai találhatóak meg az Instagram legtöbb követővel rendelkező oldala között?",
             "sourceName": "Wikipedia",
             "sourceUrl": "https://en.wikipedia.org/wiki/List_of_most-followed_Instagram_accounts",
@@ -134,7 +129,7 @@
         },
         {
             "id": "3",
-            "category": "literature",
+            "category": "culture",
             "question": "Nevezzetek meg olyan szerzőket, akiknek legalább egy művük szerepel a Nemzeti Alaptantervben lévő kötelező olvasmányok közt!",
             "answers": [
                 "Petőfi Sándor",
@@ -174,7 +169,7 @@
         },
         {
             "id": "4",
-            "category": "videoGames",
+            "category": "entertainment",
             "question": "Nevezzetek meg olyan videójáték-franchiseokat, amelyekből legalább 100 millió példányt adtak el a világon!",
             "answers": [
                 "1. Mario (957 millió)",
@@ -203,7 +198,7 @@
         },
         {
             "id": "5",
-            "category": "carBrands",
+            "category": "travel",
             "question": "Melyek a leggyakoribb autómárkák Magyarország útjain?",
             "answers": [
                 "1. Opel",
@@ -227,7 +222,7 @@
         },
         {
             "id": "6",
-            "category": "airports",
+            "category": "travel",
             "question": "Melyek azok a városok, amelyeknek legalább 1 reptere szerepel Európa legforgalmasabb repülőterei között?",
             "answers": [
                 "1. London (83,9 millió)",
@@ -249,7 +244,7 @@
         },
         {
             "id": "7",
-            "category": "movies",
+            "category": "entertainment",
             "question": "Nevezzetek meg filmeket, amelyeknek legalább 8,7-es értékelésük van IMDb-n!",
             "answers": [
                 "1. A remény rabjai (9,3)",
@@ -278,7 +273,7 @@
         },
         {
             "id": "8",
-            "category": "football",
+            "category": "sports",
             "question": "A Bajnokok Ligája indulása óta (1992) mely klubcsapatok szerezték a legtöbb pontot a sorozatban?",
             "answers": [
                 "1. Real Madrid (991 pont)",
@@ -302,7 +297,7 @@
         },
         {
             "id": "9",
-            "category": "music",
+            "category": "entertainment",
             "question": "Soroljatok fel zenei előadókat, akik karrierjük során legalább 200 millió lemezt adtak el!",
             "answers": [
                 "1. The Beatles (600 millió)",
@@ -329,7 +324,7 @@
         },
         {
             "id": "10",
-            "category": "names",
+            "category": "culture",
             "question": "Melyek a leggyakoribb női keresztnevek Magyarországon a teljes népesség körében?",
             "answers": [
                 "1. Mária",
@@ -406,7 +401,7 @@
         },
         {
             "id": "13",
-            "category": "marvel",
+            "category": "entertainment",
             "question": "Melyek azok a Marvel-karakterek, amelyek legalább 7 Marvel Cinematic Universe-filmben feltűntek?",
             "answers": [
                 "Winter Soldier (7)",
@@ -429,7 +424,7 @@
         },
         {
             "id": "14",
-            "category": "television",
+            "category": "entertainment",
             "question": "Soroljatok fel tévésorozatokat vagy talk show-kat, amelyek történetük során több mint 20 Emmy-díjat kaptak!",
             "answers": [
                 "Gengszterkorzó (20)",
@@ -460,7 +455,7 @@
         },
         {
             "id": "15",
-            "category": "history",
+            "category": "culture",
             "question": "Soroljatok fel keresztneveket, amelyeket a történelem során legalább 1 magyar kormányfő viselt!",
             "answers": [
                 "István",
@@ -508,6 +503,135 @@
                 "8. Domino's (5 876 US étterem)",
                 "9. Sonic Drive-In (3 606 US étterem)",
                 "10. Chick-fil-A (2 400 US étterem)"
+            ]
+        },
+        {
+            "id": "17",
+            "category": "sports",
+            "question": "Melyek a világ leggazdagabb sportligái az éves bevétel alapján?",
+            "sourceName": "TradeBrains",
+            "sourceUrl": "https://tradebrains.in/top-7-richest-sports-leagues-in-the-world-ranked-by-revenue-2025-update/",
+            "answers": [
+                "1. National Football League - NFL (23,0 milliárd dollár)",
+                "2. Indian Premier League - IPL (16,4 milliárd dollár)",
+                "3. Major League Baseball - MLB (12,2 milliárd dollár)",
+                "4. National Basketball Association - NBA (11,3 milliárd dollár)",
+                "5. English Premier League - EPL (7,5 milliárd dollár)",
+                "6. Bundesliga (6,8 milliárd dollár)",
+                "7. National Hockey League - NHL (6,2 milliárd dollár)",
+                "8. La Liga Santander (5,8 milliárd dollár)",
+                "9. Serie A (2,5 milliárd dollár)",
+                "10. Ligue 1 (2,0 milliárd dollár)"
+            ]
+        },
+        {
+            "id": "18",
+            "category": "entertainment",
+            "question": "Melyek voltak 2025-ben a legtöbb bevételt hozó filmek az Egyesült Államokban?",
+            "sourceName": "Box Office Mojo",
+            "sourceUrl": "https://www.boxofficemojo.com/year/2025/",
+            "answers": [
+                "1. A Minecraft Movie (423,9 millió dollár)",
+                "2. Lilo & Stitch (423,8 millió dollár)",
+                "3. Superman (354,2 millió dollár)",
+                "4. Jurassic World: Rebirth (339,6 millió dollár)",
+                "5. Sinners (278,6 millió dollár)",
+                "6. The Fantastic Four: First Steps (274,2 millió dollár)",
+                "7. How to Train Your Dragon (263,0 millió dollár)",
+                "8. Captain America: Brave New World (200,5 millió dollár)",
+                "9. Mission: Impossible - The Final Reckoning (197,4 millió dollár)",
+                "10. Thunderbolts* (190,3 millió dollár)",
+                "11. F1: The Movie (189,5 millió dollár)",
+                "12. The Conjuring: Last Rites (172,4 millió dollár)",
+                "13. Weapons (151,1 millió dollár)",
+                "14. Final Destination: Bloodlines (138,1 millió dollár)",
+                "15. Demon Slayer: Infinity Castle (128,6 millió dollár)"
+            ]
+        },
+        {
+            "id": "19",
+            "category": "technology",
+            "question": "Melyek a világ legnagyobb vállalatai piaci kapitalizáció alapján?",
+            "sourceName": "Capital.com",
+            "sourceUrl": "https://capital.com/en-int/markets/shares/largest-companies-by-market-cap",
+            "answers": [
+                "1. NVIDIA (4,55 billió dollár)",
+                "2. Microsoft (3,85 billió dollár)",
+                "3. Apple (3,51 billió dollár)",
+                "4. Alphabet - Google (3,09 billió dollár)",
+                "5. Amazon (2,47 billió dollár)",
+                "6. Meta Platforms - Facebook (1,92 billió dollár)",
+                "7. Broadcom (1,72 billió dollár)",
+                "8. Saudi Aramco (1,49 billió dollár)",
+                "9. TSMC (1,36 billió dollár)",
+                "10. Tesla (1,28 billió dollár)",
+                "11. Berkshire Hathaway (835 milliárd dollár)",
+                "12. Walmart (828 milliárd dollár)",
+                "13. JPMorgan Chase (747 milliárd dollár)",
+                "14. Visa (667 milliárd dollár)",
+                "15. Eli Lilly (518 milliárd dollár)"
+            ]
+        },
+        {
+            "id": "20",
+            "category": "travel",
+            "question": "Melyek a világ legnépesebb országai?",
+            "sourceName": "Worldometers",
+            "sourceUrl": "https://www.worldometers.info/world-population/population-by-country/",
+            "answers": [
+                "1. India (1,46 milliárd)",
+                "2. Kína (1,42 milliárd)",
+                "3. Egyesült Államok (347 millió)",
+                "4. Indonézia (286 millió)",
+                "5. Pakisztán (255 millió)",
+                "6. Nigéria (238 millió)",
+                "7. Brazília (213 millió)",
+                "8. Banglades (176 millió)",
+                "9. Oroszország (144 millió)",
+                "10. Etiópia (135 millió)",
+                "11. Mexikó (132 millió)",
+                "12. Japán (123 millió)",
+                "13. Egyiptom (118 millió)",
+                "14. Fülöp-szigetek (117 millió)",
+                "15. Kongói Demokratikus Köztársaság (113 millió)"
+            ]
+        },
+        {
+            "id": "21",
+            "category": "travel",
+            "question": "Melyek a világ legelterjedtebb nyelvei az összes beszélő száma alapján?",
+            "sourceName": "ICLS & Babbel",
+            "sourceUrl": "https://www.icls.edu/blog/most-spoken-languages-in-the-world",
+            "answers": [
+                "1. Angol (1,52 milliárd)",
+                "2. Mandarin kínai (1,14 milliárd)",
+                "3. Hindi (609 millió)",
+                "4. Spanyol (559 millió)",
+                "5. Arab (332 millió)",
+                "6. Francia (312 millió)",
+                "7. Bengáli (278 millió)",
+                "8. Portugál (264 millió)",
+                "9. Orosz (255 millió)",
+                "10. Urdu (238 millió)"
+            ]
+        },
+        {
+            "id": "22",
+            "category": "gastronomy",
+            "question": "Melyek a legkelendőbb üdítőitalok az Egyesült Államokban piaci részesedés alapján?",
+            "sourceName": "SmartBuy & Beverage Digest",
+            "sourceUrl": "https://www.beverage-digest.com/",
+            "answers": [
+                "1. Coca-Cola Classic (15,2%)",
+                "2. Dr Pepper (9,7%)",
+                "3. Sprite (8,3%)",
+                "4. Pepsi (7,9%)",
+                "5. Diet Coke (5,1%)",
+                "6. Mountain Dew (4,5%)",
+                "7. Coke Zero Sugar (3,8%)",
+                "8. Diet Pepsi (2,5%)",
+                "9. Fanta (2,2%)",
+                "10. Canada Dry Ginger Ale (1,8%)"
             ]
         }
     ]

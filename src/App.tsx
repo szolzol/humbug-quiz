@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
+import { CategoryFilter } from "@/components/CategoryFilter";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -116,6 +117,7 @@ const AnimatedQuestionsLight = ({
 function App() {
   const { t, i18n } = useTranslation();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // Load questions from translations
   const questions = t("allQuestions", { returnObjects: true }) as Array<{
@@ -125,8 +127,41 @@ function App() {
     answers: string[];
   }>;
 
+  // Get unique categories
+  const uniqueCategories = Array.from(
+    new Set(questions.map((q) => q.category))
+  ).sort();
+
+  // Count questions per category
+  const categoryCounts = questions.reduce((acc, q) => {
+    acc[q.category] = (acc[q.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Toggle category selection
+  const handleCategoryToggle = (category: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(category)) {
+        return prev.filter((c) => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+
+  // Clear all filters
+  const handleClearAll = () => {
+    setSelectedCategories([]);
+  };
+
+  // Filter questions based on selected categories
+  const filteredQuestions =
+    selectedCategories.length === 0
+      ? questions
+      : questions.filter((q) => selectedCategories.includes(q.category));
+
   // Map questions with translated categories
-  const translatedQuestions = questions.map((q) => ({
+  const translatedQuestions = filteredQuestions.map((q) => ({
     ...q,
     category: t(`categories.${q.category}`),
   }));
@@ -421,6 +456,16 @@ function App() {
               title={t("questions.backgroundMusic")}
             />
           </div>
+
+          {/* Category Filter */}
+          <CategoryFilter
+            categories={uniqueCategories}
+            selectedCategories={selectedCategories}
+            onCategoryToggle={handleCategoryToggle}
+            onClearAll={handleClearAll}
+            categoryCounts={categoryCounts}
+            totalQuestions={questions.length}
+          />
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {translatedQuestions.map((question, index) => (

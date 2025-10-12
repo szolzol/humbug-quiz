@@ -98,8 +98,9 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     <motion.div
       className="relative w-full aspect-[9/16] md:aspect-[4/3] perspective-1000"
       initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, delay: index * 0.05 }}
       whileHover={{ scale: 1.02 }}>
       <motion.div
         className="relative w-full h-full preserve-3d"
@@ -135,9 +136,9 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
           <CardContent className="flex flex-col justify-between h-full p-4 md:p-6 relative z-10">
             {/* Top section with flip instruction and arrow - aligned with button */}
-            <div className="flex items-center justify-end pr-14 md:pr-16 text-primary-foreground/80 text-sm md:text-sm">
+            <div className="flex items-center justify-end pr-14 md:pr-16 text-primary-foreground/80 text-base md:text-base">
               <div className="flex items-center gap-1.5">
-                <span className="font-medium whitespace-nowrap">
+                <span className="font-medium text-right md:whitespace-nowrap">
                   {t("questions.flipCard")}
                 </span>
                 <motion.div

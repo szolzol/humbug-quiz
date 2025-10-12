@@ -12,7 +12,7 @@ import {
   Users,
   Target,
   Crown,
-  Play,
+  ArrowDown,
   CaretDown,
   CaretUp,
 } from "@phosphor-icons/react";
@@ -238,7 +238,7 @@ function App() {
                       .getElementById("questions-section")
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}>
-                  <Play className="mr-2" size={24} weight="fill" />
+                  <ArrowDown className="mr-2" size={24} weight="bold" />
                   {t("hero.ctaButton")}
                 </Button>
               </motion.div>
@@ -293,7 +293,9 @@ function App() {
                 onClick={() => setIsRulesOpen(!isRulesOpen)}
                 className="w-full flex items-center justify-between text-sm font-medium py-2 h-auto mt-0 rounded-t-none border-t-0 bg-yellow-500/20 hover:bg-muted/50"
                 variant="ghost">
-                <span className="text-foreground">{t("rules.detailedRules")}</span>
+                <span className="text-foreground">
+                  {t("rules.detailedRules")}
+                </span>
                 <motion.div
                   animate={{ rotate: isRulesOpen ? 180 : 0 }}
                   transition={{ duration: 0.3 }}>
@@ -427,9 +429,10 @@ function App() {
             <h3 className="text-2xl font-bold mb-4 text-primary">
               {t("footer.title")}
             </h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              {t("footer.creators")}
-            </p>
+            <p
+              className="text-sm text-muted-foreground mb-2"
+              dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
+            />
             <p className="text-sm text-muted-foreground">
               {t("footer.copyright")}
             </p>

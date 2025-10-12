@@ -21,7 +21,9 @@ export function LanguageSwitcher() {
         size="sm"
         variant="outline"
         className="bg-background/90 backdrop-blur-sm hover:bg-background border-2 border-primary/20 hover:border-primary/40 font-bold shadow-lg transition-all duration-300 hover:scale-105">
-        <span className="text-sm text-foreground">{i18n.language === "hu" ? "HU" : "EN"}</span>
+        <span className="text-sm text-foreground">
+          {i18n.language === "hu" ? "HU" : "EN"}
+        </span>
       </Button>
     </motion.div>
   );

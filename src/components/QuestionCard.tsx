@@ -9,6 +9,8 @@ interface QuizQuestion {
   question: string;
   answers: string[];
   category: string;
+  sourceUrl?: string;
+  sourceName?: string;
 }
 
 interface QuestionCardProps {
@@ -170,11 +172,26 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               </h3>
             </div>
 
-            {/* Bottom section with answer count */}
-            <div className="text-center text-primary-foreground/80 text-base md:text-base font-medium">
-              {t("questions.totalAnswers", {
-                count: question.answers.length,
-              })}
+            {/* Bottom section with answer count and source */}
+            <div className="text-center space-y-1">
+              <div className="text-primary-foreground/80 text-base md:text-base font-medium">
+                {t("questions.totalAnswers", {
+                  count: question.answers.length,
+                })}
+              </div>
+              {question.sourceUrl && (
+                <div className="text-primary-foreground/60 text-sm">
+                  <span>Source: </span>
+                  <a
+                    href={question.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-foreground/80 hover:text-primary-foreground underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}>
+                    {question.sourceName || "Wikipedia"}
+                  </a>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

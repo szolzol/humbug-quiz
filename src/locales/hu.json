@@ -9,24 +9,28 @@
         "audioTitle": "Hogyan játsszuk?",
         "detailedRules": "Részletes szabályok",
         "section1": {
-            "title": "1. A játék kezdete",
-            "content": "A játékmester feltesz egy kvízkérdést a teljes csapatnak, melynek általában legalább egy tucat helyes megoldása van. Például: \"Soroljatok fel olyan keresztneveket, amelyeket a történelem során magyar kormányfő viselt!\""
+            "title": "1. Előkészületek",
+            "content": "A HUMBUG! egy egyszerű játék, amelyhez nincs szükség semmilyen fizikai eszközre, maximum az életek és passz lehetőségek számát kell nyilvántartani. A kérdés \"kártyát\" is csak a játékmesternek kell látnia, aki felolvassa a kérdést és ellenőrzi a válaszokat. A játékmester lehet bárki a csapatból és a szerepe körönként felváltva is betölthető."
         },
         "section2": {
-            "title": "2. Játékosok válaszai",
-            "content": "A játékosoknak sorban haladva mondaniuk kell egy-egy lehetséges választ, amelyik szerintük helyes válasz lehet az adott kérdésre (például: \"Ferenc\"). A játékmester nem kommentálja az elhangzott válaszokat, mert nem az a lényeg, hogy a válasz jó-e vagy sem, hanem, hogy lesz-e aki lefüleli a blöfföt!"
+            "title": "2. A játék kezdete",
+            "content": "Minden kör úgy indul, hogy a játékmester feltesz egy kvízkérdést a teljes csapatnak, melynek általában legalább egy tucat helyes megoldása van. Például: \"Soroljatok fel olyan keresztneveket, amelyeket a történelem során magyar kormányfő viselt!\". A játékmester egyedül a lehetséges válaszok számát és a kérdés forrását ismertetheti."
         },
         "section3": {
-            "title": "3. A \"Humbug!\"",
-            "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \"Humbug!\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
+            "title": "3. Játékosok válaszai",
+            "content": "A játékosoknak sorban haladva mondaniuk kell egy-egy lehetséges választ, amelyik szerintük helyes válasz lehet az adott kérdésre (például: \"Ferenc\"). Hacsak a játékosnak nincs passzolási lehetősége (lásd később), kötelező választ adnia. Ha nem tudja a választ, természetesen blöffölhet. A játékmester nem kommentálja az elhangzott válaszokat, mert nem az a lényeg, hogy a válasz jó-e vagy sem, hanem, hogy lesz-e aki lefüleli a (lehetséges) blöfföt!"
         },
         "section4": {
-            "title": "4. Győzelem és vereség",
-            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \"életben marad\"."
+            "title": "4. A \"Humbug!\"",
+            "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \"Humbug!\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
         },
         "section5": {
-            "title": "5. Alternatív játékmód",
-            "content": "Játszható a játék úgy is, hogy egy adott forduló nem ér véget az első blöff bemondásánál. Ekkor a még aktív játékosok - azaz a megkérdőjelezett választ adó és a blöfföt behívó játékos kivételével mindenki - mennek tovább a második blöff bemondásáig. Ebben az esetben 2 különböző játékos is életet veszít az adott körben."
+            "title": "5. Győzelem és vereség",
+            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \"életben marad\"."
+        },
+        "section6": {
+            "title": "6. Alternatív játékmód",
+            "content": "Sok játékos esetén játszható a játék úgy is, hogy egy adott forduló nem ér véget az első blöff bemondásánál. Ekkor a még aktív játékosok - azaz a megkérdőjelezett választ adó és a blöfföt behívó játékos kivételével mindenki - mennek tovább a második blöff bemondásáig. Ebben az esetben 2 különböző játékos is életet veszít az adott körben."
         }
     },
     "features": {
@@ -53,7 +57,7 @@
         "title": "Feladványok",
         "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
         "backgroundMusic": "HUMBUG! háttérzene",
-        "musicPlaying": "🎵 Most szól...",
+        "musicPlaying": "Most szól...",
         "musicPaused": "Kattints a hangulat megteremtéséhez",
         "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
         "totalAnswers": "Összesen {{count}} lehetséges válasz",

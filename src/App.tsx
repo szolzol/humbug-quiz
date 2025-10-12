@@ -166,7 +166,7 @@ function App() {
       <div className="relative overflow-hidden">
         {/* Shared Background Image - covers both hero and game rules */}
         <div
-          className="absolute inset-0 bg-cover bg-fixed opacity-70 hero-background"
+          className="absolute inset-0 bg-cover bg-no-repeat bg-fixed opacity-70 hero-background"
           style={{
             backgroundImage: `url(${humbugMoodImage})`,
             backgroundPosition: "center 40%",

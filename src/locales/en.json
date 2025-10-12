@@ -9,24 +9,28 @@
         "audioTitle": "How to Play?",
         "detailedRules": "Detailed Rules",
         "section1": {
-            "title": "1. Starting the Game",
-            "content": "The game master asks a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \"Name first names that have been held by Hungarian prime ministers throughout history!\""
+            "title": "1. Preparation",
+            "content": "HUMBUG! is a simple game that doesn't require any physical equipment, at most you need to keep track of lives and pass options. Only the game master needs to see the question \"card\", who reads the question aloud and verifies the answers. The game master can be anyone from the group and the role can be rotated between rounds."
         },
         "section2": {
-            "title": "2. Players' Answers",
-            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \"Ferenc\"). The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the bluff!"
+            "title": "2. Starting the Game",
+            "content": "Each round begins with the game master asking a quiz question to the entire team, which usually has at least a dozen correct answers. For example: \"Name first names that have been held by prime ministers throughout history!\". The game master may only reveal the number of possible answers and the source of the question."
         },
         "section3": {
-            "title": "3. The \"Humbug!\"",
-            "content": "A round ends when a player challenges the answer of the person before them by loudly saying \"Humbug!\" The game master then checks whether the questioned answer is correct or not."
+            "title": "3. Players' Answers",
+            "content": "Players must take turns giving one possible answer that they think could be correct for the given question (for example: \"Ferenc\"). Unless a player has a pass option (see later), they must give an answer. If they don't know the answer, they can naturally bluff. The game master does not comment on the answers given, because the point is not whether the answer is correct or not, but whether anyone will call out the (potential) bluff!"
         },
         "section4": {
-            "title": "4. Victory and Defeat",
-            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \"alive\" last."
+            "title": "4. The \"Humbug!\"",
+            "content": "A round ends when a player challenges the answer of someone before them by loudly saying \"Humbug!\" The game master then checks whether the questioned answer is correct or not."
         },
         "section5": {
-            "title": "5. Alternative Game Mode",
-            "content": "The game can also be played so that a round does not end at the first bluff call. In this case, the still active players - meaning everyone except the player who gave the challenged answer and the player who called the bluff - continue until the second bluff call. In this case, 2 different players lose a life in that round."
+            "title": "5. Victory and Defeat",
+            "content": "If it was correct, the player who called the bluff loses a life, but if it was wrong, then logically the one who gave the incorrect answer loses. If the bluff call was correct, that player also gains a pass option, which they can use later at any time. Meaning when it's their turn, they can say pass and we skip their round. Players start with 1, 2, or 3 lives based on prior agreement. The winner is the one who remains \"alive\" last."
+        },
+        "section6": {
+            "title": "6. Alternative Game Mode",
+            "content": "With many players, the game can also be played so that a round does not end at the first bluff call. In this case, the still active players - meaning everyone except the player who gave the challenged answer and the player who called the bluff - continue until the second bluff call. In this case, 2 different players lose a life in that round."
         }
     },
     "features": {
@@ -52,8 +56,8 @@
     "questions": {
         "title": "Questions",
         "subtitle": "Browse through the questions! If you're the game master, click on the cards to view the answers and mark the correct answers that have been given.",
-        "backgroundMusic": "HUMBUG! main theme",
-        "musicPlaying": "🎵 Now Playing...",
+        "backgroundMusic": "HUMBUG! Main theme",
+        "musicPlaying": "Now Playing...",
         "musicPaused": "Click to set the mood",
         "flipCard": "Game master? Click for the answers!",
         "totalAnswers": "Total of {{count}} possible answers",

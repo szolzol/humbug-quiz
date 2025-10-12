@@ -178,7 +178,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
       sans-serif;
   }
 
@@ -192,7 +192,7 @@
   h4,
   h5,
   h6 {
-    font-family: "Poppins", sans-serif;
+    font-family: "Space Grotesk", sans-serif;
   }
 }
 

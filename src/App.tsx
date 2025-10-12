@@ -191,7 +191,9 @@ function App() {
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
                 className="mb-4">
-                <h1 className="text-6xl md:text-8xl font-black tracking-tight">
+                <h1
+                  className="text-6xl md:text-8xl font-black tracking-tight"
+                  style={{ fontFamily: "Space Grotesk, sans-serif" }}>
                   <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-2xl">
                     {t("hero.title")}
                   </span>
@@ -206,7 +208,8 @@ function App() {
                   delay: 0.6,
                   ease: [0.25, 0.1, 0.25, 1.0],
                 }}
-                className="text-xl md:text-3xl font-bold text-foreground/90 mb-6 tracking-wide">
+                className="text-xl md:text-3xl font-bold text-foreground/90 mb-6 tracking-wide"
+                style={{ fontFamily: "Space Grotesk, sans-serif" }}>
                 {t("hero.subtitle")}
               </motion.p>
 

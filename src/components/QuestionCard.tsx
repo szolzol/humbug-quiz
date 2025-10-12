@@ -130,7 +130,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               className="text-primary-foreground/[0.07] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
               style={{
                 transform: "rotate(-45deg)",
-                fontFamily: "Poppins, sans-serif",
+                fontFamily: "Space Grotesk, sans-serif",
               }}>
               HUMBUG!
             </div>
@@ -206,7 +206,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
               className="text-secondary-foreground/[0.05] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
               style={{
                 transform: "rotate(-45deg)",
-                fontFamily: "Poppins, sans-serif",
+                fontFamily: "Space Grotesk, sans-serif",
               }}>
               HUMBUG!
             </div>

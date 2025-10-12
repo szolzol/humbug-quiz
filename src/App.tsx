@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +19,7 @@ import {
 } from "@phosphor-icons/react";
 import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
 import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
+import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 
 // Studio light animation configurations
@@ -164,8 +166,11 @@ function App() {
       <div className="relative overflow-hidden">
         {/* Shared Background Image - covers both hero and game rules */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-fixed opacity-70 hero-background"
-          style={{ backgroundImage: `url(${humbugMoodImage})` }}
+          className="absolute inset-0 bg-cover bg-fixed opacity-70 hero-background"
+          style={{
+            backgroundImage: `url(${humbugMoodImage})`,
+            backgroundPosition: "center 40%",
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background/90" />
 
@@ -235,7 +240,7 @@ function App() {
                 }}>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 hover:!bg-none hover:!bg-transparent hover:border-2 hover:border-primary hover:text-white hover:shadow-2xl"
                   onClick={() => {
                     document
                       .getElementById("questions-section")
@@ -408,6 +413,14 @@ function App() {
               {t("questions.subtitle")}
             </p>
           </motion.div>
+
+          {/* Background Music Player */}
+          <div className="max-w-3xl mx-auto mb-12">
+            <BackgroundMusicPlayer
+              src={humbugMainTheme}
+              title={t("questions.backgroundMusic")}
+            />
+          </div>
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {translatedQuestions.map((question, index) => (

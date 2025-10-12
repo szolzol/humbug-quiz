@@ -18,11 +18,11 @@
         },
         "section3": {
             "title": "3. A \"Humbug!\"",
-            "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \\\"Humbug!\\\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
+            "content": "Egy fordulónak akkor van vége, ha egy játékos megkérdőjelezi egy előtte megszólaló válaszát azzal, hogy hangosan \"Humbug!\" szót mond rá. A játékmester ekkor ellenőrzi, hogy a kérdéses válasz jó-e vagy sem."
         },
         "section4": {
             "title": "4. Győzelem és vereség",
-            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \\\"életben marad\\\"."
+            "content": "Ha jó volt, a blöfföt hívó játékos veszít egy életet, ha viszont rossz, akkor értelemszerűen az veszít, aki a hibás választ mondta. Ha helyes volt a blöff bemondása, akkor az azt bemondó játékos egy passzolási lehetőséggel is gazdagodik, amit később bármikor felhasználhat. Vagyis amikor rákerül a sor, mondhat passzt is, és átugorjuk a körét. A játékosok előzetes megegyezés alapján 1, 2 vagy 3 élettel indulnak. Az nyer, aki utoljára \"életben marad\"."
         },
         "section5": {
             "title": "5. Alternatív játékmód",
@@ -51,7 +51,10 @@
     },
     "questions": {
         "title": "Feladványok",
-        "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a helyes válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
+        "subtitle": "Böngéssz a kérdések között! Ha játékmester vagy, kattints a kártyákra a válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
+        "backgroundMusic": "HUMBUG! háttérzene",
+        "musicPlaying": "🎵 Most szól...",
+        "musicPaused": "Kattints a hangulat megteremtéséhez",
         "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
         "totalAnswers": "Összesen {{count}} lehetséges válasz",
         "correctAnswers": "Helyes válaszok",
@@ -488,19 +491,19 @@
             "id": "16",
             "category": "gastronomy",
             "question": "Melyek azok a gyorsétterem láncok, amelyeknek a legtöbb étterme van az Egyesült Államokban?",
-            "sourceName": "Wikipedia",
-            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_the_largest_fast_food_restaurant_chains",
+            "sourceName": "QSR Magazine",
+            "sourceUrl": "https://www.qsrmagazine.com/reports/ranking-top-50-fast-food-chains-america/",
             "answers": [
-                "1. McDonald's",
-                "2. Starbucks",
-                "3. Subway",
-                "4. Dunkin' Donuts",
-                "5. Taco Bell",
-                "6. Wendy's",
-                "7. Burger King",
-                "8. Chick-fil-A",
-                "9. Sonic Drive-In",
-                "10. Domino's"
+                "1. Subway (24 798 US étterem)",
+                "2. Starbucks (14 825 US étterem)",
+                "3. McDonald's (13 914 US étterem)",
+                "4. Dunkin' (9 419 US étterem)",
+                "5. Burger King (7 327 US étterem)",
+                "6. Wendy's (6 711 US étterem)",
+                "7. Taco Bell (6 588 US étterem)",
+                "8. Domino's (5 876 US étterem)",
+                "9. Sonic Drive-In (3 606 US étterem)",
+                "10. Chick-fil-A (2 400 US étterem)"
             ]
         }
     ]

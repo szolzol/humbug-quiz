@@ -198,12 +198,12 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
         {/* Back of card */}
         <Card
-          className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/80 border-2 border-accent shadow-xl overflow-hidden"
+          className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-card border-2 border-border shadow-xl overflow-hidden"
           style={{ pointerEvents: isFlipped ? "auto" : "none" }}>
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
-              className="text-secondary-foreground/[0.05] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
+              className="text-card-foreground/[0.05] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
               style={{
                 transform: "rotate(-45deg)",
                 fontFamily: "Space Grotesk, sans-serif",
@@ -215,7 +215,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
           <CardContent
             className="flex flex-col h-full p-3 md:p-4 relative z-10"
             onClick={(e) => e.stopPropagation()}>
-            <div className="text-secondary-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
+            <div className="text-card-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
               {t("questions.correctAnswers")}
               <span className="ml-2 text-xs md:text-sm font-normal">
                 ({selectedAnswers.size} / {question.answers.length})
@@ -230,23 +230,23 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                   : columns === 2
                   ? "grid-cols-1 md:grid-cols-2"
                   : "grid-cols-1"
-              } gap-1.5 md:gap-2 scrollbar-thin scrollbar-thumb-secondary-foreground/20 scrollbar-track-transparent`}>
+              } gap-1.5 md:gap-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent`}>
               {question.answers.map((answer, answerIndex) => (
                 <button
                   key={answerIndex}
                   className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 w-full ${
                     selectedAnswers.has(answerIndex)
                       ? "bg-green-500/30 border border-green-500/50"
-                      : "bg-secondary-foreground/10 hover:bg-secondary-foreground/20"
+                      : "bg-muted hover:bg-muted/80"
                   }`}
                   onClick={(e) => handleAnswerClick(e, answerIndex)}>
-                  <span className="text-secondary-foreground font-medium">
+                  <span className="text-card-foreground font-medium">
                     {answer}
                   </span>
                 </button>
               ))}
             </div>
-            <div className="mt-2 text-secondary-foreground/60 text-[10px] md:text-xs text-center leading-tight">
+            <div className="mt-2 text-muted-foreground text-[10px] md:text-xs text-center leading-tight">
               {t("questions.clickToMark")}
             </div>
           </CardContent>

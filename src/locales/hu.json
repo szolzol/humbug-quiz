@@ -71,7 +71,8 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Készítette: <strong>Szoleczki Zoltán</strong> és <strong>Beró Zsolt</strong>",
-        "copyright": "© 2025 HUMBUG! Minden jog fenntartva."
+        "copyright": "© 2025 HUMBUG! Minden jog fenntartva.",
+        "otherProject": "Nézd meg a másik projektjüket: <strong>DarQba</strong> - Rejtély megfejtős parti játék"
     },
     "categories": {
         "entertainment": "Szórakozás",

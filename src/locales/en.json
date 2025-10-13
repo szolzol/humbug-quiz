@@ -71,7 +71,8 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Created by <strong>Zoltán Szoleczki</strong> and <strong>Zsolt Beró</strong>",
-        "copyright": "© 2025 HUMBUG! All rights reserved."
+        "copyright": "© 2025 HUMBUG! All rights reserved.",
+        "otherProject": "Check out their other project: <strong>DarQba</strong> - Mystery solving party game"
     },
     "categories": {
         "entertainment": "Entertainment",

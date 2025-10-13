@@ -100,7 +100,7 @@ export function AudioPlayer({ src, title }: AudioPlayerProps) {
 
   return (
     <motion.div
-      className="bg-card/30 backdrop-blur-sm border border-border rounded-t-xl rounded-b-none p-6 shadow-lg"
+      className="bg-card/10 md:bg-card/30 backdrop-blur-sm border border-border/50 rounded-t-xl rounded-b-none p-6 shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}>

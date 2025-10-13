@@ -494,6 +494,19 @@ function App() {
               className="text-sm text-muted-foreground mb-2"
               dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
             />
+            <p className="text-sm text-muted-foreground mb-2">
+              <span
+                dangerouslySetInnerHTML={{ __html: t("footer.otherProject") }}
+              />{" "}
+              -{" "}
+              <a
+                href="https://szolzol.github.io/darkoba-vue/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-accent transition-colors underline">
+                Play DarQba
+              </a>
+            </p>
             <p className="text-sm text-muted-foreground">
               {t("footer.copyright")}
             </p>

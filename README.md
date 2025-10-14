@@ -4,7 +4,7 @@
 
 **FAKE IT TILL YOU WIN IT**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://humbug-quiz.vercel.app)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://humbug.hu)
 [![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38bdf8)](https://tailwindcss.com/)
@@ -496,7 +496,7 @@ HUMBUG! is a fully functional **Progressive Web App** with offline support and i
 
 #### Mobile (Android/iOS)
 
-1. Visit [humbug-quiz.vercel.app](https://humbug-quiz.vercel.app)
+1. Visit [humbug.hu](https://humbug.hu)
 2. Tap browser menu (⋮ or share icon)
 3. Select **"Add to Home Screen"**
 4. App icon appears on home screen
@@ -563,6 +563,15 @@ This project is optimized for Vercel deployment:
    - Push to `main` branch triggers automatic deployment
    - Preview deployments for all PRs
 
+### Custom Domain Setup
+
+To configure a custom domain with Vercel:
+
+- See [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) for complete instructions
+- Includes Vercel dashboard configuration
+- DNS setup for registrars (Forpsi, GoDaddy, etc.)
+- Troubleshooting and verification steps
+
 ### Custom Headers (vercel.json)
 
 The project includes a `vercel.json` with:
@@ -626,7 +635,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Contact & Support
 
-- **Live Demo**: [humbug-quiz.vercel.app](https://humbug-quiz.vercel.app)
+- **Live Demo**: [humbug.hu](https://humbug.hu)
 - **Repository**: [github.com/szolzol/humbug-quiz](https://github.com/szolzol/humbug-quiz)
 - **Issues**: [GitHub Issues](https://github.com/szolzol/humbug-quiz/issues)
 

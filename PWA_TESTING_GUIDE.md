@@ -106,7 +106,7 @@ git push
 
 After deployment:
 
-1. Visit: https://humbug-quiz.vercel.app
+1. Visit: https://humbug.hu
 2. Install on mobile device
 3. Test offline functionality
 4. Share with users!

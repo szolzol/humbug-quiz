@@ -1,8 +1,8 @@
 // HUMBUG! Quiz Service Worker
-// Version 1.0.0
+// Version 1.1.0 - Updated icons
 
-const CACHE_NAME = "humbug-quiz-v1";
-const RUNTIME_CACHE = "humbug-quiz-runtime-v1";
+const CACHE_NAME = "humbug-quiz-v2";
+const RUNTIME_CACHE = "humbug-quiz-runtime-v2";
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
@@ -10,8 +10,13 @@ const PRECACHE_ASSETS = [
   "/index.html",
   "/manifest.json",
   "/icon.svg",
-  "/icon-192x192.png",
-  "/icon-512x512.png",
+  "/icon-maskable.svg",
+  "/favicon.ico",
+  "/favicon-16x16.png",
+  "/favicon-32x32.png",
+  "/android-chrome-192x192.png",
+  "/android-chrome-512x512.png",
+  "/apple-touch-icon.png",
   "/fonts/SpaceGrotesk-Light.ttf",
   "/fonts/SpaceGrotesk-Regular.ttf",
   "/fonts/SpaceGrotesk-Medium.ttf",

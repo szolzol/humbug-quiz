@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" style="stop-color:#2d2d3f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#15151f;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Safe zone background (entire canvas) -->
+  <rect width="512" height="512" fill="url(#bgGradient)"/>
+  
+  <!-- Icon content in safe zone (80% of canvas = 410x410 centered) -->
+  <g transform="translate(51, 51)">
+    <!-- Brain Icon - Gold - scaled to fit safe zone -->
+    <g fill="none" stroke="#d4af37" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Left hemisphere -->
+      <path d="M 144 205 Q 112 144, 144 112 Q 176 80, 205 112" />
+      <path d="M 144 205 Q 112 266, 144 298 Q 176 330, 205 298" />
+      
+      <!-- Right hemisphere -->
+      <path d="M 266 205 Q 298 144, 266 112 Q 234 80, 205 112" />
+      <path d="M 266 205 Q 298 266, 266 298 Q 234 330, 205 298" />
+      
+      <!-- Center connection -->
+      <path d="M 205 112 L 205 144" />
+      <path d="M 205 266 L 205 298" />
+      
+      <!-- Brain folds - left side -->
+      <path d="M 128 160 Q 144 152, 160 160 Q 176 168, 184 184" />
+      <path d="M 128 205 Q 144 197, 160 205" />
+      <path d="M 128 250 Q 144 242, 160 250 Q 176 258, 184 242" />
+      
+      <!-- Brain folds - right side -->
+      <path d="M 282 160 Q 266 152, 250 160 Q 234 168, 226 184" />
+      <path d="M 282 205 Q 266 197, 250 205" />
+      <path d="M 282 250 Q 266 242, 250 250 Q 234 258, 226 242" />
+      
+      <!-- Additional detail lines -->
+      <path d="M 160 136 Q 176 128, 192 136" />
+      <path d="M 218 136 Q 234 128, 250 136" />
+      <path d="M 160 274 Q 176 282, 192 274" />
+      <path d="M 218 274 Q 234 282, 250 274" />
+    </g>
+    
+    <!-- Highlight/shine effect -->
+    <ellipse cx="160" cy="144" rx="32" ry="24" fill="#f5d070" opacity="0.15"/>
+    
+    <!-- HUMBUG! text at bottom -->
+    <text x="205" y="370" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="bold" fill="#d4af37" letter-spacing="2">HUMBUG!</text>
+  </g>
+</svg>

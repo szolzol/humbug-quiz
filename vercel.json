@@ -11,6 +11,13 @@
     "github": {
         "autoAlias": true
     },
+    "redirects": [
+        {
+            "source": "/www",
+            "destination": "https://humbug.hu",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",

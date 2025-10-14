@@ -495,6 +495,7 @@ HUMBUG! is a fully functional **Progressive Web App** with offline support and i
 ### Installation
 
 #### Mobile (Android/iOS)
+
 1. Visit [humbug-quiz.vercel.app](https://humbug-quiz.vercel.app)
 2. Tap browser menu (⋮ or share icon)
 3. Select **"Add to Home Screen"**
@@ -502,6 +503,7 @@ HUMBUG! is a fully functional **Progressive Web App** with offline support and i
 5. Launch like any native app!
 
 #### Desktop (Chrome/Edge)
+
 1. Visit the site in browser
 2. Look for install icon (⊕) in address bar
 3. Click to install
@@ -511,18 +513,21 @@ HUMBUG! is a fully functional **Progressive Web App** with offline support and i
 ### Technical Details
 
 **Service Worker**: `public/sw.js`
+
 - Cache-first strategy with network fallback
 - Precaches: HTML, fonts, icons, manifest
 - Runtime caches: JS, CSS, images
 - Version-controlled cache management
 
 **Manifest**: `public/manifest.json`
+
 - Standalone display mode
 - Golden theme color (#d4af37)
 - Navy background (#15151f)
 - Multiple icon sizes (192x192, 512x512, SVG)
 
 **Update Mechanism**:
+
 - Automatic update checks every hour
 - User-friendly update notifications
 - Non-intrusive "Update" or "Later" prompts

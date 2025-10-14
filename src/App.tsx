@@ -221,7 +221,7 @@ function App() {
           transition={{ duration: 1 }}>
           <div className="container mx-auto px-6 py-8 relative z-10">
             {/* Language Switcher & Login Button - Top Right */}
-            <div className="absolute -top-2 right-2 md:top-4 md:right-6 z-20 flex items-center gap-2">
+            <div className="absolute top-4 right-2 md:top-4 md:right-6 z-20 flex items-center gap-2">
               <LoginButton />
               <LanguageSwitcher />
             </div>

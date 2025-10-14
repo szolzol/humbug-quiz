@@ -599,5 +599,21 @@
         "androidManual": "To install:",
         "androidStep1": "Tap the browser menu (⋮)",
         "androidStep2": "Select 'Add to Home screen' or 'Install app'"
+    },
+    "auth": {
+        "signIn": "Sign in",
+        "signInWithGoogle": "Sign in with Google",
+        "signOut": "Sign Out",
+        "welcome": "Welcome",
+        "lockedCard": "Locked card",
+        "unlockCards": "Sign in to unlock all cards",
+        "cardCount": "{{visible}}/{{total}} cards available",
+        "ctaTitle": "Discover all questions after signing in!",
+        "ctaDescription": "Make your next HUMBUG! party even more memorable!",
+        "benefit1": "All 20+ cards instantly",
+        "benefit2": "Free and fast",
+        "benefit3": "Secure Google sign-in",
+        "trustBadge": "🔒 Secure authentication",
+        "moreCards": "more cards"
     }
 }

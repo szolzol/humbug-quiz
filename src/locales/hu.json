@@ -647,5 +647,21 @@
         "androidManual": "Telepítéshez:",
         "androidStep1": "Nyomd meg a böngésző menüt (⋮)",
         "androidStep2": "Válaszd a 'Hozzáadás a kezdőképernyőhöz' vagy 'Alkalmazás telepítése' opciót"
+    },
+    "auth": {
+        "signIn": "Belépés",
+        "signInWithGoogle": "Belépés Google-lel",
+        "signOut": "Kijelentkezés",
+        "welcome": "Üdvözöllek",
+        "lockedCard": "Zárolt kártya",
+        "unlockCards": "Jelentkezz be az összes kártya feloldásához",
+        "cardCount": "{{visible}}/{{total}} kártya elérhető",
+        "ctaTitle": "Fedezd fel az összes feladványt belépés után!",
+        "ctaDescription": "Tedd még emlékezetesebbé a következő HUMBUG! partidat!",
+        "benefit1": "Mind a 20+ kártya azonnal",
+        "benefit2": "Ingyenes és gyors",
+        "benefit3": "Biztonságos Google bejelentkezés",
+        "trustBadge": "🔒 Biztonságos hitelesítés",
+        "moreCards": "további kártya"
     }
 }

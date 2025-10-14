@@ -6,7 +6,9 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LoginButton } from "@/components/LoginButton";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -117,6 +119,7 @@ const AnimatedQuestionsLight = ({
 
 function App() {
   const { t, i18n } = useTranslation();
+  const { isAuthenticated, login } = useAuth();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -217,8 +220,9 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}>
           <div className="container mx-auto px-6 py-8 relative z-10">
-            {/* Language Switcher - Top Right */}
-            <div className="absolute top-2 right-2 md:top-4 md:right-6 z-20">
+            {/* Language Switcher & Login Button - Top Right */}
+            <div className="absolute -top-2 right-2 md:top-4 md:right-6 z-20 flex items-center gap-2">
+              <LoginButton />
               <LanguageSwitcher />
             </div>
 
@@ -469,13 +473,193 @@ function App() {
           />
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {translatedQuestions.map((question, index) => (
+            {/* Show first 6 cards for anonymous users, all for authenticated */}
+            {(isAuthenticated
+              ? translatedQuestions
+              : translatedQuestions.slice(0, 6)
+            ).map((question, index) => (
               <QuestionCard
                 key={question.id}
                 question={question}
                 index={index}
               />
             ))}
+
+            {/* Hero-style CTA Section for anonymous users */}
+            {!isAuthenticated && translatedQuestions.length > 6 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="col-span-full">
+                <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/10 p-12 text-center shadow-2xl">
+                  {/* Decorative animated background */}
+                  <motion.div
+                    animate={{
+                      background: [
+                        "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                        "radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                        "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                      ],
+                    }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 pointer-events-none"
+                  />
+
+                  <div className="relative z-10 max-w-3xl mx-auto">
+                    {/* Badge */}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      viewport={{ once: true }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-primary"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                      <span className="text-sm font-semibold text-primary">
+                        +{translatedQuestions.length - 6} {t("auth.moreCards")}
+                      </span>
+                    </motion.div>
+
+                    {/* Title */}
+                    <motion.h2
+                      initial={{ y: 20, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.3 }}
+                      viewport={{ once: true }}
+                      className="text-4xl md:text-5xl font-black mb-4"
+                      style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+                      <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                        {t("auth.ctaTitle")}
+                      </span>
+                    </motion.h2>
+
+                    {/* Description */}
+                    <motion.p
+                      initial={{ y: 20, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.4 }}
+                      viewport={{ once: true }}
+                      className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+                      {t("auth.ctaDescription")}
+                    </motion.p>
+
+                    {/* Benefits List */}
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.5 }}
+                      viewport={{ once: true }}
+                      className="flex flex-col md:flex-row gap-4 justify-center mb-8 text-sm md:text-base">
+                      <div className="flex items-center gap-2 text-foreground">
+                        <svg
+                          className="w-5 h-5 text-primary flex-shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>{t("auth.benefit1")}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground">
+                        <svg
+                          className="w-5 h-5 text-primary flex-shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>{t("auth.benefit2")}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground">
+                        <svg
+                          className="w-5 h-5 text-primary flex-shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>{t("auth.benefit3")}</span>
+                      </div>
+                    </motion.div>
+
+                    {/* CTA Button */}
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.6 }}
+                      viewport={{ once: true }}>
+                      <Button
+                        onClick={login}
+                        size="lg"
+                        className="bg-primary hover:bg-accent text-background font-bold text-lg px-10 py-7 shadow-xl hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105">
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 18 18"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="mr-3">
+                          <g fill="none" fillRule="evenodd">
+                            <path
+                              d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
+                              fill="#4285F4"
+                            />
+                            <path
+                              d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"
+                              fill="#34A853"
+                            />
+                            <path
+                              d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+                              fill="#FBBC05"
+                            />
+                            <path
+                              d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
+                              fill="#EA4335"
+                            />
+                          </g>
+                        </svg>
+                        {t("auth.signInWithGoogle")}
+                      </Button>
+                    </motion.div>
+
+                    {/* Trust badge */}
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.7 }}
+                      viewport={{ once: true }}
+                      className="text-xs text-muted-foreground mt-4">
+                      {t("auth.trustBadge")}
+                    </motion.p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </section>

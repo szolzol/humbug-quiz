@@ -9,6 +9,7 @@ This document contains important learnings, considerations, and best practices d
 - NEVER interrupt a running dev server, always check background terminals for running servers and run any commands in a new terminal window
 - Always expose local dev server on the local network
 - Always update README.MD file after key changes
+- Buildelni nem kell, tesztelni a dev server indításával tesztelj..
 
 ## 📱 Mobile & Responsive Design
 

@@ -22,4 +22,20 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
+      output: {
+        // Ensure service worker is not hashed
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'sw.js') {
+            return 'sw.js';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
+      }
+    }
+  }
 });

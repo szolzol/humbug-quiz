@@ -4,6 +4,12 @@ This document contains important learnings, considerations, and best practices d
 
 ---
 
+### VSCode instructions
+
+- NEVER interrupt a running dev server, always check background terminals for running servers and run any commands in a new terminal window
+- Always expose local dev server on the local network
+- Always update README.MD file after key changes
+
 ## 📱 Mobile & Responsive Design
 
 ### Mobile Viewport Considerations
@@ -289,6 +295,80 @@ hero-background.png → hero-background.webp (when possible)
   font-display: swap; /* Shows fallback font while loading */
 }
 ```
+
+---
+
+## 🔌 Progressive Web App (PWA)
+
+### Service Worker Implementation
+
+**Location**: `public/sw.js` and `src/serviceWorkerRegistration.ts`
+
+**Caching Strategy**: Cache-First with Network Fallback
+
+```javascript
+// Precached assets (static)
+- HTML, manifest, icons, fonts
+
+// Runtime cached (dynamic)
+- JS bundles, CSS files, images
+```
+
+**Key Features**:
+
+1. **Offline Support**: App works without network after first visit
+2. **Automatic Updates**: Hourly check for new versions
+3. **Update Notifications**: Users notified of new content
+4. **Smart Caching**: Version-controlled cache management
+
+### Service Worker Best Practices
+
+**Development vs Production**:
+```typescript
+// Service worker ONLY in production
+if (import.meta.env.PROD) {
+  registerServiceWorker();
+}
+```
+
+**Testing PWA**:
+```bash
+# Build production version
+npm run build
+npm run preview
+
+# Test in Chrome DevTools:
+# Application tab → Service Workers
+# Application tab → Manifest
+# Lighthouse tab → PWA audit
+```
+
+**Cache Versioning**:
+```javascript
+// Update version on every deployment
+const CACHE_NAME = 'humbug-quiz-v2'; // Increment!
+const RUNTIME_CACHE = 'humbug-quiz-runtime-v2';
+```
+
+**Common Issues**:
+
+- ❌ Service worker not updating → Check cache version
+- ❌ Offline not working → Check precache assets list
+- ❌ Old content showing → Clear browser cache
+- ✅ Use `skipWaiting()` for immediate updates
+- ✅ Always test on actual devices
+
+### PWA Installation
+
+**Desktop**: Install icon in browser address bar  
+**Mobile Android**: "Add to Home Screen" in Chrome menu  
+**Mobile iOS**: Share → "Add to Home Screen"
+
+**Manifest Requirements**:
+- ✅ `manifest.json` with name, icons, display mode
+- ✅ Icons: 192x192, 512x512 (PNG) + SVG
+- ✅ `start_url` and `background_color`
+- ✅ Service worker registered
 
 ---
 

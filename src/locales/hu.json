@@ -635,5 +635,14 @@
                 "10. Canada Dry Ginger Ale (1,8%)"
             ]
         }
-    ]
+    ],
+    "installPrompt": {
+        "title": "Telepítsd a HUMBUG!-ot",
+        "description": "Gyors hozzáférés a kezdőképernyődről",
+        "descriptionIOS": "Nyomd meg a Megosztás gombot, majd 'Hozzáadás a kezdőképernyőhöz'",
+        "install": "Telepítés most",
+        "later": "Talán később",
+        "close": "Bezárás",
+        "tapShare": "Nyomd meg a megosztás gombot lent"
+    }
 }

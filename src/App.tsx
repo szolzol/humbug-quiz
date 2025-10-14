@@ -6,6 +6,7 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -513,6 +514,9 @@ function App() {
           </motion.div>
         </div>
       </footer>
+
+      {/* Install Prompt for Mobile PWA */}
+      <InstallPrompt />
     </div>
   );
 }

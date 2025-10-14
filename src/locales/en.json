@@ -587,5 +587,14 @@
                 "10. Canada Dry Ginger Ale (1.8%)"
             ]
         }
-    ]
+    ],
+    "installPrompt": {
+        "title": "Install HUMBUG!",
+        "description": "Quick access from your home screen",
+        "descriptionIOS": "Tap Share, then 'Add to Home Screen'",
+        "install": "Install Now",
+        "later": "Maybe later",
+        "close": "Close",
+        "tapShare": "Tap the share button below"
+    }
 }

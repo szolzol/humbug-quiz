@@ -591,10 +591,13 @@
     "installPrompt": {
         "title": "Install HUMBUG!",
         "description": "Quick access from your home screen",
-        "descriptionIOS": "Tap Share, then 'Add to Home Screen'",
+        "descriptionIOS": "Tap ..., then 'Add to Home Screen'",
         "install": "Install Now",
         "later": "Maybe later",
         "close": "Close",
-        "tapShare": "Tap the share button below"
+        "tapShare": "Tap the ... button below",
+        "androidManual": "To install:",
+        "androidStep1": "Tap the browser menu (⋮)",
+        "androidStep2": "Select 'Add to Home screen' or 'Install app'"
     }
 }

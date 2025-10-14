@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Download } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,8 @@ export function InstallPrompt() {
     useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const promptShownRef = useRef(false);
 
   useEffect(() => {
     // Check if already installed
@@ -46,31 +48,42 @@ export function InstallPrompt() {
       /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iOS);
 
-    // For Android and other browsers that support beforeinstallprompt
+    // Capture beforeinstallprompt event (Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
-      // Show prompt after 3 seconds delay (non-intrusive)
-      setTimeout(() => {
-        setShowPrompt(true);
-      }, 3000);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // For iOS, show manual instruction after 3 seconds
-    if (iOS) {
-      setTimeout(() => {
-        setShowPrompt(true);
-      }, 3000);
-    }
+    // Scroll listener - show prompt when user scrolls to questions section
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+
+      // Show prompt when user scrolls past first screen (hero section)
+      if (scrollPosition > windowHeight * 0.5 && !promptShownRef.current) {
+        setHasScrolled(true);
+        promptShownRef.current = true;
+
+        // Small delay after scroll to not be jarring
+        setTimeout(() => {
+          setShowPrompt(true);
+        }, 1000);
+
+        // Remove listener after first trigger
+        window.removeEventListener("scroll", handleScroll);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener(
         "beforeinstallprompt",
         handleBeforeInstallPrompt
       );
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -123,7 +136,11 @@ export function InstallPrompt() {
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[oklch(0.75_0.15_85)] to-[oklch(0.85_0.18_90)] flex items-center justify-center shadow-lg">
-              <Download size={24} weight="bold" className="text-[oklch(0.15_0.1_240)]" />
+              <Download
+                size={24}
+                weight="bold"
+                className="text-[oklch(0.15_0.1_240)]"
+              />
             </div>
 
             {/* Text */}
@@ -143,13 +160,32 @@ export function InstallPrompt() {
                     "Quick access from your home screen"}
               </p>
 
-              {/* Install button (only for non-iOS) */}
+              {/* Install button (only for non-iOS with deferred prompt) */}
               {!isIOS && deferredPrompt && (
                 <button
                   onClick={handleInstallClick}
                   className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-[oklch(0.75_0.15_85)] to-[oklch(0.85_0.18_90)] text-[oklch(0.15_0.1_240)] font-semibold text-sm hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
                   {t("installPrompt.install") || "Install Now"}
                 </button>
+              )}
+
+              {/* Android manual instruction if no deferred prompt */}
+              {!isIOS && !deferredPrompt && (
+                <div className="text-xs text-[oklch(0.75_0.15_85)] font-medium">
+                  <p className="mb-2">
+                    {t("installPrompt.androidManual") || "To install:"}
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 text-white/70">
+                    <li>
+                      {t("installPrompt.androidStep1") ||
+                        "Tap the browser menu (⋮)"}
+                    </li>
+                    <li>
+                      {t("installPrompt.androidStep2") ||
+                        "Select 'Add to Home screen' or 'Install app'"}
+                    </li>
+                  </ol>
+                </div>
               )}
 
               {/* iOS instruction */}

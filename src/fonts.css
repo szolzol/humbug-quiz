@@ -1,0 +1,140 @@
+/* Self-hosted Space Grotesk font *//* Self-hosted Google Fonts - Space Grotesk & Poppins */
+
+@font-face {
+
+  font-family: 'Space Grotesk';/* Space Grotesk - Light 300 */
+
+  src: url('/fonts/SpaceGrotesk-Light.ttf') format('truetype');@font-face {
+
+  font-weight: 300;  font-family: "Space Grotesk";
+
+  font-style: normal;  src: url("/fonts/SpaceGrotesk-Light.ttf") format("truetype");
+
+  font-display: swap;  font-weight: 300;
+
+}  font-style: normal;
+
+  font-display: swap;
+
+@font-face {}
+
+  font-family: 'Space Grotesk';
+
+  src: url('/fonts/SpaceGrotesk-Regular.ttf') format('truetype');/* Space Grotesk - Regular 400 */
+
+  font-weight: 400;@font-face {
+
+  font-style: normal;  font-family: "Space Grotesk";
+
+  font-display: swap;  src: url("/fonts/SpaceGrotesk-Regular.ttf") format("truetype");
+
+}  font-weight: 400;
+
+  font-style: normal;
+
+@font-face {  font-display: swap;
+
+  font-family: 'Space Grotesk';}
+
+  src: url('/fonts/SpaceGrotesk-Medium.ttf') format('truetype');
+
+  font-weight: 500;/* Space Grotesk - Medium 500 */
+
+  font-style: normal;@font-face {
+
+  font-display: swap;  font-family: "Space Grotesk";
+
+}  src: url("/fonts/SpaceGrotesk-Medium.ttf") format("truetype");
+
+  font-weight: 500;
+
+@font-face {  font-style: normal;
+
+  font-family: 'Space Grotesk';  font-display: swap;
+
+  src: url('/fonts/SpaceGrotesk-SemiBold.ttf') format('truetype');}
+
+  font-weight: 600;
+
+  font-style: normal;/* Space Grotesk - SemiBold 600 */
+
+  font-display: swap;@font-face {
+
+}  font-family: "Space Grotesk";
+
+  src: url("/fonts/SpaceGrotesk-SemiBold.ttf") format("truetype");
+
+@font-face {  font-weight: 600;
+
+  font-family: 'Space Grotesk';  font-style: normal;
+
+  src: url('/fonts/SpaceGrotesk-Bold.ttf') format('truetype');  font-display: swap;
+
+  font-weight: 700;}
+
+  font-style: normal;
+
+  font-display: swap;/* Space Grotesk - Bold 700 */
+
+}@font-face {
+
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - Regular 400 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - Medium 500 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - SemiBold 600 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - Bold 700 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - ExtraBold 800 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins - Black 900 */
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/poppins-v21-latin-900.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}

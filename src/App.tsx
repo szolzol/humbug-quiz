@@ -495,7 +495,7 @@ function App() {
             ))}
 
             {/* Hero-style CTA Section for anonymous users */}
-            {!isAuthenticated && translatedQuestions.length > 4 && (
+            {!isAuthenticated && questions.length > 4 && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -542,7 +542,7 @@ function App() {
                         />
                       </svg>
                       <span className="text-sm font-semibold text-primary">
-                        +{translatedQuestions.length - 4} {t("auth.moreCards")}
+                        +{questions.length - 4} {t("auth.moreCards")}
                       </span>
                     </motion.div>
 

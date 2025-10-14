@@ -81,6 +81,12 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     getStoredAnswers(question.id, currentLanguage)
   );
 
+  // Reset state when language changes
+  useEffect(() => {
+    setIsFlipped(getStoredFlipState(question.id, currentLanguage));
+    setSelectedAnswers(getStoredAnswers(question.id, currentLanguage));
+  }, [currentLanguage, question.id]);
+
   // Persist flip state to localStorage
   useEffect(() => {
     setStoredFlipState(question.id, currentLanguage, isFlipped);

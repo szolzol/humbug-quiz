@@ -5,6 +5,7 @@ This document describes the PWA and service worker implementation for HUMBUG! Qu
 ## 📋 Overview
 
 The app is now a fully functional Progressive Web App with offline support, allowing users to:
+
 - Install the app on their device (mobile/desktop)
 - Access the app offline after the first visit
 - Receive automatic updates when new versions are available
@@ -37,11 +38,13 @@ src/main.tsx                 # Service worker initialization
 The service worker uses a **Cache-First** strategy with network fallback:
 
 1. **Precaching (Install Phase)**
+
    - Static assets (HTML, fonts, icons)
    - Cached immediately when service worker installs
    - Version-controlled cache name: `humbug-quiz-v1`
 
 2. **Runtime Caching (Fetch Phase)**
+
    - JavaScript bundles
    - CSS files
    - Images
@@ -58,6 +61,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 📦 Cached Assets
 
 ### **Precached on Install:**
+
 ```javascript
 - /                              (Root HTML)
 - /index.html
@@ -69,6 +73,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ```
 
 ### **Runtime Cached:**
+
 ```javascript
 - /assets/*.js                  (JavaScript bundles)
 - /assets/*.css                 (CSS files)
@@ -81,6 +86,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 🔄 Update Mechanism
 
 ### **Automatic Update Detection**
+
 - Service worker checks for updates **every hour**
 - Users receive notification when new version available
 - Two options:
@@ -88,6 +94,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
   2. **Later** - Continue using current version
 
 ### **Update Notification UI**
+
 ```
 ┌─────────────────────────────────────┐
 │ New version available!              │
@@ -102,6 +109,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 🎨 Manifest Configuration
 
 ### **PWA Settings:**
+
 ```json
 {
   "name": "HUMBUG! Quiz Party Game",
@@ -114,6 +122,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ```
 
 ### **Display Modes:**
+
 - **Standalone**: Runs in its own window (like native app)
 - No browser UI (address bar, back button)
 - Full-screen experience on mobile
@@ -123,6 +132,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 📱 Installation
 
 ### **Mobile (Android/iOS)**
+
 1. Visit site in mobile browser
 2. Browser shows "Add to Home Screen" prompt
 3. Tap to install
@@ -130,6 +140,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 5. Launch like native app
 
 ### **Desktop (Chrome/Edge)**
+
 1. Visit site in browser
 2. Install icon appears in address bar
 3. Click to install
@@ -141,6 +152,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 🧪 Testing PWA
 
 ### **Lighthouse PWA Audit**
+
 ```bash
 # Run Lighthouse in Chrome DevTools
 1. Open DevTools (F12)
@@ -150,6 +162,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ```
 
 **Expected Scores:**
+
 - ✅ Installable
 - ✅ PWA Optimized
 - ✅ Offline support
@@ -158,6 +171,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ### **Manual Testing**
 
 1. **Test Offline Mode:**
+
    ```bash
    # In Chrome DevTools:
    Network tab → Throttling → Offline
@@ -165,6 +179,7 @@ The service worker uses a **Cache-First** strategy with network fallback:
    ```
 
 2. **Test Installation:**
+
    - Desktop: Click install icon in address bar
    - Mobile: Use "Add to Home Screen" option
 
@@ -180,19 +195,21 @@ The service worker uses a **Cache-First** strategy with network fallback:
 ## 🔍 Service Worker Registration
 
 ### **Production Only**
+
 Service worker only registers in **production builds**:
 
 ```typescript
 if (import.meta.env.PROD) {
   registerServiceWorker({
-    onSuccess: () => console.log('Ready for offline use'),
-    onUpdate: () => console.log('New version available'),
-    onOfflineReady: () => console.log('App ready offline')
+    onSuccess: () => console.log("Ready for offline use"),
+    onUpdate: () => console.log("New version available"),
+    onOfflineReady: () => console.log("App ready offline"),
   });
 }
 ```
 
 ### **Development Mode**
+
 - Service worker **not active** in development
 - Use `npm run build && npm run preview` to test PWA features
 
@@ -201,12 +218,14 @@ if (import.meta.env.PROD) {
 ## 📊 Performance Impact
 
 ### **Benefits:**
+
 - **Faster load times** (cached assets)
 - **Offline functionality** (works without network)
 - **Reduced bandwidth** (fewer network requests)
 - **Better UX** (instant page loads on repeat visits)
 
 ### **Metrics:**
+
 - First visit: ~165KB JS + 40KB CSS
 - Repeat visits: Load from cache (0KB network)
 - Offline: Full functionality
@@ -216,11 +235,13 @@ if (import.meta.env.PROD) {
 ## 🛠️ Development Commands
 
 ### **Build with Service Worker:**
+
 ```bash
 npm run build
 ```
 
 ### **Test PWA Locally:**
+
 ```bash
 npm run build
 npm run preview
@@ -228,10 +249,12 @@ npm run preview
 ```
 
 ### **Unregister Service Worker (if needed):**
+
 ```javascript
 // In browser console:
-navigator.serviceWorker.getRegistrations()
-  .then(regs => regs.forEach(reg => reg.unregister()));
+navigator.serviceWorker
+  .getRegistrations()
+  .then((regs) => regs.forEach((reg) => reg.unregister()));
 ```
 
 ---
@@ -241,12 +264,14 @@ navigator.serviceWorker.getRegistrations()
 When deploying new version:
 
 1. **Update cache version** in `public/sw.js`:
+
    ```javascript
-   const CACHE_NAME = 'humbug-quiz-v2'; // Increment version
-   const RUNTIME_CACHE = 'humbug-quiz-runtime-v2';
+   const CACHE_NAME = "humbug-quiz-v2"; // Increment version
+   const RUNTIME_CACHE = "humbug-quiz-runtime-v2";
    ```
 
 2. **Build and deploy:**
+
    ```bash
    npm run build
    git add .
@@ -261,26 +286,28 @@ When deploying new version:
 ## 🐛 Troubleshooting
 
 ### **Service Worker Not Updating**
+
 ```javascript
 // Force update in console:
-navigator.serviceWorker.getRegistration()
-  .then(reg => reg?.update());
+navigator.serviceWorker.getRegistration().then((reg) => reg?.update());
 ```
 
 ### **Clear All Caches**
+
 ```javascript
 // In console:
-caches.keys().then(keys => 
-  Promise.all(keys.map(key => caches.delete(key)))
-);
+caches
+  .keys()
+  .then((keys) => Promise.all(keys.map((key) => caches.delete(key))));
 ```
 
 ### **Check Service Worker Status**
+
 ```javascript
 // In console:
-import { getServiceWorkerStatus } from './serviceWorkerRegistration';
+import { getServiceWorkerStatus } from "./serviceWorkerRegistration";
 const status = await getServiceWorkerStatus();
-console.log('SW Status:', status);
+console.log("SW Status:", status);
 ```
 
 ---
@@ -312,11 +339,13 @@ PWA Implementation Status:
 ## 🎯 Next Steps
 
 1. **Test on Real Devices**
+
    - Install on Android phone
    - Install on iPhone
    - Install on desktop Chrome/Edge
 
 2. **Monitor Performance**
+
    - Run Lighthouse audits regularly
    - Track cache hit rates
    - Monitor update adoption

@@ -8,14 +8,14 @@ interface ServiceWorkerConfig {
 }
 
 export function registerServiceWorker(config?: ServiceWorkerConfig) {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      const swUrl = '/sw.js';
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      const swUrl = "/sw.js";
 
       navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
-          console.log('[SW] Service worker registered:', registration.scope);
+          console.log("[SW] Service worker registered:", registration.scope);
 
           // Check for updates periodically
           setInterval(() => {
@@ -29,11 +29,11 @@ export function registerServiceWorker(config?: ServiceWorkerConfig) {
             }
 
             installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed') {
+              if (installingWorker.state === "installed") {
                 if (navigator.serviceWorker.controller) {
                   // New update available
-                  console.log('[SW] New content is available; please refresh.');
-                  
+                  console.log("[SW] New content is available; please refresh.");
+
                   if (config?.onUpdate) {
                     config.onUpdate(registration);
                   } else {
@@ -42,12 +42,12 @@ export function registerServiceWorker(config?: ServiceWorkerConfig) {
                   }
                 } else {
                   // Content is cached for offline use
-                  console.log('[SW] Content is cached for offline use.');
-                  
+                  console.log("[SW] Content is cached for offline use.");
+
                   if (config?.onOfflineReady) {
                     config.onOfflineReady();
                   }
-                  
+
                   if (config?.onSuccess) {
                     config.onSuccess(registration);
                   }
@@ -57,30 +57,30 @@ export function registerServiceWorker(config?: ServiceWorkerConfig) {
           };
         })
         .catch((error) => {
-          console.error('[SW] Service worker registration failed:', error);
+          console.error("[SW] Service worker registration failed:", error);
         });
     });
   } else {
-    console.log('[SW] Service workers are not supported in this browser.');
+    console.log("[SW] Service workers are not supported in this browser.");
   }
 }
 
 export function unregisterServiceWorker() {
-  if ('serviceWorker' in navigator) {
+  if ("serviceWorker" in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
         registration.unregister();
-        console.log('[SW] Service worker unregistered');
+        console.log("[SW] Service worker unregistered");
       })
       .catch((error) => {
-        console.error('[SW] Error unregistering service worker:', error);
+        console.error("[SW] Error unregistering service worker:", error);
       });
   }
 }
 
 function showUpdateNotification(registration: ServiceWorkerRegistration) {
-  const updateMessage = document.createElement('div');
-  updateMessage.id = 'sw-update-notification';
+  const updateMessage = document.createElement("div");
+  updateMessage.id = "sw-update-notification";
   updateMessage.style.cssText = `
     position: fixed;
     bottom: 20px;
@@ -131,17 +131,17 @@ function showUpdateNotification(registration: ServiceWorkerRegistration) {
 
   document.body.appendChild(updateMessage);
 
-  const updateBtn = document.getElementById('sw-update-btn');
-  const dismissBtn = document.getElementById('sw-dismiss-btn');
+  const updateBtn = document.getElementById("sw-update-btn");
+  const dismissBtn = document.getElementById("sw-dismiss-btn");
 
-  updateBtn?.addEventListener('click', () => {
+  updateBtn?.addEventListener("click", () => {
     if (registration.waiting) {
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
     }
     window.location.reload();
   });
 
-  dismissBtn?.addEventListener('click', () => {
+  dismissBtn?.addEventListener("click", () => {
     updateMessage.remove();
   });
 }
@@ -149,34 +149,34 @@ function showUpdateNotification(registration: ServiceWorkerRegistration) {
 // Check if the app is running in standalone mode (installed as PWA)
 export function isStandalone(): boolean {
   return (
-    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia("(display-mode: standalone)").matches ||
     (window.navigator as any).standalone === true
   );
 }
 
 // Get service worker registration status
 export async function getServiceWorkerStatus(): Promise<string> {
-  if (!('serviceWorker' in navigator)) {
-    return 'not-supported';
+  if (!("serviceWorker" in navigator)) {
+    return "not-supported";
   }
 
   const registration = await navigator.serviceWorker.getRegistration();
-  
+
   if (!registration) {
-    return 'not-registered';
+    return "not-registered";
   }
 
   if (registration.waiting) {
-    return 'waiting';
+    return "waiting";
   }
 
   if (registration.installing) {
-    return 'installing';
+    return "installing";
   }
 
   if (registration.active) {
-    return 'active';
+    return "active";
   }
 
-  return 'unknown';
+  return "unknown";
 }

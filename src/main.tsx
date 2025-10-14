@@ -23,13 +23,13 @@ createRoot(document.getElementById("root")!).render(
 if (import.meta.env.PROD) {
   registerServiceWorker({
     onSuccess: () => {
-      console.log('Content is cached for offline use.');
+      console.log("Content is cached for offline use.");
     },
     onUpdate: () => {
-      console.log('New content is available; please refresh.');
+      console.log("New content is available; please refresh.");
     },
     onOfflineReady: () => {
-      console.log('App is ready to work offline.');
-    }
+      console.log("App is ready to work offline.");
+    },
   });
 }

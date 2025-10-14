@@ -25,6 +25,7 @@
 - [Development](#-development)
 - [Design Philosophy](#-design-philosophy)
 - [Internationalization](#-internationalization)
+- [Progressive Web App](#-progressive-web-app)
 - [Deployment](#-deployment)
 - [Credits](#-credits)
 - [License](#-license)
@@ -150,6 +151,16 @@ The game continues until only one player remains "alive" - requiring both knowle
   - Category names and labels
 - **Localized formatting**: Number formats, dates, etc.
 - **Automatic language detection** based on browser preferences
+
+### 📱 Progressive Web App (PWA)
+
+- **Offline Support**: App works without internet after first visit
+- **Installable**: Add to home screen on mobile/desktop
+- **Automatic Updates**: Hourly checks for new versions
+- **Smart Caching**: Cache-first strategy with network fallback
+- **Service Worker**: Version-controlled asset caching
+- **Update Notifications**: User-friendly prompts for new versions
+- **Manifest**: Full PWA configuration with icons and theme colors
 
 ---
 
@@ -468,7 +479,60 @@ Using three equally spaced colors on the color wheel:
 
 ---
 
-## 🚀 Deployment
+## � Progressive Web App
+
+HUMBUG! is a fully functional **Progressive Web App** with offline support and installability.
+
+### Features
+
+- 🔌 **Offline Support**: Works without internet after first visit
+- 📥 **Installable**: Add to home screen on any device
+- 🔄 **Auto-Updates**: Checks for new versions every hour
+- ⚡ **Fast Loading**: Smart caching for instant page loads
+- 🎨 **Native Look**: Runs in standalone mode (no browser UI)
+- 📱 **Cross-Platform**: Works on Android, iOS, and desktop
+
+### Installation
+
+#### Mobile (Android/iOS)
+1. Visit [humbug-quiz.vercel.app](https://humbug-quiz.vercel.app)
+2. Tap browser menu (⋮ or share icon)
+3. Select **"Add to Home Screen"**
+4. App icon appears on home screen
+5. Launch like any native app!
+
+#### Desktop (Chrome/Edge)
+1. Visit the site in browser
+2. Look for install icon (⊕) in address bar
+3. Click to install
+4. App opens in standalone window
+5. Access from Start Menu/Applications
+
+### Technical Details
+
+**Service Worker**: `public/sw.js`
+- Cache-first strategy with network fallback
+- Precaches: HTML, fonts, icons, manifest
+- Runtime caches: JS, CSS, images
+- Version-controlled cache management
+
+**Manifest**: `public/manifest.json`
+- Standalone display mode
+- Golden theme color (#d4af37)
+- Navy background (#15151f)
+- Multiple icon sizes (192x192, 512x512, SVG)
+
+**Update Mechanism**:
+- Automatic update checks every hour
+- User-friendly update notifications
+- Non-intrusive "Update" or "Later" prompts
+- Immediate apply with page reload
+
+For detailed PWA documentation, see [PWA_IMPLEMENTATION.md](./PWA_IMPLEMENTATION.md).
+
+---
+
+## �🚀 Deployment
 
 ### Vercel (Recommended)
 

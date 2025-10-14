@@ -324,6 +324,7 @@ hero-background.png → hero-background.webp (when possible)
 ### Service Worker Best Practices
 
 **Development vs Production**:
+
 ```typescript
 // Service worker ONLY in production
 if (import.meta.env.PROD) {
@@ -332,6 +333,7 @@ if (import.meta.env.PROD) {
 ```
 
 **Testing PWA**:
+
 ```bash
 # Build production version
 npm run build
@@ -344,10 +346,11 @@ npm run preview
 ```
 
 **Cache Versioning**:
+
 ```javascript
 // Update version on every deployment
-const CACHE_NAME = 'humbug-quiz-v2'; // Increment!
-const RUNTIME_CACHE = 'humbug-quiz-runtime-v2';
+const CACHE_NAME = "humbug-quiz-v2"; // Increment!
+const RUNTIME_CACHE = "humbug-quiz-runtime-v2";
 ```
 
 **Common Issues**:
@@ -365,6 +368,7 @@ const RUNTIME_CACHE = 'humbug-quiz-runtime-v2';
 **Mobile iOS**: Share → "Add to Home Screen"
 
 **Manifest Requirements**:
+
 - ✅ `manifest.json` with name, icons, display mode
 - ✅ Icons: 192x192, 512x512 (PNG) + SVG
 - ✅ `start_url` and `background_color`

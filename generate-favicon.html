@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HUMBUG! Favicon Generator</title>
+</head>
+<body>
+  <canvas id="canvas" width="512" height="512"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Background - Deep Navy with gold gradient
+    const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 400);
+    gradient.addColorStop(0, '#2d2d3f');
+    gradient.addColorStop(1, '#15151f');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 512);
+    
+    // Draw brain icon in gold
+    ctx.fillStyle = '#d4af37';
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    // Brain outline - left hemisphere
+    ctx.beginPath();
+    ctx.arc(220, 256, 120, Math.PI, 0, false);
+    ctx.stroke();
+    
+    // Brain outline - right hemisphere
+    ctx.beginPath();
+    ctx.arc(292, 256, 120, Math.PI, 0, false);
+    ctx.stroke();
+    
+    // Brain folds - left side
+    ctx.beginPath();
+    ctx.moveTo(150, 220);
+    ctx.bezierCurveTo(180, 200, 210, 210, 220, 240);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(160, 280);
+    ctx.bezierCurveTo(190, 300, 210, 290, 220, 270);
+    ctx.stroke();
+    
+    // Brain folds - right side
+    ctx.beginPath();
+    ctx.moveTo(362, 220);
+    ctx.bezierCurveTo(332, 200, 302, 210, 292, 240);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(352, 280);
+    ctx.bezierCurveTo(322, 300, 302, 290, 292, 270);
+    ctx.stroke();
+    
+    // Center connection
+    ctx.beginPath();
+    ctx.moveTo(256, 180);
+    ctx.lineTo(256, 332);
+    ctx.stroke();
+    
+    // Additional brain texture lines
+    ctx.lineWidth = 4;
+    
+    // Left details
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(140 + i * 30, 200 + i * 20);
+      ctx.quadraticCurveTo(180 + i * 10, 220 + i * 15, 200, 250 + i * 10);
+      ctx.stroke();
+    }
+    
+    // Right details
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(372 - i * 30, 200 + i * 20);
+      ctx.quadraticCurveTo(332 - i * 10, 220 + i * 15, 312, 250 + i * 10);
+      ctx.stroke();
+    }
+    
+    // Export as PNG
+    canvas.toBlob(function(blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'icon-512x512.png';
+      a.click();
+    });
+    
+    console.log('Favicon generated! Check your downloads folder.');
+  </script>
+</body>
+</html>

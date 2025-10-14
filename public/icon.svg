@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" style="stop-color:#2d2d3f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#15151f;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGradient)" rx="80"/>
+  
+  <!-- Brain Icon - Gold -->
+  <g fill="none" stroke="#d4af37" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left hemisphere -->
+    <path d="M 180 256 Q 140 180, 180 140 Q 220 100, 256 140" />
+    <path d="M 180 256 Q 140 332, 180 372 Q 220 412, 256 372" />
+    
+    <!-- Right hemisphere -->
+    <path d="M 332 256 Q 372 180, 332 140 Q 292 100, 256 140" />
+    <path d="M 332 256 Q 372 332, 332 372 Q 292 412, 256 372" />
+    
+    <!-- Center connection -->
+    <path d="M 256 140 L 256 180" />
+    <path d="M 256 332 L 256 372" />
+    
+    <!-- Brain folds - left side -->
+    <path d="M 160 200 Q 180 190, 200 200 Q 220 210, 230 230" />
+    <path d="M 160 256 Q 180 246, 200 256" />
+    <path d="M 160 312 Q 180 302, 200 312 Q 220 322, 230 302" />
+    
+    <!-- Brain folds - right side -->
+    <path d="M 352 200 Q 332 190, 312 200 Q 292 210, 282 230" />
+    <path d="M 352 256 Q 332 246, 312 256" />
+    <path d="M 352 312 Q 332 302, 312 312 Q 292 322, 282 302" />
+    
+    <!-- Additional detail lines -->
+    <path d="M 200 170 Q 220 160, 240 170" />
+    <path d="M 272 170 Q 292 160, 312 170" />
+    <path d="M 200 342 Q 220 352, 240 342" />
+    <path d="M 272 342 Q 292 352, 312 342" />
+  </g>
+  
+  <!-- Highlight/shine effect -->
+  <ellipse cx="200" cy="180" rx="40" ry="30" fill="#f5d070" opacity="0.15"/>
+</svg>

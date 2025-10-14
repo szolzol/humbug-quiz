@@ -1,0 +1,41 @@
+{
+  "name": "HUMBUG! Quiz Party Game",
+  "short_name": "HUMBUG!",
+  "description": "An experimental quiz party game that combines trivia knowledge, strategy, and bluffing. Fake it till you win it!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#15151f",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["games", "entertainment", "education"],
+  "lang": "hu",
+  "dir": "ltr",
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}

@@ -132,12 +132,15 @@ function App() {
   }>;
 
   // Get unique categories
+  // Limit visible questions based on authentication status
+  const visibleQuestions = isAuthenticated ? questions : questions.slice(0, 4);
+
   const uniqueCategories = Array.from(
-    new Set(questions.map((q) => q.category))
+    new Set(visibleQuestions.map((q) => q.category))
   ).sort();
 
-  // Count questions per category
-  const categoryCounts = questions.reduce((acc, q) => {
+  // Count questions per category (only from visible questions)
+  const categoryCounts = visibleQuestions.reduce((acc, q) => {
     acc[q.category] = (acc[q.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -161,8 +164,8 @@ function App() {
   // Filter questions based on selected categories
   const filteredQuestions =
     selectedCategories.length === 0
-      ? questions
-      : questions.filter((q) => selectedCategories.includes(q.category));
+      ? visibleQuestions
+      : visibleQuestions.filter((q) => selectedCategories.includes(q.category));
 
   // Map questions with translated categories
   const translatedQuestions = filteredQuestions.map((q) => ({
@@ -466,21 +469,23 @@ function App() {
             />
           </div>
 
-          {/* Category Filter */}
-          <CategoryFilter
-            categories={uniqueCategories}
-            selectedCategories={selectedCategories}
-            onCategoryToggle={handleCategoryToggle}
-            onClearAll={handleClearAll}
-            categoryCounts={categoryCounts}
-            totalQuestions={questions.length}
-          />
+          {/* Category Filter - Only visible for authenticated users */}
+          {isAuthenticated && (
+            <CategoryFilter
+              categories={uniqueCategories}
+              selectedCategories={selectedCategories}
+              onCategoryToggle={handleCategoryToggle}
+              onClearAll={handleClearAll}
+              categoryCounts={categoryCounts}
+              totalQuestions={visibleQuestions.length}
+            />
+          )}
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {/* Show first 6 cards for anonymous users, all for authenticated */}
+            {/* Show first 4 cards for anonymous users, all for authenticated */}
             {(isAuthenticated
               ? translatedQuestions
-              : translatedQuestions.slice(0, 6)
+              : translatedQuestions.slice(0, 4)
             ).map((question, index) => (
               <QuestionCard
                 key={question.id}
@@ -490,7 +495,7 @@ function App() {
             ))}
 
             {/* Hero-style CTA Section for anonymous users */}
-            {!isAuthenticated && translatedQuestions.length > 6 && (
+            {!isAuthenticated && translatedQuestions.length > 4 && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -537,7 +542,7 @@ function App() {
                         />
                       </svg>
                       <span className="text-sm font-semibold text-primary">
-                        +{translatedQuestions.length - 6} {t("auth.moreCards")}
+                        +{translatedQuestions.length - 4} {t("auth.moreCards")}
                       </span>
                     </motion.div>
 

@@ -8,6 +8,7 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LoginButton } from "@/components/LoginButton";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { CookieConsent } from "@/components/CookieConsent";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -710,6 +711,9 @@ function App() {
 
       {/* Install Prompt for Mobile PWA */}
       <InstallPrompt />
+
+      {/* GDPR Cookie Consent Banner */}
+      <CookieConsent />
     </div>
   );
 }

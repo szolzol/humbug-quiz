@@ -20,9 +20,23 @@ interface QuestionCardProps {
 
 // Helper functions for localStorage with language-specific keys
 const getStoredFlipState = (questionId: string, language: string): boolean => {
+  // Check consent first
   try {
+    const consent = localStorage.getItem("cookie_consent");
+    if (consent !== "accepted") return false;
+    
     const stored = localStorage.getItem(`flip_${language}_${questionId}`);
     return stored === "true";
+  } catch {
+    return false;
+  }
+};
+
+// Check if user has given consent for functional cookies
+const hasFunctionalConsent = (): boolean => {
+  try {
+    const consent = localStorage.getItem("cookie_consent");
+    return consent === "accepted";
   } catch {
     return false;
   }
@@ -33,6 +47,7 @@ const setStoredFlipState = (
   language: string,
   isFlipped: boolean
 ) => {
+  if (!hasFunctionalConsent()) return;
   try {
     localStorage.setItem(`flip_${language}_${questionId}`, String(isFlipped));
   } catch {
@@ -44,6 +59,7 @@ const getStoredAnswers = (
   questionId: string,
   language: string
 ): Set<number> => {
+  if (!hasFunctionalConsent()) return new Set();
   try {
     const stored = localStorage.getItem(`answers_${language}_${questionId}`);
     if (stored) {
@@ -60,6 +76,7 @@ const setStoredAnswers = (
   language: string,
   answers: Set<number>
 ) => {
+  if (!hasFunctionalConsent()) return;
   try {
     localStorage.setItem(
       `answers_${language}_${questionId}`,

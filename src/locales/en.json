@@ -615,5 +615,16 @@
         "benefit3": "Secure Google sign-in",
         "trustBadge": "🔒 Secure authentication",
         "moreCards": "more cards"
+    },
+    "cookies": {
+        "title": "Cookie Notice",
+        "description": "This website uses cookies to manage authentication and save your game state. Please accept cookies to continue.",
+        "necessary": "Necessary cookies",
+        "necessaryDescription": "Authentication and session management (auth_token). These are essential.",
+        "functional": "Functional storage",
+        "functionalDescription": "Saving card states (flip state, selected answers). These enhance your experience.",
+        "acceptAll": "Accept all",
+        "rejectOptional": "Only necessary",
+        "privacyInfo": "Learn more about cookies in our privacy policy."
     }
 }

@@ -663,5 +663,16 @@
         "benefit3": "Biztonságos Google bejelentkezés",
         "trustBadge": "🔒 Biztonságos hitelesítés",
         "moreCards": "további kártya"
+    },
+    "cookies": {
+        "title": "Süti tájékoztató",
+        "description": "Ez az oldal sütiket (cookie-kat) használ a bejelentkezés kezeléséhez és a játék állapotának tárolásához. A folytatáshoz kérjük fogadd el a sütik használatát.",
+        "necessary": "Alapvető sütik",
+        "necessaryDescription": "Bejelentkezés és munkamenet kezelése (auth_token). Ezek elengedhetetlenek.",
+        "functional": "Funkcionális tárolás",
+        "functionalDescription": "Kártyák állapotának mentése (flip state, kiválasztott válaszok). Ezek javítják az élményt.",
+        "acceptAll": "Összes elfogadása",
+        "rejectOptional": "Csak alapvető",
+        "privacyInfo": "A sütikről bővebben az adatvédelmi tájékoztatóban olvashatsz."
     }
 }

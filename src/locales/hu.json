@@ -667,12 +667,86 @@
     "cookies": {
         "title": "Süti tájékoztató",
         "description": "Ez az oldal sütiket (cookie-kat) használ a bejelentkezés kezeléséhez és a játék állapotának tárolásához. A folytatáshoz kérjük fogadd el a sütik használatát.",
-        "necessary": "Alapvető sütik",
-        "necessaryDescription": "Bejelentkezés és munkamenet kezelése (auth_token). Ezek elengedhetetlenek.",
-        "functional": "Funkcionális tárolás",
-        "functionalDescription": "Kártyák állapotának mentése (flip state, kiválasztott válaszok). Ezek javítják az élményt.",
         "acceptAll": "Összes elfogadása",
         "rejectOptional": "Csak alapvető",
-        "privacyInfo": "A sütikről bővebben az adatvédelmi tájékoztatóban olvashatsz."
+        "privacyInfo": "További információ az adatvédelmi tájékoztatóban"
+    },
+    "privacy": {
+        "title": "Adatvédelmi Tájékoztató",
+        "lastUpdated": "Utolsó frissítés",
+        "close": "Bezárás",
+        "intro": {
+            "title": "Bevezetés",
+            "content": "Ez az adatvédelmi tájékoztató ismerteti, hogy a HUMBUG! Quiz Party Game webalkalmazás hogyan gyűjti, használja és védi a felhasználók személyes adatait. Elkötelezettek vagyunk adataid védelme és a GDPR (Általános Adatvédelmi Rendelet) követelményeinek betartása mellett."
+        },
+        "controller": {
+            "title": "Adatkezelő",
+            "content": "Jelen weboldal adatkezelője és üzemeltetője magánszemély. Elérhetőség: humbug@humbug.hu"
+        },
+        "dataCollected": {
+            "title": "Milyen adatokat gyűjtünk?",
+            "auth": {
+                "title": "1. Hitelesítési adatok (Google OAuth)",
+                "content": "Amikor Google fiókkal jelentkezel be, a következő adatokat kapjuk meg:",
+                "item1": "Név (Google profilod alapján)",
+                "item2": "E-mail cím (Google fiókod)",
+                "item3": "Profilkép URL (Google profilod)",
+                "item4": "Egyedi Google felhasználói azonosító"
+            },
+            "gameState": {
+                "title": "2. Játék állapot adatok (localStorage)",
+                "content": "A játékélmény javítása érdekében helyben tároljuk böngésződben:",
+                "item1": "Kártyák flip állapota (melyik kártyát fordítottad meg)",
+                "item2": "Kiválasztott válaszok (mely válaszokat jelölted meg)"
+            }
+        },
+        "cookies": {
+            "title": "Sütik (Cookies) használata",
+            "necessary": {
+                "title": "Alapvető sütik (Strictly Necessary)",
+                "description": "Ezek a sütik elengedhetetlenek a weboldal működéséhez. Hozzájárulás nélkül is használhatók.",
+                "purpose": "JWT munkamenet token, 7 napig érvényes, csak HTTPS-en keresztül"
+            },
+            "functional": {
+                "title": "Funkcionális sütik (Functional Cookies)",
+                "description": "Ezek a sütik javítják a felhasználói élményt. Csak hozzájárulással használhatók.",
+                "flip": "Kártya fordítás állapota",
+                "answers": "Kiválasztott válaszok",
+                "consent": "Cookie hozzájárulás döntés"
+            }
+        },
+        "legalBasis": {
+            "title": "Jogalap az adatkezelésre",
+            "content": "Az adatkezelés jogalapja a GDPR 6. cikk (1) bekezdés a) pontja szerinti hozzájárulás. A bejelentkezéssel és a cookie banner elfogadásával hozzájárulsz adataid kezeléséhez. Hozzájárulásodat bármikor visszavonhatod."
+        },
+        "dataSharing": {
+            "title": "Adatok megosztása harmadik féllel",
+            "content": "Adataidat a következő szolgáltatókkal osztjuk meg:",
+            "google": "OAuth hitelesítéshez használjuk. Google adatvédelmi irányelvei: https://policies.google.com/privacy",
+            "vercel": "Hosting szolgáltató, ahol az alkalmazás fut. Vercel adatvédelmi irányelvei: https://vercel.com/legal/privacy-policy"
+        },
+        "rights": {
+            "title": "Jogaid (GDPR szerint)",
+            "intro": "A GDPR értelmében a következő jogokkal rendelkezel:",
+            "access": "Hozzáférés joga: Kérheted személyes adataid másolatát",
+            "rectification": "Helyesbítés joga: Kérheted pontatlan adataid javítását",
+            "erasure": "Törlés joga: Kérheted adataid törlését (\"elfeledtetéshez való jog\")",
+            "restrict": "Korlátozás joga: Kérheted adatkezelés korlátozását",
+            "portability": "Adathordozhatóság joga: Kérheted adataid géppel olvasható formátumban",
+            "object": "Tiltakozás joga: Tiltakozhatsz adataid kezelése ellen",
+            "withdraw": "Hozzájárulás visszavonása: Bármikor visszavonhatod hozzájárulásodat"
+        },
+        "retention": {
+            "title": "Adatmegőrzés",
+            "content": "Hitelesítési adataidat (JWT token) 7 napig őrizzük meg. Játék állapot adataid (localStorage) a böngésződben tárolódnak, amíg nem törlöd őket vagy nem vonod vissza hozzájárulásodat. Kijelentkezéskor a JWT token törlődik. Cookie consent visszavonásakor a funkcionális adatok törlődnek."
+        },
+        "contact": {
+            "title": "Kapcsolat",
+            "content": "Ha kérdésed van az adatvédelemmel kapcsolatban, vagy élni szeretnél jogaiddal, írj nekünk: humbug@humbug.hu"
+        },
+        "changes": {
+            "title": "Változások",
+            "content": "Fenntartjuk a jogot, hogy ezt az adatvédelmi tájékoztatót bármikor módosítsuk. A változásokról ezen az oldalon tájékoztatunk. Utolsó módosítás dátuma: 2025-10-16"
+        }
     }
 }

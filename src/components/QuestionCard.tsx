@@ -24,7 +24,7 @@ const getStoredFlipState = (questionId: string, language: string): boolean => {
   try {
     const consent = localStorage.getItem("cookie_consent");
     if (consent !== "accepted") return false;
-    
+
     const stored = localStorage.getItem(`flip_${language}_${questionId}`);
     return stored === "true";
   } catch {

@@ -619,12 +619,86 @@
     "cookies": {
         "title": "Cookie Notice",
         "description": "This website uses cookies to manage authentication and save your game state. Please accept cookies to continue.",
-        "necessary": "Necessary cookies",
-        "necessaryDescription": "Authentication and session management (auth_token). These are essential.",
-        "functional": "Functional storage",
-        "functionalDescription": "Saving card states (flip state, selected answers). These enhance your experience.",
         "acceptAll": "Accept all",
         "rejectOptional": "Only necessary",
-        "privacyInfo": "Learn more about cookies in our privacy policy."
+        "privacyInfo": "Learn more in our privacy policy"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "lastUpdated": "Last updated",
+        "close": "Close",
+        "intro": {
+            "title": "Introduction",
+            "content": "This privacy policy explains how the HUMBUG! Quiz Party Game web application collects, uses, and protects users' personal data. We are committed to protecting your data and complying with GDPR (General Data Protection Regulation) requirements."
+        },
+        "controller": {
+            "title": "Data Controller",
+            "content": "The data controller and operator of this website is a private individual. Contact: humbug@humbug.hu"
+        },
+        "dataCollected": {
+            "title": "What data do we collect?",
+            "auth": {
+                "title": "1. Authentication data (Google OAuth)",
+                "content": "When you sign in with your Google account, we receive the following data:",
+                "item1": "Name (from your Google profile)",
+                "item2": "Email address (from your Google account)",
+                "item3": "Profile picture URL (from your Google profile)",
+                "item4": "Unique Google user ID"
+            },
+            "gameState": {
+                "title": "2. Game state data (localStorage)",
+                "content": "To improve your gaming experience, we store locally in your browser:",
+                "item1": "Card flip states (which cards you've flipped)",
+                "item2": "Selected answers (which answers you've marked)"
+            }
+        },
+        "cookies": {
+            "title": "Use of Cookies",
+            "necessary": {
+                "title": "Strictly Necessary Cookies",
+                "description": "These cookies are essential for the website to function. They can be used without consent.",
+                "purpose": "JWT session token, valid for 7 days, HTTPS only"
+            },
+            "functional": {
+                "title": "Functional Cookies",
+                "description": "These cookies enhance the user experience. They require consent to be used.",
+                "flip": "Card flip state",
+                "answers": "Selected answers",
+                "consent": "Cookie consent decision"
+            }
+        },
+        "legalBasis": {
+            "title": "Legal basis for processing",
+            "content": "The legal basis for data processing is consent under Article 6(1)(a) GDPR. By signing in and accepting the cookie banner, you consent to the processing of your data. You can withdraw your consent at any time."
+        },
+        "dataSharing": {
+            "title": "Sharing data with third parties",
+            "content": "We share your data with the following service providers:",
+            "google": "Used for OAuth authentication. Google Privacy Policy: https://policies.google.com/privacy",
+            "vercel": "Hosting provider where the application runs. Vercel Privacy Policy: https://vercel.com/legal/privacy-policy"
+        },
+        "rights": {
+            "title": "Your rights (under GDPR)",
+            "intro": "Under GDPR, you have the following rights:",
+            "access": "Right to access: You can request a copy of your personal data",
+            "rectification": "Right to rectification: You can request correction of inaccurate data",
+            "erasure": "Right to erasure: You can request deletion of your data (\"right to be forgotten\")",
+            "restrict": "Right to restriction: You can request restriction of processing",
+            "portability": "Right to data portability: You can request your data in machine-readable format",
+            "object": "Right to object: You can object to the processing of your data",
+            "withdraw": "Right to withdraw consent: You can withdraw your consent at any time"
+        },
+        "retention": {
+            "title": "Data retention",
+            "content": "We retain your authentication data (JWT token) for 7 days. Your game state data (localStorage) is stored in your browser until you delete it or withdraw consent. When you sign out, the JWT token is deleted. When you withdraw cookie consent, functional data is deleted."
+        },
+        "contact": {
+            "title": "Contact",
+            "content": "If you have questions about privacy or want to exercise your rights, please contact us: humbug@humbug.hu"
+        },
+        "changes": {
+            "title": "Changes",
+            "content": "We reserve the right to modify this privacy policy at any time. We will notify you of changes on this page. Last modified: 2025-10-16"
+        }
     }
 }

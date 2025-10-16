@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { X } from "@phosphor-icons/react";
+import { PrivacyPolicy } from "@/components/PrivacyPolicy";
 
 /**
  * CookieConsent Component
@@ -12,6 +13,7 @@ import { X } from "@phosphor-icons/react";
 export function CookieConsent() {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   useEffect(() => {
     // Check if user has already given consent
@@ -67,31 +69,9 @@ export function CookieConsent() {
                   {t("cookies.title")}
                 </h3>
 
-                <p className="text-sm md:text-base text-muted-foreground mb-4 leading-relaxed">
+                <p className="text-sm md:text-base text-muted-foreground mb-6 leading-relaxed">
                   {t("cookies.description")}
                 </p>
-
-                {/* Cookie categories */}
-                <div className="space-y-2 mb-6">
-                  <div className="text-xs md:text-sm">
-                    <span className="font-semibold text-foreground">
-                      {t("cookies.necessary")}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      - {t("cookies.necessaryDescription")}
-                    </span>
-                  </div>
-                  <div className="text-xs md:text-sm">
-                    <span className="font-semibold text-foreground">
-                      {t("cookies.functional")}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      - {t("cookies.functionalDescription")}
-                    </span>
-                  </div>
-                </div>
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -112,13 +92,23 @@ export function CookieConsent() {
 
                 {/* Privacy info */}
                 <p className="text-xs text-muted-foreground mt-4 text-center">
-                  {t("cookies.privacyInfo")}
+                  <button
+                    onClick={() => setIsPrivacyOpen(true)}
+                    className="underline hover:text-foreground transition-colors">
+                    {t("cookies.privacyInfo")}
+                  </button>
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
       )}
+
+      {/* Privacy Policy Modal */}
+      <PrivacyPolicy
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+      />
     </AnimatePresence>
   );
 }

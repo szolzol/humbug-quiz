@@ -236,29 +236,68 @@ To test the fallbacks:
 
 This ensures the background starts fully transparent so the animated radial gradients (questionsStudioLights) show through.
 
-### 10. Hero Background Blueish Hue
+### 10. Hero Background Overlay (Fixed Opacity)
+
+**Issue:** Initial fallback had opacity values too high (0.4, 0.6, 0.9), creating a thick white layer that obscured the hero background image on legacy browsers.
 
 **Original:** `bg-gradient-to-b from-background/40 via-background/60 to-background/90`
 
-**Fallback Added:**
+**Fixed Fallback:**
 
 ```css
 .no-oklch
   .bg-gradient-to-b.from-background\/40.via-background\/60.to-background\/90 {
   background: linear-gradient(
     to bottom,
+    rgba(255, 255, 255, 0.2),
     rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.6),
-    rgba(255, 255, 255, 0.9)
+    rgba(255, 255, 255, 0.7)
   ) !important;
 }
 ```
 
-This ensures the overlay gradient on the hero background image renders properly.
+Reduced opacity values (0.2, 0.4, 0.7) ensure the hero background image remains clearly visible while maintaining a subtle overlay effect for text readability.
+
+### 11. Google Sign-In CTA Background
+
+**Issue:** The CTA card background had `via-background` without opacity modifier, rendering as solid white instead of semi-transparent.
+
+**Original:** `bg-gradient-to-br from-primary/5 via-background to-accent/10`
+
+**Fixed Fallback:**
+
+```css
+.no-oklch .bg-gradient-to-br.from-primary\/5.via-background.to-accent\/10 {
+  background: linear-gradient(
+    to bottom right,
+    rgba(234, 179, 8, 0.05),
+    rgba(255, 255, 255, 0.3),
+    rgba(251, 191, 36, 0.1)
+  ) !important;
+}
+```
+
+Changed `via-background` from solid `rgb(255, 255, 255)` to semi-transparent `rgba(255, 255, 255, 0.3)` so the animated golden light effects show through.
+
+### 12. Text Color Utilities
+
+**Added fallbacks for:**
+- `text-background` - White text on colored backgrounds
+- `text-foreground` - Dark text for body content
+
+```css
+.no-oklch .text-background {
+  color: rgb(255, 255, 255) !important;
+}
+
+.no-oklch .text-foreground {
+  color: rgb(10, 10, 10) !important;
+}
+```
 
 ## Files Modified
 
-- `src/styles/compatibility.css` - Added 80+ lines of gradient fallback rules
+- `src/styles/compatibility.css` - Added 90+ lines of gradient and utility fallback rules
 
 ## Implementation Date
 

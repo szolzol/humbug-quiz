@@ -142,7 +142,7 @@
   background: linear-gradient(
     to bottom right,
     rgba(234, 179, 8, 0.05),
-    rgb(255, 255, 255),
+    rgba(255, 255, 255, 0.3),
     rgba(251, 191, 36, 0.1)
   ) !important;
 }
@@ -224,9 +224,9 @@
   .bg-gradient-to-b.from-background\/40.via-background\/60.to-background\/90 {
   background: linear-gradient(
     to bottom,
+    rgba(255, 255, 255, 0.2),
     rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.6),
-    rgba(255, 255, 255, 0.9)
+    rgba(255, 255, 255, 0.7)
   ) !important;
 }
 
@@ -605,6 +605,14 @@
 
 .no-oklch .text-accent {
   color: rgb(251, 191, 36) !important;
+}
+
+.no-oklch .text-background {
+  color: rgb(255, 255, 255) !important;
+}
+
+.no-oklch .text-foreground {
+  color: rgb(10, 10, 10) !important;
 }
 
 .no-oklch .border-primary {

@@ -9,6 +9,138 @@
  * - These fallbacks support: Chrome 60+, Safari 12+, Firefox 60+ (2018+)
  */
 
+/* ========================================
+   TAILWIND GRADIENT UTILITY FALLBACKS
+   ======================================== */
+/* These rules provide explicit fallbacks for Tailwind's gradient utilities
+   when they use CSS variables that contain OKLCH colors */
+
+.no-oklch .bg-gradient-to-r.from-primary {
+  background: linear-gradient(to right, rgb(234, 179, 8), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary.to-accent {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36)) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary.via-accent {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36), var(--tw-gradient-to, rgba(251, 191, 36, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary.via-accent.to-primary {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36), rgb(234, 179, 8)) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary.via-primary\/90 {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), rgba(234, 179, 8, 0.9), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary.via-primary\/90.to-primary\/80 {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), rgba(234, 179, 8, 0.9), rgba(234, 179, 8, 0.8)) !important;
+}
+
+.no-oklch .bg-gradient-to-tl.from-primary\/20 {
+  background: linear-gradient(to top left, rgba(234, 179, 8, 0.2), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-tl.from-primary\/20.to-accent\/20 {
+  background: linear-gradient(to top left, rgba(234, 179, 8, 0.2), rgba(251, 191, 36, 0.2)) !important;
+}
+
+/* Text gradient fallback - for bg-clip-text */
+.no-oklch .bg-clip-text.text-transparent.bg-gradient-to-r.from-primary.via-accent.to-primary {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36), rgb(234, 179, 8)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Fallback for browsers without bg-clip-text support */
+@supports not (background-clip: text) {
+  .bg-clip-text.text-transparent {
+    color: rgb(234, 179, 8) !important;
+    background: none !important;
+  }
+}
+
+/* Additional gradient patterns */
+.no-oklch .bg-gradient-to-br.from-primary.to-accent {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), rgb(251, 191, 36)) !important;
+}
+
+.no-oklch .bg-gradient-to-b.from-background {
+  background: linear-gradient(to bottom, rgb(255, 255, 255), var(--tw-gradient-to, rgba(255, 255, 255, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary\/5 {
+  background: linear-gradient(to bottom right, rgba(234, 179, 8, 0.05), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary\/5.via-background.to-accent\/10 {
+  background: linear-gradient(to bottom right, rgba(234, 179, 8, 0.05), rgb(255, 255, 255), rgba(251, 191, 36, 0.1)) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary\/10 {
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.1), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary\/10.to-accent\/10 {
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.1), rgba(251, 191, 36, 0.1)) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-primary\/10.via-accent\/10.to-primary\/10 {
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.1), rgba(251, 191, 36, 0.1), rgba(234, 179, 8, 0.1)) !important;
+}
+
+/* Category filter buttons */
+.no-oklch button.bg-gradient-to-r.from-primary.to-accent {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36)) !important;
+}
+
+/* Hover state fallbacks */
+.no-oklch .bg-gradient-to-r.from-primary.to-accent.hover\:from-primary\/90:hover,
+.no-oklch .bg-gradient-to-r.from-primary.to-accent:hover {
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.9), rgba(251, 191, 36, 0.9)) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-primary.to-accent.hover\:from-primary\/90:hover,
+.no-oklch .bg-gradient-to-br.from-primary.to-accent:hover {
+  background: linear-gradient(to bottom right, rgba(234, 179, 8, 0.9), rgba(251, 191, 36, 0.9)) !important;
+}
+
+/* InstallPrompt hardcoded OKLCH fallbacks */
+.no-oklch .bg-gradient-to-br.from-\[oklch\(0\.25_0\.1_240\)\] {
+  background: linear-gradient(to bottom right, rgb(23, 23, 50), var(--tw-gradient-to, rgba(23, 23, 50, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-\[oklch\(0\.25_0\.1_240\)\].to-\[oklch\(0\.15_0\.1_240\)\] {
+  background: linear-gradient(to bottom right, rgb(23, 23, 50), rgb(12, 12, 25)) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-\[oklch\(0\.75_0\.15_85\)\] {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), var(--tw-gradient-to, rgba(234, 179, 8, 0))) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-\[oklch\(0\.75_0\.15_85\)\].to-\[oklch\(0\.85_0\.18_90\)\] {
+  background: linear-gradient(to bottom right, rgb(234, 179, 8), rgb(251, 191, 36)) !important;
+}
+
+.no-oklch .bg-gradient-to-br.from-\[oklch\(0\.75_0\.15_85\)\]\/10 {
+  background: linear-gradient(to bottom right, rgba(234, 179, 8, 0.1), transparent) !important;
+}
+
+.no-oklch .bg-gradient-to-r.from-\[oklch\(0\.75_0\.15_85\)\].to-\[oklch\(0\.85_0\.18_90\)\] {
+  background: linear-gradient(to right, rgb(234, 179, 8), rgb(251, 191, 36)) !important;
+}
+
+/* ========================================
+   BASE COLOR VARIABLE FALLBACKS
+   ======================================== */
+
 /* Root fallbacks for light mode */
 :root {
   /* Background colors - RGB fallbacks */

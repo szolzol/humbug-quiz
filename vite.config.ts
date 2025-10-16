@@ -23,6 +23,10 @@ export default defineConfig({
     },
   },
   build: {
+    // Better browser compatibility - target older browsers
+    target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+    // CSS target for better color space fallbacks
+    cssTarget: ["chrome87", "safari14"],
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
@@ -36,6 +40,13 @@ export default defineConfig({
           return "assets/[name]-[hash][extname]";
         },
       },
+    },
+  },
+  // Optimize dependencies for better compatibility
+  optimizeDeps: {
+    include: ["react", "react-dom", "framer-motion"],
+    esbuildOptions: {
+      target: "es2020",
     },
   },
 });

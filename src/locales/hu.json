@@ -71,8 +71,11 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Készítette: <strong>Szoleczki Zoltán</strong> és <strong>Beró Zsolt</strong>",
-        "copyright": "© 2025 HUMBUG! Minden jog fenntartva.",
+        "copyright": "© 2025 HUMBUG! humbugquiz@gmail.hu - Minden jog fenntartva.",
         "otherProject": "Nézd meg a másik projektjüket: <strong>DarQba</strong> - Rejtély megfejtős parti játék"
+    },
+    "browserCompatibility": {
+        "warning": "A legjobb élményhez használj modern böngészőt"
     },
     "categories": {
         "entertainment": "Szórakozás",
@@ -681,7 +684,7 @@
         },
         "controller": {
             "title": "Adatkezelő",
-            "content": "Jelen weboldal adatkezelője és üzemeltetője magánszemély. Elérhetőség: humbug@humbug.hu"
+            "content": "Jelen weboldal adatkezelője és üzemeltetője magánszemély. Elérhetőség: humbugquiz@gmail.hu"
         },
         "dataCollected": {
             "title": "Milyen adatokat gyűjtünk?",

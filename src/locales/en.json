@@ -71,8 +71,11 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Created by <strong>Zoltán Szoleczki</strong> and <strong>Zsolt Beró</strong>",
-        "copyright": "© 2025 HUMBUG! All rights reserved.",
+        "copyright": "© 2025 HUMBUG! humbugquiz@gmail.hu - All rights reserved.",
         "otherProject": "Check out their other project: <strong>DarQba</strong> - Mystery solving party game"
+    },
+    "browserCompatibility": {
+        "warning": "For the best experience, please use a modern browser."
     },
     "categories": {
         "entertainment": "Entertainment",
@@ -633,7 +636,7 @@
         },
         "controller": {
             "title": "Data Controller",
-            "content": "The data controller and operator of this website is a private individual. Contact: humbug@humbug.hu"
+            "content": "The data controller and operator of this website is a private individual. Contact: humbugquiz@gmail.hu"
         },
         "dataCollected": {
             "title": "What data do we collect?",

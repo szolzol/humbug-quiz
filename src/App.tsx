@@ -1,5 +1,5 @@
 ﻿import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
@@ -123,6 +123,79 @@ function App() {
   const { isAuthenticated, login } = useAuth();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // Browser compatibility detection
+  useEffect(() => {
+    // Check for OKLCH color space support
+    const supportsOklch = CSS.supports("color", "oklch(0.5 0.1 180)");
+
+    // Check for backdrop-filter support
+    const supportsBackdropFilter = CSS.supports(
+      "backdrop-filter",
+      "blur(10px)"
+    );
+
+    // Check for 3D transform support
+    const supports3D = CSS.supports("transform-style", "preserve-3d");
+
+    // Detect low-end device
+    const isLowEndDevice =
+      navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+
+    // Add classes to document for CSS fallbacks
+    if (!supportsOklch) {
+      document.documentElement.classList.add("no-oklch");
+      console.warn(
+        "⚠️ Browser Compatibility: Your browser does not support OKLCH color space. Using RGB fallbacks."
+      );
+    }
+
+    if (!supportsBackdropFilter) {
+      document.documentElement.classList.add("no-backdrop-filter");
+      console.warn(
+        "⚠️ Browser Compatibility: Your browser does not support backdrop-filter. Visual effects may be limited."
+      );
+    }
+
+    if (!supports3D) {
+      console.warn(
+        "⚠️ Browser Compatibility: Your browser has limited 3D transform support. Card flip animations may not work properly."
+      );
+    }
+
+    if (isLowEndDevice) {
+      console.info(
+        "ℹ️ Performance: Low-end device detected. Some animations may be disabled for better performance."
+      );
+    }
+
+    // Log comprehensive browser support info
+    const browserInfo = {
+      oklch: supportsOklch,
+      backdropFilter: supportsBackdropFilter,
+      transform3D: supports3D,
+      hardwareCores: navigator.hardwareConcurrency || "unknown",
+      userAgent: navigator.userAgent,
+    };
+
+    console.log("🔍 Browser Compatibility Check:", browserInfo);
+
+    // Show user-friendly notification for critical missing features
+    if (!supportsOklch || !supportsBackdropFilter) {
+      const message =
+        t("browserCompatibility.warning") ||
+        "Your browser may not display all visual effects correctly. For the best experience, please use a modern browser (Chrome 111+, Safari 15.4+, or Firefox 113+).";
+
+      // Only show warning once per session
+      if (!sessionStorage.getItem("compatibility-warning-shown")) {
+        setTimeout(() => {
+          // You can replace this with a proper toast notification component
+          console.warn("📢 " + message);
+        }, 2000);
+        sessionStorage.setItem("compatibility-warning-shown", "true");
+      }
+    }
+  }, [t]);
 
   // Load questions from translations
   const questions = t("allQuestions", { returnObjects: true }) as Array<{

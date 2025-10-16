@@ -10,7 +10,7 @@ try {
     theme = JSON.parse(fs.readFileSync(themePath, "utf-8"));
   }
 } catch (err) {
-  console.error('failed to parse custom styles', err)
+  console.error("failed to parse custom styles", err);
 }
 const defaultTheme = {
   container: {
@@ -19,7 +19,13 @@ const defaultTheme = {
   },
   extend: {
     fontFamily: {
-      sans: ['"Space Grotesk"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+      sans: [
+        '"Space Grotesk"',
+        "-apple-system",
+        "BlinkMacSystemFont",
+        '"Segoe UI"',
+        "sans-serif",
+      ],
     },
     screens: {
       coarse: { raw: "(pointer: coarse)" },
@@ -142,7 +148,7 @@ const defaultTheme = {
     96: "var(--size-96)",
   },
   darkMode: ["selector", '[data-appearance="dark"]'],
-}
+};
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],

@@ -146,6 +146,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   /*
   ---break---
@@ -180,12 +181,11 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
-      sans-serif;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
   h1,

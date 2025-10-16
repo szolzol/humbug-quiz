@@ -220,7 +220,8 @@
 }
 
 /* Global blueish background tint overlay */
-.no-oklch .bg-gradient-to-br.from-primary\/\[0\.03\].via-transparent.to-accent\/\[0\.02\] {
+.no-oklch
+  .bg-gradient-to-br.from-primary\/\[0\.03\].via-transparent.to-accent\/\[0\.02\] {
   background: linear-gradient(
     to bottom right,
     rgba(234, 179, 8, 0.03),

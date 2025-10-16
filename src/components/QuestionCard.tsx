@@ -18,14 +18,14 @@ interface QuestionCardProps {
   index: number;
 }
 
-// Helper functions for localStorage with language-specific keys
-const getStoredFlipState = (questionId: string, language: string): boolean => {
+// Helper functions for localStorage (no longer language-specific)
+const getStoredFlipState = (questionId: string): boolean => {
   // Check consent first
   try {
     const consent = localStorage.getItem("cookie_consent");
     if (consent !== "accepted") return false;
 
-    const stored = localStorage.getItem(`flip_${language}_${questionId}`);
+    const stored = localStorage.getItem(`flip_${questionId}`);
     return stored === "true";
   } catch {
     return false;
@@ -42,26 +42,19 @@ const hasFunctionalConsent = (): boolean => {
   }
 };
 
-const setStoredFlipState = (
-  questionId: string,
-  language: string,
-  isFlipped: boolean
-) => {
+const setStoredFlipState = (questionId: string, isFlipped: boolean) => {
   if (!hasFunctionalConsent()) return;
   try {
-    localStorage.setItem(`flip_${language}_${questionId}`, String(isFlipped));
+    localStorage.setItem(`flip_${questionId}`, String(isFlipped));
   } catch {
     // Ignore localStorage errors
   }
 };
 
-const getStoredAnswers = (
-  questionId: string,
-  language: string
-): Set<number> => {
+const getStoredAnswers = (questionId: string): Set<number> => {
   if (!hasFunctionalConsent()) return new Set();
   try {
-    const stored = localStorage.getItem(`answers_${language}_${questionId}`);
+    const stored = localStorage.getItem(`answers_${questionId}`);
     if (stored) {
       return new Set(JSON.parse(stored));
     }
@@ -71,15 +64,11 @@ const getStoredAnswers = (
   return new Set();
 };
 
-const setStoredAnswers = (
-  questionId: string,
-  language: string,
-  answers: Set<number>
-) => {
+const setStoredAnswers = (questionId: string, answers: Set<number>) => {
   if (!hasFunctionalConsent()) return;
   try {
     localStorage.setItem(
-      `answers_${language}_${questionId}`,
+      `answers_${questionId}`,
       JSON.stringify(Array.from(answers))
     );
   } catch {
@@ -88,31 +77,24 @@ const setStoredAnswers = (
 };
 
 export function QuestionCard({ question, index }: QuestionCardProps) {
-  const { t, i18n } = useTranslation();
-  const currentLanguage = i18n.language;
+  const { t } = useTranslation();
 
   const [isFlipped, setIsFlipped] = useState(() =>
-    getStoredFlipState(question.id, currentLanguage)
+    getStoredFlipState(question.id)
   );
   const [selectedAnswers, setSelectedAnswers] = useState<Set<number>>(() =>
-    getStoredAnswers(question.id, currentLanguage)
+    getStoredAnswers(question.id)
   );
-
-  // Reset state when language changes
-  useEffect(() => {
-    setIsFlipped(getStoredFlipState(question.id, currentLanguage));
-    setSelectedAnswers(getStoredAnswers(question.id, currentLanguage));
-  }, [currentLanguage, question.id]);
 
   // Persist flip state to localStorage
   useEffect(() => {
-    setStoredFlipState(question.id, currentLanguage, isFlipped);
-  }, [isFlipped, question.id, currentLanguage]);
+    setStoredFlipState(question.id, isFlipped);
+  }, [isFlipped, question.id]);
 
   // Persist selected answers to localStorage
   useEffect(() => {
-    setStoredAnswers(question.id, currentLanguage, selectedAnswers);
-  }, [selectedAnswers, question.id, currentLanguage]);
+    setStoredAnswers(question.id, selectedAnswers);
+  }, [selectedAnswers, question.id]);
 
   const handleAnswerClick = (e: React.MouseEvent, answerIndex: number) => {
     e.stopPropagation();

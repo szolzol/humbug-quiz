@@ -64,6 +64,17 @@
         "correctAnswers": "Helyes válaszok",
         "clickToMark": "Kattints a válaszokra a jelöléshez"
     },
+    "questionPacks": {
+        "menu": "Kérdéscsomag menü",
+        "title": "Kérdéscsomagok",
+        "description": "Válaszd ki, hogy melyik kérdéscsomaggal szeretnél játszani",
+        "selectPack": "Kérdéscsomag kiválasztása",
+        "selectDescription": "Válaszd ki, melyik kérdéscsomaggal szeretnél játszani",
+        "questions": "kérdés",
+        "noPacks": "Nincs elérhető kérdéscsomag",
+        "currentPack": "Jelenlegi csomag",
+        "changePack": "Csomag váltása"
+    },
     "categoryFilter": {
         "all": "összes",
         "activeFilters": "{{count}} kategória kiválasztva"

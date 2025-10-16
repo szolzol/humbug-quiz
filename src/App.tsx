@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LoginButton } from "@/components/LoginButton";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { CookieConsent } from "@/components/CookieConsent";
+import { QuestionPackSelector } from "@/components/QuestionPackSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -120,9 +121,23 @@ const AnimatedQuestionsLight = ({
 
 function App() {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, refreshSession } = useAuth();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedPack, setSelectedPack] = useState<string>("us-starter-pack");
+
+  // Handle OAuth callback - refresh session when redirected with ?auth=success
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authStatus = params.get("auth");
+
+    if (authStatus === "success") {
+      console.log("🔄 Auth callback detected, refreshing session...");
+      refreshSession();
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [refreshSession]);
 
   // Browser compatibility detection
   useEffect(() => {
@@ -197,13 +212,70 @@ function App() {
     }
   }, [t]);
 
-  // Load questions from translations
-  const questions = t("allQuestions", { returnObjects: true }) as Array<{
-    id: string;
-    category: string;
-    question: string;
-    answers: string[];
-  }>;
+  // State for API-loaded questions
+  const [apiQuestions, setApiQuestions] = useState<
+    Array<{
+      id: string;
+      category: string;
+      question_en: string;
+      question_hu: string;
+      answers: Array<{ answer_en: string; answer_hu: string }>;
+      source_name?: string;
+      source_url?: string;
+    }>
+  >([]);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
+
+  // Load questions from API when pack changes
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setQuestionsLoading(true);
+        const response = await fetch(`/api/questions/${selectedPack}`);
+        if (!response.ok) throw new Error("Failed to fetch questions");
+        const data = await response.json();
+        setApiQuestions(data.questions || []);
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+        // Fallback to JSON questions if API fails
+        const fallbackQuestions = t("allQuestions", {
+          returnObjects: true,
+        }) as Array<{
+          id: string;
+          category: string;
+          question: string;
+          answers: string[];
+        }>;
+        // Convert fallback to API format
+        setApiQuestions(
+          fallbackQuestions.map((q) => ({
+            id: q.id,
+            category: q.category,
+            question_en: q.question,
+            question_hu: q.question,
+            answers: q.answers.map((a) => ({ answer_en: a, answer_hu: a })),
+          }))
+        );
+      } finally {
+        setQuestionsLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [selectedPack, t]);
+
+  // Transform API questions to app format
+  const currentLang = i18n.language as "en" | "hu";
+  const questions = apiQuestions.map((q) => ({
+    id: q.id,
+    category: q.category,
+    question: currentLang === "hu" ? q.question_hu : q.question_en,
+    answers: q.answers.map((a) =>
+      currentLang === "hu" ? a.answer_hu : a.answer_en
+    ),
+    sourceName: q.source_name,
+    sourceUrl: q.source_url,
+  }));
 
   // Get unique categories
   // Limit visible questions based on authentication status
@@ -275,7 +347,7 @@ function App() {
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Blueish background tint overlay for atmospheric effect */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.02] pointer-events-none z-0" />
-      
+
       {/* Studio Light Animations */}
       {studioLights.map((light, index) => (
         <AnimatedLight key={index} {...light} />
@@ -300,14 +372,20 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}>
           <div className="container mx-auto px-6 py-8 relative z-10">
-            {/* Language Switcher - Top Left */}
-            <div className="absolute top-4 left-2 md:top-4 md:left-6 z-20">
-              <LanguageSwitcher />
-            </div>
+            {/* Top Navigation Bar */}
+            <div className="absolute top-4 left-2 right-2 md:left-6 md:right-6 z-20 flex items-center justify-between">
+              {/* Left side - Question Pack Hamburger Menu */}
+              <QuestionPackSelector
+                variant="hamburger"
+                currentPack={selectedPack}
+                onPackChange={setSelectedPack}
+              />
 
-            {/* Login Button - Top Right */}
-            <div className="absolute top-4 right-2 md:top-4 md:right-6 z-20">
-              <LoginButton />
+              {/* Right side - Language & Login */}
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher />
+                <LoginButton />
+              </div>
             </div>
 
             <div className="text-center max-w-3xl mx-auto">
@@ -538,6 +616,15 @@ function App() {
             </p>
           </motion.div>
 
+          {/* Question Pack Selector - Inline Version */}
+          <div className="max-w-3xl mx-auto mb-8">
+            <QuestionPackSelector
+              variant="inline"
+              currentPack={selectedPack}
+              onPackChange={setSelectedPack}
+            />
+          </div>
+
           {/* Background Music Player */}
           <div className="max-w-3xl mx-auto mb-12">
             <BackgroundMusicPlayer
@@ -559,17 +646,24 @@ function App() {
           )}
 
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {/* Show first 4 cards for anonymous users, all for authenticated */}
-            {(isAuthenticated
-              ? translatedQuestions
-              : translatedQuestions.slice(0, 4)
-            ).map((question, index) => (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                index={index}
-              />
-            ))}
+            {questionsLoading ? (
+              // Loading state
+              <div className="col-span-full flex items-center justify-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              /* Show first 4 cards for anonymous users, all for authenticated */
+              (isAuthenticated
+                ? translatedQuestions
+                : translatedQuestions.slice(0, 4)
+              ).map((question, index) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  index={index}
+                />
+              ))
+            )}
 
             {/* Hero-style CTA Section for anonymous users */}
             {!isAuthenticated && questions.length > 4 && (

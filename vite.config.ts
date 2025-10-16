@@ -1,22 +1,428 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
-import { defineConfig, PluginOption } from "vite";
+import { defineConfig, PluginOption, ViteDevServer } from "vite";
 
 import sparkPlugin from "@github/spark/spark-vite-plugin";
 import createIconImportProxy from "@github/spark/vitePhosphorIconProxyPlugin";
 import { resolve } from "path";
+import { neon } from "@neondatabase/serverless";
+import dotenv from "dotenv";
+
+// Load environment variables for development
+dotenv.config({ path: ".env.local" });
 
 const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname;
+
+// Development API handler plugin
+function apiRoutesPlugin(): PluginOption {
+  return {
+    name: "api-routes",
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use(async (req, res, next) => {
+        // Handle /api/auth/google
+        if (req.url === "/api/auth/google") {
+          console.log("🔐 Auth Request: /api/auth/google");
+
+          const clientId = process.env.GOOGLE_CLIENT_ID;
+          const appUrl =
+            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+          const redirectUri = `${appUrl}/api/auth/callback`;
+
+          console.log("📍 Using redirect URI:", redirectUri);
+          console.log(
+            "📍 NEXT_PUBLIC_APP_URL:",
+            process.env.NEXT_PUBLIC_APP_URL
+          );
+
+          if (!clientId) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                error: "Google OAuth not configured",
+                hint: "Add GOOGLE_CLIENT_ID to .env.local",
+              })
+            );
+            return;
+          }
+
+          // Build Google OAuth URL
+          const googleAuthUrl = new URL(
+            "https://accounts.google.com/o/oauth2/v2/auth"
+          );
+          googleAuthUrl.searchParams.append("client_id", clientId);
+          googleAuthUrl.searchParams.append("redirect_uri", redirectUri);
+          googleAuthUrl.searchParams.append("response_type", "code");
+          googleAuthUrl.searchParams.append("scope", "openid email profile");
+          googleAuthUrl.searchParams.append("access_type", "offline");
+          googleAuthUrl.searchParams.append("prompt", "consent");
+
+          console.log("🔀 Redirecting to Google OAuth...");
+          res.statusCode = 302;
+          res.setHeader("Location", googleAuthUrl.toString());
+          res.end();
+          return;
+        }
+
+        // Handle /api/auth/callback
+        if (req.url?.startsWith("/api/auth/callback")) {
+          console.log("🔐 Auth Callback: /api/auth/callback");
+
+          const url = new URL(req.url, `http://${req.headers.host}`);
+          const code = url.searchParams.get("code");
+          const error = url.searchParams.get("error");
+
+          if (error) {
+            console.error("❌ OAuth Error:", error);
+            res.statusCode = 302;
+            res.setHeader("Location", "/?auth=error");
+            res.end();
+            return;
+          }
+
+          if (!code) {
+            console.error("❌ No authorization code received");
+            res.statusCode = 302;
+            res.setHeader("Location", "/?auth=missing_code");
+            res.end();
+            return;
+          }
+
+          try {
+            const clientId = process.env.GOOGLE_CLIENT_ID;
+            const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+            const appUrl =
+              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+            const redirectUri = `${appUrl}/api/auth/callback`;
+
+            if (!clientId || !clientSecret) {
+              throw new Error("Google OAuth credentials not configured");
+            }
+
+            // Exchange code for tokens
+            const tokenResponse = await fetch(
+              "https://oauth2.googleapis.com/token",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                  code,
+                  client_id: clientId,
+                  client_secret: clientSecret,
+                  redirect_uri: redirectUri,
+                  grant_type: "authorization_code",
+                }),
+              }
+            );
+
+            if (!tokenResponse.ok) {
+              const errorData = await tokenResponse.text();
+              console.error("Token exchange error:", errorData);
+              throw new Error("Failed to exchange code for tokens");
+            }
+
+            const tokens = await tokenResponse.json();
+
+            // Get user info
+            const userInfoResponse = await fetch(
+              "https://www.googleapis.com/oauth2/v2/userinfo",
+              {
+                headers: { Authorization: `Bearer ${tokens.access_token}` },
+              }
+            );
+
+            if (!userInfoResponse.ok) {
+              throw new Error("Failed to fetch user info");
+            }
+
+            const userInfo = await userInfoResponse.json();
+
+            // Save or update user in database
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+            try {
+              await sql`
+                INSERT INTO users (id, email, name, picture, last_login)
+                VALUES (${userInfo.id}, ${userInfo.email}, ${userInfo.name}, ${userInfo.picture}, NOW())
+                ON CONFLICT (id) 
+                DO UPDATE SET 
+                  name = EXCLUDED.name,
+                  picture = EXCLUDED.picture,
+                  last_login = NOW(),
+                  updated_at = NOW()
+              `;
+              console.log("💾 User saved to database:", userInfo.email);
+            } catch (dbError) {
+              console.error("❌ Database error:", dbError);
+              // Continue even if DB save fails - user can still use the app
+            }
+
+            // Create simple session token
+            const sessionData = JSON.stringify({
+              id: userInfo.id,
+              email: userInfo.email,
+              name: userInfo.name,
+              picture: userInfo.picture,
+              exp: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+            });
+
+            const token = Buffer.from(sessionData).toString("base64");
+
+            console.log("✅ User authenticated:", userInfo.email);
+
+            // Set cookie and redirect
+            res.setHeader(
+              "Set-Cookie",
+              `auth_token=${token}; Path=/; HttpOnly; Max-Age=604800; SameSite=Lax`
+            );
+            res.statusCode = 302;
+            res.setHeader("Location", "/?auth=success");
+            res.end();
+            return;
+          } catch (error) {
+            console.error("❌ Auth callback error:", error);
+            res.statusCode = 302;
+            res.setHeader("Location", "/?auth=error");
+            res.end();
+            return;
+          }
+        }
+
+        // Handle /api/auth/session
+        if (req.url === "/api/auth/session") {
+          console.log("🔐 Session Request: /api/auth/session");
+          console.log("📝 Cookie header:", req.headers.cookie);
+
+          try {
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            console.log("🍪 Parsed cookies:", Object.keys(cookies));
+            const token = cookies.auth_token;
+
+            if (!token) {
+              console.log("⚠️ No auth_token found in cookies");
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ authenticated: false, user: null }));
+              return;
+            }
+
+            console.log("✅ Auth token found, decoding...");
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            // Check expiration
+            if (sessionData.exp < Date.now()) {
+              console.log("⚠️ Token expired");
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ authenticated: false, user: null }));
+              return;
+            }
+
+            console.log("✅ User session valid:", sessionData.email);
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                authenticated: true,
+                user: {
+                  id: sessionData.id,
+                  email: sessionData.email,
+                  name: sessionData.name,
+                  picture: sessionData.picture,
+                },
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("❌ Session error:", error);
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ authenticated: false, user: null }));
+            return;
+          }
+        }
+
+        // Handle /api/auth/logout
+        if (req.url === "/api/auth/logout") {
+          console.log("🔐 Logout Request: /api/auth/logout");
+
+          res.setHeader(
+            "Set-Cookie",
+            "auth_token=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax"
+          );
+          res.statusCode = 302;
+          res.setHeader("Location", "/");
+          res.end();
+          return;
+        }
+
+        // Handle /api/question-sets
+        if (req.url === "/api/question-sets") {
+          try {
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Database not configured",
+                })
+              );
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+            const questionSets = await sql`
+              SELECT 
+                id, slug, name_en, name_hu, description_en, description_hu,
+                access_level, is_active, is_published, cover_image_url, icon_url,
+                display_order, question_count, total_plays, metadata
+              FROM question_sets
+              WHERE is_active = true AND is_published = true
+              ORDER BY display_order ASC, created_at ASC
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: true,
+                questionSets,
+                count: questionSets.length,
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("API Error:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: false,
+                error: "Failed to fetch question sets",
+              })
+            );
+            return;
+          }
+        }
+
+        // Handle /api/questions/:slug
+        if (req.url?.startsWith("/api/questions/")) {
+          try {
+            const packSlug = req.url.split("/api/questions/")[1];
+
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Database not configured",
+                })
+              );
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            // Fetch question set
+            const questionSets = await sql`
+              SELECT id, slug, name_en, name_hu, description_en, description_hu
+              FROM question_sets
+              WHERE slug = ${packSlug} AND is_active = true AND is_published = true
+            `;
+
+            if (questionSets.length === 0) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Question pack not found",
+                })
+              );
+              return;
+            }
+
+            const questionSet = questionSets[0];
+
+            // Fetch questions with answers
+            const questions = await sql`
+              SELECT 
+                q.id, q.question_en, q.question_hu, q.category, q.difficulty,
+                q.source_name, q.source_url, q.order_index,
+                json_agg(
+                  json_build_object(
+                    'id', a.id,
+                    'answer_en', a.answer_en,
+                    'answer_hu', a.answer_hu,
+                    'order_index', a.order_index
+                  ) ORDER BY a.order_index
+                ) as answers
+              FROM questions q
+              LEFT JOIN answers a ON a.question_id = q.id
+              WHERE q.set_id = ${questionSet.id} AND q.is_active = true
+              GROUP BY q.id, q.question_en, q.question_hu, q.category, 
+                       q.difficulty, q.source_name, q.source_url, q.order_index
+              ORDER BY q.order_index ASC
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: true,
+                questionSet,
+                questions,
+                count: questions.length,
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("API Error:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: false,
+                error: "Failed to fetch questions",
+              })
+            );
+            return;
+          }
+        }
+
+        next();
+      });
+    },
+  };
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    apiRoutesPlugin(), // Add API routes handler for development
     // DO NOT REMOVE
     createIconImportProxy() as PluginOption,
     sparkPlugin() as PluginOption,
   ],
+  server: {
+    port: 3000,
+  },
   resolve: {
     alias: {
       "@": resolve(projectRoot, "src"),

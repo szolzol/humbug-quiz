@@ -24,15 +24,15 @@ function apiRoutesPlugin(): PluginOption {
           console.log("🔐 Auth Request: /api/auth/google");
 
           const clientId = process.env.GOOGLE_CLIENT_ID;
-          const appUrl =
-            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+          
+          // Dynamically detect the current domain from request headers
+          const host = req.headers.host || "localhost:5000";
+          const protocol = host.includes("localhost") ? "http" : "https";
+          const appUrl = `${protocol}://${host}`;
           const redirectUri = `${appUrl}/api/auth/callback`;
 
           console.log("📍 Using redirect URI:", redirectUri);
-          console.log(
-            "📍 NEXT_PUBLIC_APP_URL:",
-            process.env.NEXT_PUBLIC_APP_URL
-          );
+          console.log("📍 Detected host:", host);
 
           if (!clientId) {
             res.statusCode = 500;
@@ -91,8 +91,11 @@ function apiRoutesPlugin(): PluginOption {
           try {
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-            const appUrl =
-              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+            
+            // Dynamically detect the current domain from request headers
+            const host = req.headers.host || "localhost:5000";
+            const protocol = host.includes("localhost") ? "http" : "https";
+            const appUrl = `${protocol}://${host}`;
             const redirectUri = `${appUrl}/api/auth/callback`;
 
             if (!clientId || !clientSecret) {

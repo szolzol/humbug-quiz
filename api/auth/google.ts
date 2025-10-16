@@ -6,7 +6,11 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
  */
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+  
+  // Dynamically detect the current domain from request headers
+  const host = req.headers.host || "localhost:5000";
+  const protocol = host.includes("localhost") ? "http" : "https";
+  const appUrl = `${protocol}://${host}`;
   const redirectUri = `${appUrl}/api/auth/callback`;
 
   if (!clientId) {

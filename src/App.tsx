@@ -273,6 +273,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Blueish background tint overlay for atmospheric effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.02] pointer-events-none z-0" />
+      
       {/* Studio Light Animations */}
       {studioLights.map((light, index) => (
         <AnimatedLight key={index} {...light} />

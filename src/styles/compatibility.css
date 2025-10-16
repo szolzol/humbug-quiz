@@ -142,7 +142,7 @@
   background: linear-gradient(
     to bottom right,
     rgba(234, 179, 8, 0.05),
-    rgba(255, 255, 255, 0.3),
+    transparent,
     rgba(251, 191, 36, 0.1)
   ) !important;
 }
@@ -203,6 +203,11 @@
 }
 
 /* Background color gradients with opacity */
+/* Background color utilities with opacity */
+.no-oklch .bg-background\/90 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
 .no-oklch .bg-gradient-to-b.from-background\/40 {
   background: linear-gradient(
     to bottom,
@@ -222,12 +227,7 @@
 
 .no-oklch
   .bg-gradient-to-b.from-background\/40.via-background\/60.to-background\/90 {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.7)
-  ) !important;
+  background: transparent !important;
 }
 
 .no-oklch .bg-gradient-to-b.from-background.to-muted\/50 {
@@ -609,10 +609,6 @@
 
 .no-oklch .text-background {
   color: rgb(255, 255, 255) !important;
-}
-
-.no-oklch .text-foreground {
-  color: rgb(10, 10, 10) !important;
 }
 
 .no-oklch .border-primary {

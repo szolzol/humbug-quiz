@@ -105,6 +105,18 @@
   color: transparent !important;
 }
 
+.no-oklch
+  .bg-clip-text.text-transparent.bg-gradient-to-r.from-primary.to-accent {
+  background: linear-gradient(
+    to right,
+    rgb(234, 179, 8),
+    rgb(251, 191, 36)
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
 /* Fallback for browsers without bg-clip-text support */
 @supports not (background-clip: text) {
   .bg-clip-text.text-transparent {
@@ -202,12 +214,13 @@
   ) !important;
 }
 
-/* Background color gradients with opacity */
-/* Background color utilities with opacity */
-.no-oklch .bg-background\/90 {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+/* Hero section header buttons - darker backgrounds for better visibility */
+.no-oklch .bg-background\/90.backdrop-blur-sm {
+  background-color: rgba(20, 20, 40, 0.85) !important;
+  color: rgb(255, 255, 255) !important;
 }
 
+/* Background color gradients with opacity */
 .no-oklch .bg-gradient-to-b.from-background\/40 {
   background: linear-gradient(
     to bottom,

@@ -282,6 +282,7 @@ Changed `via-background` from solid `rgb(255, 255, 255)` to semi-transparent `rg
 ### 12. Text Color Utilities
 
 **Added fallbacks for:**
+
 - `text-background` - White text on colored backgrounds
 - `text-foreground` - Dark text for body content
 

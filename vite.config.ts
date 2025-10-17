@@ -24,7 +24,7 @@ function apiRoutesPlugin(): PluginOption {
           console.log("🔐 Auth Request: /api/auth/google");
 
           const clientId = process.env.GOOGLE_CLIENT_ID;
-          
+
           // Dynamically detect the current domain from request headers
           const host = req.headers.host || "localhost:5000";
           const protocol = host.includes("localhost") ? "http" : "https";
@@ -91,7 +91,7 @@ function apiRoutesPlugin(): PluginOption {
           try {
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-            
+
             // Dynamically detect the current domain from request headers
             const host = req.headers.host || "localhost:5000";
             const protocol = host.includes("localhost") ? "http" : "https";
@@ -287,15 +287,58 @@ function apiRoutesPlugin(): PluginOption {
             }
 
             const sql = neon(process.env.POSTGRES_POSTGRES_URL);
-            const questionSets = await sql`
-              SELECT 
-                id, slug, name_en, name_hu, description_en, description_hu,
-                access_level, is_active, is_published, cover_image_url, icon_url,
-                display_order, question_count, total_plays, metadata
-              FROM question_sets
-              WHERE is_active = true AND is_published = true
-              ORDER BY display_order ASC, created_at ASC
-            `;
+
+            // Check authentication status
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const authToken = cookies.auth_token;
+            let isAuthenticated = false;
+
+            if (authToken) {
+              try {
+                // Decode and check if valid
+                const sessionData = JSON.parse(
+                  Buffer.from(authToken, "base64").toString()
+                );
+                isAuthenticated = sessionData.exp >= Date.now();
+              } catch (e) {
+                // Invalid token
+                isAuthenticated = false;
+              }
+            }
+
+            // Fetch question sets based on authentication
+            let questionSets;
+            if (isAuthenticated) {
+              // Authenticated: Show premium packs only
+              questionSets = await sql`
+                SELECT 
+                  id, slug, name_en, name_hu, description_en, description_hu,
+                  access_level, is_active, is_published, cover_image_url, icon_url,
+                  display_order, question_count, total_plays, metadata
+                FROM question_sets
+                WHERE is_active = true AND is_published = true
+                  AND access_level IN ('premium', 'admin_only')
+                ORDER BY display_order ASC, created_at ASC
+              `;
+            } else {
+              // Unauthenticated: Show free packs only
+              questionSets = await sql`
+                SELECT 
+                  id, slug, name_en, name_hu, description_en, description_hu,
+                  access_level, is_active, is_published, cover_image_url, icon_url,
+                  display_order, question_count, total_plays, metadata
+                FROM question_sets
+                WHERE is_active = true AND is_published = true
+                  AND access_level = 'free'
+                ORDER BY display_order ASC, created_at ASC
+              `;
+            }
 
             res.statusCode = 200;
             res.setHeader("Content-Type", "application/json");
@@ -304,6 +347,7 @@ function apiRoutesPlugin(): PluginOption {
                 success: true,
                 questionSets,
                 count: questionSets.length,
+                isAuthenticated,
               })
             );
             return;

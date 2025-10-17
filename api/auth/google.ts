@@ -6,12 +6,20 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
  */
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  
+
   // Dynamically detect the current domain from request headers
   const host = req.headers.host || "localhost:5000";
   const protocol = host.includes("localhost") ? "http" : "https";
   const appUrl = `${protocol}://${host}`;
   const redirectUri = `${appUrl}/api/auth/callback`;
+
+  // Debug logging
+  console.log("🔍 OAuth Debug Info:");
+  console.log("   Host header:", req.headers.host);
+  console.log("   Detected host:", host);
+  console.log("   Protocol:", protocol);
+  console.log("   App URL:", appUrl);
+  console.log("   Redirect URI:", redirectUri);
 
   if (!clientId) {
     return res.status(500).json({ error: "Google OAuth not configured" });

@@ -82,7 +82,7 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Created by <strong>Zoltán Szoleczki</strong> and <strong>Zsolt Beró</strong>",
-        "copyright": "© 2025 HUMBUG! humbugquiz@gmail.hu - All rights reserved.",
+        "copyright": "© 2025 HUMBUG! humbugquiz@gmail.com - All rights reserved.",
         "otherProject": "Check out their other project: <strong>DarQba</strong> - Mystery solving party game"
     },
     "browserCompatibility": {
@@ -622,8 +622,8 @@
         "lockedCard": "Locked card",
         "unlockCards": "Sign in to unlock all cards",
         "cardCount": "{{visible}}/{{total}} cards available",
-        "ctaTitle": "Discover all questions after signing in!",
-        "ctaDescription": "Make your next HUMBUG! party even more memorable!",
+        "ctaTitle": "Just...one...more...turn...",
+        "ctaDescription": "Discover all questions after signing in!",
         "benefit1": "All 20+ cards instantly",
         "benefit2": "Free and fast",
         "benefit3": "Secure Google sign-in",

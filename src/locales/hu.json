@@ -82,7 +82,7 @@
     "footer": {
         "title": "HUMBUG!",
         "creators": "Készítette: <strong>Szoleczki Zoltán</strong> és <strong>Beró Zsolt</strong>",
-        "copyright": "© 2025 HUMBUG! humbugquiz@gmail.hu - Minden jog fenntartva.",
+        "copyright": "© 2025 HUMBUG! - humbugquiz@gmail.com \n - Minden jog fenntartva.",
         "otherProject": "Nézd meg a másik projektjüket: <strong>DarQba</strong> - Rejtély megfejtős parti játék"
     },
     "browserCompatibility": {
@@ -670,8 +670,8 @@
         "lockedCard": "Zárolt kártya",
         "unlockCards": "Jelentkezz be az összes kártya feloldásához",
         "cardCount": "{{visible}}/{{total}} kártya elérhető",
-        "ctaTitle": "Fedezd fel az összes feladványt belépés után!",
-        "ctaDescription": "Tedd még emlékezetesebbé a következő HUMBUG! partidat!",
+        "ctaTitle": "Csak még egy kört mindenkinek!",
+        "ctaDescription": "Fedezd fel az összes feladványt belépés után!",
         "benefit1": "Mind a 20+ kártya azonnal",
         "benefit2": "Ingyenes és gyors",
         "benefit3": "Biztonságos Google bejelentkezés",

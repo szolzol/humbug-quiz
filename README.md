@@ -209,13 +209,210 @@ The game continues until only one player remains "alive" - requiring both knowle
   - Location: `public/fonts/`
   - Purpose: Network compatibility (works on restricted networks without external CDN)
 
+### Backend & Database
+
+- **Neon PostgreSQL**: Serverless PostgreSQL database
+  - `@neondatabase/serverless` (0.10.6): Serverless-optimized database client
+  - Stores user data, question packs, and authentication sessions
+- **Vercel Serverless Functions**: API endpoints in `api/` folder
+  - Google OAuth authentication flow
+  - Question pack management
+  - Session validation
+- **JWT Authentication**: Secure token-based authentication
+  - `jsonwebtoken` (9.0.2): JWT token creation and validation
+  - `cookie` (1.0.2): HTTP-only cookie management
+  - 7-day session expiration
+
+---
+
+## 🔐 Authentication & Environment Strategy
+
+### OAuth Flow Architecture
+
+This application uses **dynamic domain detection** for Google OAuth to ensure the authentication flow works correctly across all environments without manual configuration.
+
+#### How It Works
+
+Instead of relying on environment variables that may be misconfigured, the auth endpoints detect the current domain from HTTP request headers:
+
+```typescript
+// Dynamically detect the current domain from request headers
+const host = req.headers.host || "localhost:5000";
+const protocol = host.includes("localhost") ? "http" : "https";
+const appUrl = `${protocol}://${host}`;
+const redirectUri = `${appUrl}/api/auth/callback`;
+```
+
+This ensures:
+
+- ✅ Production (`humbug.hu`) stays on production
+- ✅ Pre-production (`humbug-quiz.vercel.app`) stays on pre-prod
+- ✅ Local development (`localhost:5000`) stays local
+- ✅ No environment variable configuration needed for domain detection
+
+### Environment Configuration
+
+#### Branch Strategy
+
+| Branch   | Environment    | Domain                               | Purpose                |
+| -------- | -------------- | ------------------------------------ | ---------------------- |
+| `master` | **Production** | https://humbug.hu                    | Live production site   |
+| `main`   | **Pre-Prod**   | https://humbug-quiz.vercel.app       | Testing before release |
+| Other    | **Preview**    | `https://[branch]-[hash].vercel.app` | Feature testing        |
+
+#### Required Environment Variables
+
+Create a `.env.local` file for local development:
+
+```bash
+# Database Configuration
+POSTGRES_POSTGRES_URL="postgresql://user:password@host/database"
+
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# JWT Secret (generate with: openssl rand -base64 32)
+JWT_SECRET="your-secure-random-secret"
+
+# Optional: App URL (auto-detected if not set)
+# NEXT_PUBLIC_APP_URL="http://localhost:5000"
+```
+
+**For Vercel deployment**, set these environment variables in the Vercel dashboard for each environment. See [VERCEL_ENV_VARS.md](./VERCEL_ENV_VARS.md) for detailed setup instructions.
+
+### Google OAuth Configuration
+
+#### Required Redirect URIs
+
+Add all three environments to your Google Cloud Console OAuth Client:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Select your OAuth 2.0 Client ID
+3. Add these **Authorized redirect URIs**:
+
+```
+https://humbug.hu/api/auth/callback                    (Production)
+https://humbug-quiz.vercel.app/api/auth/callback       (Pre-Production)
+http://localhost:5000/api/auth/callback                (Local Development)
+```
+
+#### OAuth Endpoints
+
+| Endpoint             | Purpose                            | Method |
+| -------------------- | ---------------------------------- | ------ |
+| `/api/auth/google`   | Initiates OAuth flow               | GET    |
+| `/api/auth/callback` | Handles OAuth callback from Google | GET    |
+| `/api/auth/session`  | Validates current session          | GET    |
+| `/api/auth/logout`   | Clears authentication cookie       | POST   |
+
+#### Authentication Flow
+
+1. **User clicks "Login with Google"**
+
+   - Frontend calls `/api/auth/google`
+   - Server detects domain from `req.headers.host`
+   - Redirects to Google with correct `redirect_uri`
+
+2. **Google redirects back to app**
+
+   - Google calls `/api/auth/callback?code=...`
+   - Server exchanges code for user info
+   - Creates JWT token with user data
+   - Stores user in database (if new)
+   - Sets HTTP-only cookie with JWT
+   - Redirects to app homepage
+
+3. **Session validation**
+
+   - Frontend calls `/api/auth/session` on mount
+   - Server validates JWT from cookie
+   - Returns `{ authenticated: true, user: {...} }`
+
+4. **Logout**
+   - Frontend calls `/api/auth/logout`
+   - Server clears auth cookie
+   - Redirects to homepage
+
+### Local Development with OAuth
+
+For local development, the project includes a custom Vite plugin (`apiRoutesPlugin` in `vite.config.ts`) that handles API routes during development:
+
+```typescript
+// vite.config.ts includes middleware for:
+// - /api/auth/google: OAuth initiation
+// - /api/auth/callback: OAuth callback handler
+// - /api/auth/session: Session validation
+// - /api/auth/logout: Logout handler
+// - /api/question-sets: Question pack listing
+// - /api/questions/:slug: Question pack data
+```
+
+**To run with OAuth locally:**
+
+1. Ensure `.env.local` has all required variables
+2. Add `http://localhost:5000/api/auth/callback` to Google OAuth redirect URIs
+3. Run `npm run dev`
+4. OAuth will work seamlessly with dynamic domain detection
+
+### Security Features
+
+- ✅ **HTTP-only cookies**: JWT token not accessible via JavaScript (XSS protection)
+- ✅ **Secure flag**: Cookies only sent over HTTPS in production
+- ✅ **SameSite=Lax**: CSRF protection
+- ✅ **7-day expiration**: Automatic session timeout
+- ✅ **Database persistence**: User data stored securely in Neon PostgreSQL
+- ✅ **Dynamic domain detection**: Prevents redirect URI mismatches
+
+### Troubleshooting OAuth
+
+**Issue: "redirect_uri_mismatch" error**
+
+- Verify all three redirect URIs are added to Google Console
+- Check that the domain matches exactly (no trailing slashes)
+- Ensure Google OAuth Client ID is correct in environment variables
+
+**Issue: OAuth works locally but not in Vercel**
+
+- Check Vercel environment variables are set correctly
+- Verify `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are present
+- Ensure `JWT_SECRET` is configured in Vercel
+
+**Issue: Session not persisting**
+
+- Check browser allows cookies
+- Verify cookie domain settings
+- Check JWT_SECRET is consistent across deployments
+
+For detailed deployment documentation, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
+
 ---
 
 ## 📁 Project Structure
 
 ```
 humbug-quiz/
+├── api/                             # Vercel serverless functions
+│   └── auth/
+│       ├── google.ts                # OAuth initiation endpoint
+│       ├── callback.ts              # OAuth callback handler
+│       ├── session.ts               # Session validation endpoint
+│       └── logout.ts                # Logout endpoint
+│   ├── question-sets.ts             # Question pack listing API
+│   └── questions/
+│       └── [slug].ts                # Question pack data API
+│
+├── database/                        # Database scripts
+│   ├── migrate-two-packs.js         # Migration script for question packs
+│   ├── fix-first-question.js        # Data fix scripts
+│   ├── check-first-question.js      # Database verification
+│   └── translations/                # Question pack translations
+│       ├── us-starter-pack-hu.js    # US pack with Hungarian translations
+│       └── hun-starter-pack-en.js   # Hungarian pack with English translations
+│
 ├── public/                          # Static assets
+│   ├── manifest.json                # PWA manifest
+│   ├── sw.js                        # Service worker
 │   └── fonts/                       # Self-hosted fonts
 │       ├── SpaceGrotesk-Light.ttf
 │       ├── SpaceGrotesk-Regular.ttf
@@ -236,8 +433,13 @@ humbug-quiz/
 │   │   ├── AudioPlayer.tsx          # Custom audio player
 │   │   ├── BackgroundMusicPlayer.tsx # Ambient music player
 │   │   ├── CategoryFilter.tsx       # Question category filter
+│   │   ├── CookieConsent.tsx        # Cookie consent banner
+│   │   ├── InstallPrompt.tsx        # PWA install prompt
 │   │   ├── LanguageSwitcher.tsx     # Language toggle
+│   │   ├── LoginButton.tsx          # Google OAuth login
+│   │   ├── PrivacyPolicy.tsx        # Privacy policy modal
 │   │   ├── QuestionCard.tsx         # Flip card component
+│   │   ├── QuestionPackSelector.tsx # Question pack switcher
 │   │   └── ui/                      # Radix UI components
 │   │       ├── button.tsx
 │   │       ├── card.tsx
@@ -245,8 +447,12 @@ humbug-quiz/
 │   │       ├── separator.tsx
 │   │       └── ... (30+ components)
 │   │
+│   ├── context/                     # React context providers
+│   │   └── AuthContext.tsx          # Authentication state management
+│   │
 │   ├── hooks/                       # Custom React hooks
-│   │   └── use-mobile.ts            # Mobile detection hook
+│   │   ├── use-mobile.ts            # Mobile detection hook
+│   │   └── useAuth.ts               # Authentication hook
 │   │
 │   ├── lib/                         # Utilities
 │   │   └── utils.ts                 # Helper functions (cn, etc.)
@@ -273,6 +479,8 @@ humbug-quiz/
 │   ├── questions_extracted.txt
 │   └── Space_Grotesk/               # Font source files
 │
+├── .env.example                     # Environment variables template
+├── .env.local                       # Local environment variables (git-ignored)
 ├── components.json                  # shadcn/ui configuration
 ├── index.html                       # HTML entry point
 ├── LICENSE                          # MIT License
@@ -284,6 +492,8 @@ humbug-quiz/
 ├── tailwind.config.js               # Tailwind configuration
 ├── theme.json                       # Theme configuration
 ├── tsconfig.json                    # TypeScript configuration
+├── VERCEL_DEPLOYMENT.md             # Vercel deployment guide
+├── VERCEL_ENV_VARS.md               # Environment variables reference
 ├── vercel.json                      # Vercel deployment config
 └── vite.config.ts                   # Vite build configuration
 ```
@@ -296,6 +506,8 @@ humbug-quiz/
 
 - **Node.js** 18.x or higher
 - **npm** 9.x or higher (or yarn/pnpm)
+- **PostgreSQL Database** (Neon recommended for serverless)
+- **Google OAuth Client** (from Google Cloud Console)
 
 ### Setup Steps
 
@@ -312,15 +524,54 @@ humbug-quiz/
    npm install
    ```
 
-3. **Start development server**
+3. **Configure environment variables**
+
+   Create a `.env.local` file in the root directory:
+
+   ```bash
+   # Database (get from Neon dashboard)
+   POSTGRES_POSTGRES_URL="postgresql://user:password@host/database?sslmode=require"
+
+   # Google OAuth (get from Google Cloud Console)
+   GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+   # JWT Secret (generate with: openssl rand -base64 32)
+   JWT_SECRET="your-secure-random-secret-key"
+
+   # App URL (optional, auto-detected)
+   NEXT_PUBLIC_APP_URL="http://localhost:5000"
+   ```
+
+   See [.env.example](./.env.example) for a complete template.
+
+4. **Set up Google OAuth**
+
+   - Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create a new OAuth 2.0 Client ID (or use existing)
+   - Add authorized redirect URI: `http://localhost:5000/api/auth/callback`
+   - Copy Client ID and Client Secret to `.env.local`
+
+5. **Initialize database** (optional - questions already in production DB)
+
+   If setting up a new database instance:
+
+   ```bash
+   node database/migrate-two-packs.js
+   ```
+
+   This will create tables and populate with question packs.
+
+6. **Start development server**
 
    ```bash
    npm run dev
    ```
 
-4. **Open in browser**
+7. **Open in browser**
    - Navigate to `http://localhost:5000`
    - Or access from network: `http://[your-ip]:5000`
+   - Test Google login to verify OAuth setup
 
 ---
 
@@ -537,11 +788,23 @@ For detailed PWA documentation, see [PWA_IMPLEMENTATION.md](./PWA_IMPLEMENTATION
 
 ---
 
-## �🚀 Deployment
+## 🚀 Deployment
 
-### Vercel (Recommended)
+### Deployment Strategy
 
-This project is optimized for Vercel deployment:
+This project uses a **multi-environment deployment strategy** with Vercel:
+
+| Environment    | Branch   | Domain                               | Purpose                |
+| -------------- | -------- | ------------------------------------ | ---------------------- |
+| **Production** | `master` | https://humbug.hu                    | Live production site   |
+| **Pre-Prod**   | `main`   | https://humbug-quiz.vercel.app       | Testing before release |
+| **Preview**    | Other    | `https://[branch]-[hash].vercel.app` | Feature testing        |
+
+### Vercel Deployment (Recommended)
+
+This project is optimized for Vercel with automatic deployments:
+
+#### Initial Setup
 
 1. **Connect Repository**
 
@@ -549,27 +812,75 @@ This project is optimized for Vercel deployment:
    - Import your GitHub repository
    - Vercel auto-detects Vite configuration
 
-2. **Configure Build**
+2. **Configure Build Settings**
 
+   - Framework Preset: **Vite**
    - Build Command: `npm run build`
    - Output Directory: `dist`
    - Install Command: `npm install`
 
-3. **Environment Variables** (if needed)
+3. **Set Production Branch**
 
-   - None required for current setup
+   In Vercel Dashboard → Settings → Git:
 
-4. **Deploy**
-   - Push to `main` branch triggers automatic deployment
-   - Preview deployments for all PRs
+   - Production Branch: `master`
+   - This ensures `master` deploys to custom domain (humbug.hu)
+   - `main` branch deploys to `humbug-quiz.vercel.app` (pre-prod)
+
+4. **Configure Environment Variables**
+
+   Add these in Vercel Dashboard → Settings → Environment Variables:
+
+   **For ALL environments** (Production + Preview + Development):
+
+   ```
+   POSTGRES_POSTGRES_URL          (PostgreSQL connection string)
+   GOOGLE_CLIENT_ID               (Google OAuth Client ID)
+   GOOGLE_CLIENT_SECRET           (Google OAuth Secret)
+   JWT_SECRET                     (Random secret for JWT signing)
+   ```
+
+   **Note**: `NEXT_PUBLIC_APP_URL` is **NOT required** - the app automatically detects the current domain from request headers.
+
+   For detailed environment setup, see [VERCEL_ENV_VARS.md](./VERCEL_ENV_VARS.md).
+
+5. **Configure Google OAuth Redirect URIs**
+
+   Add all three environments to Google Cloud Console:
+
+   ```
+   https://humbug.hu/api/auth/callback
+   https://humbug-quiz.vercel.app/api/auth/callback
+   http://localhost:5000/api/auth/callback
+   ```
+
+6. **Deploy**
+   - Push to `master` → Production deployment (humbug.hu)
+   - Push to `main` → Pre-production deployment (humbug-quiz.vercel.app)
+   - Push to other branches → Preview deployment
+
+For comprehensive deployment documentation, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
 
 ### Custom Domain Setup
 
 To configure a custom domain with Vercel:
 
+1. In Vercel Dashboard → Settings → Domains
+2. Add your custom domain (e.g., `humbug.hu`)
+3. Configure DNS records with your registrar:
+
+   ```
+   Type: A
+   Name: @
+   Value: 76.76.21.21
+
+   Type: CNAME
+   Name: www
+   Value: cname.vercel-dns.com
+   ```
+
 - See [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) for complete instructions
-- Includes Vercel dashboard configuration
-- DNS setup for registrars (Forpsi, GoDaddy, etc.)
+- Includes registrar-specific setup (Forpsi, GoDaddy, etc.)
 - Troubleshooting and verification steps
 
 ### Custom Headers (vercel.json)
@@ -582,6 +893,8 @@ The project includes a `vercel.json` with:
 
 ### Manual Deployment
 
+For non-Vercel hosting:
+
 ```bash
 # Build production bundle
 npm run build
@@ -590,7 +903,10 @@ npm run build
 npm run preview
 
 # Deploy dist/ folder to your hosting provider
+# Note: API routes require serverless function support
 ```
+
+**Important**: The `/api` endpoints require serverless function support. If deploying to a static host, you'll need to set up a separate backend server for authentication and database access.
 
 ---
 

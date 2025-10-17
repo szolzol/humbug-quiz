@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface QuestionPack {
   id: number;
@@ -37,6 +38,7 @@ export function QuestionPackSelector({
   variant = "hamburger",
 }: QuestionPackSelectorProps) {
   const { t, i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [packs, setPacks] = useState<QuestionPack[]>([]);
   const [selectedPack, setSelectedPack] = useState(currentPack);
   const [isOpen, setIsOpen] = useState(false);
@@ -44,9 +46,10 @@ export function QuestionPackSelector({
 
   const currentLang = i18n.language as "en" | "hu";
 
+  // Refetch question packs when authentication state changes
   useEffect(() => {
     fetchQuestionPacks();
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchQuestionPacks = async () => {
     try {
@@ -54,7 +57,20 @@ export function QuestionPackSelector({
       const response = await fetch("/api/question-sets");
       if (!response.ok) throw new Error("Failed to fetch question packs");
       const data = await response.json();
-      setPacks(data.questionSets || []);
+      const fetchedPacks = data.questionSets || [];
+      setPacks(fetchedPacks);
+      
+      // If current selected pack is not in the new list, select the first available pack
+      if (fetchedPacks.length > 0) {
+        const isCurrentPackAvailable = fetchedPacks.some((p: QuestionPack) => p.slug === selectedPack);
+        if (!isCurrentPackAvailable) {
+          const firstPack = fetchedPacks[0].slug;
+          setSelectedPack(firstPack);
+          if (onPackChange) {
+            onPackChange(firstPack);
+          }
+        }
+      }
     } catch (error) {
       console.error("Error fetching question packs:", error);
     } finally {

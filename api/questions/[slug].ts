@@ -13,6 +13,8 @@ export async function GET(request: Request) {
     const pathParts = url.pathname.split("/");
     const packSlug = pathParts[pathParts.length - 1];
 
+    console.log(`📦 API Request: /api/questions/${packSlug}`);
+
     if (!packSlug) {
       return new Response(
         JSON.stringify({
@@ -99,18 +101,26 @@ export async function GET(request: Request) {
       ORDER BY q.order_index ASC
     `;
 
+    console.log(`✅ Returning ${questions.length} questions for pack: ${packSlug}`);
+
     return new Response(
       JSON.stringify({
         success: true,
         questionSet,
         questions,
         count: questions.length,
+        packSlug, // Include packSlug in response for debugging
       }),
       {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+          // Shorter cache: 60s edge cache, 120s stale-while-revalidate
+          // Vary header ensures different packs get different cache entries
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+          "Vary": "Accept-Encoding",
+          // Add ETag based on packSlug to help with cache validation
+          "X-Pack-Slug": packSlug,
         },
       }
     );

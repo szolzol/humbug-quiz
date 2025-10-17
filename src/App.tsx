@@ -1,5 +1,5 @@
 ﻿import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
@@ -231,9 +231,17 @@ function App() {
     const fetchQuestions = async () => {
       try {
         setQuestionsLoading(true);
-        const response = await fetch(`/api/questions/${selectedPack}`);
+        // Add cache-busting and ensure fresh data on pack change
+        const response = await fetch(`/api/questions/${selectedPack}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (!response.ok) throw new Error("Failed to fetch questions");
         const data = await response.json();
+        console.log(`📦 Loaded ${data.questions?.length || 0} questions for pack: ${selectedPack}`);
         setApiQuestions(data.questions || []);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -264,18 +272,22 @@ function App() {
     fetchQuestions();
   }, [selectedPack, t]);
 
-  // Transform API questions to app format
+  // Transform API questions to app format based on current language
+  // This will re-compute when apiQuestions or i18n.language changes
   const currentLang = i18n.language as "en" | "hu";
-  const questions = apiQuestions.map((q) => ({
-    id: q.id,
-    category: q.category,
-    question: currentLang === "hu" ? q.question_hu : q.question_en,
-    answers: q.answers.map((a) =>
-      currentLang === "hu" ? a.answer_hu : a.answer_en
-    ),
-    sourceName: q.source_name,
-    sourceUrl: q.source_url,
-  }));
+  const questions = React.useMemo(() => {
+    console.log(`🌐 Transforming questions for language: ${currentLang}`);
+    return apiQuestions.map((q) => ({
+      id: q.id,
+      category: q.category,
+      question: currentLang === "hu" ? q.question_hu : q.question_en,
+      answers: q.answers.map((a) =>
+        currentLang === "hu" ? a.answer_hu : a.answer_en
+      ),
+      sourceName: q.source_name,
+      sourceUrl: q.source_url,
+    }));
+  }, [apiQuestions, currentLang]);
 
   // Get unique categories
   // Limit visible questions based on authentication status

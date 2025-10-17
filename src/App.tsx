@@ -231,8 +231,12 @@ function App() {
     const fetchQuestions = async () => {
       try {
         setQuestionsLoading(true);
-        // Add cache-busting and ensure fresh data on pack change
-        const response = await fetch(`/api/questions/${selectedPack}`, {
+        // Add timestamp cache-buster to ensure fresh data on pack change
+        const timestamp = Date.now();
+        const url = `/api/questions/${selectedPack}?_t=${timestamp}`;
+        console.log(`🔄 Fetching questions from: ${url}`);
+
+        const response = await fetch(url, {
           cache: "no-cache",
           headers: {
             "Cache-Control": "no-cache",
@@ -242,11 +246,20 @@ function App() {
         if (!response.ok) throw new Error("Failed to fetch questions");
         const data = await response.json();
         console.log(
-          `📦 Loaded ${
-            data.questions?.length || 0
-          } questions for pack: ${selectedPack}`
+          `📦 Loaded ${data.questions?.length || 0} questions for pack: ${
+            data.packSlug || selectedPack
+          }`
         );
-        setApiQuestions(data.questions || []);
+        console.log(
+          `📋 First question ID: ${
+            data.questions?.[0]?.id
+          }, Question: ${data.questions?.[0]?.question_en?.substring(0, 50)}...`
+        );
+
+        // Force new array reference to ensure React detects the change
+        const newQuestions = [...(data.questions || [])];
+        console.log(`🔄 Setting ${newQuestions.length} questions to state`);
+        setApiQuestions(newQuestions);
       } catch (error) {
         console.error("Error fetching questions:", error);
         // Fallback to JSON questions if API fails
@@ -280,7 +293,14 @@ function App() {
   // This will re-compute when apiQuestions or i18n.language changes
   const currentLang = i18n.language as "en" | "hu";
   const questions = React.useMemo(() => {
-    console.log(`🌐 Transforming questions for language: ${currentLang}`);
+    console.log(
+      `🌐 Transforming ${apiQuestions.length} questions for language: ${currentLang}`
+    );
+    if (apiQuestions.length > 0) {
+      console.log(`   First question ID: ${apiQuestions[0].id}`);
+      console.log(`   EN: ${apiQuestions[0].question_en.substring(0, 60)}...`);
+      console.log(`   HU: ${apiQuestions[0].question_hu.substring(0, 60)}...`);
+    }
     return apiQuestions.map((q) => ({
       id: q.id,
       category: q.category,

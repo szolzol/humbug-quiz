@@ -1,6 +1,6 @@
 /**
  * Check for duplicate questions in US Starter Pack
- * 
+ *
  * Usage: node database/check-us-pack-duplicates.js
  */
 
@@ -49,13 +49,13 @@ async function checkDuplicates() {
     const questionTexts = new Map();
     const duplicates = [];
 
-    questions.forEach(q => {
+    questions.forEach((q) => {
       const key = q.question_en.toLowerCase().trim();
       if (questionTexts.has(key)) {
         duplicates.push({
           id1: questionTexts.get(key),
           id2: q.id,
-          text: q.question_en
+          text: q.question_en,
         });
       } else {
         questionTexts.set(key, q.id);
@@ -64,28 +64,53 @@ async function checkDuplicates() {
 
     if (duplicates.length > 0) {
       console.log(`⚠️  Found ${duplicates.length} duplicate questions:\n`);
-      duplicates.forEach(dup => {
-        console.log(`  IDs ${dup.id1} and ${dup.id2}: ${dup.text.substring(0, 70)}...`);
+      duplicates.forEach((dup) => {
+        console.log(
+          `  IDs ${dup.id1} and ${dup.id2}: ${dup.text.substring(0, 70)}...`
+        );
       });
     } else {
       console.log("✅ No duplicate question texts found");
     }
 
     // Check which questions came from the original pack (IDs 1-22 range)
-    const originalRangeQuestions = questions.filter(q => q.id >= 1 && q.id <= 22);
-    const movedQuestions = questions.filter(q => q.id >= 1 && q.id <= 22 && q.id !== 2 && q.id !== 6 && q.id !== 7 && q.id !== 8);
-    const usOriginalQuestions = questions.filter(q => q.id >= 46);
+    const originalRangeQuestions = questions.filter(
+      (q) => q.id >= 1 && q.id <= 22
+    );
+    const movedQuestions = questions.filter(
+      (q) =>
+        q.id >= 1 &&
+        q.id <= 22 &&
+        q.id !== 2 &&
+        q.id !== 6 &&
+        q.id !== 7 &&
+        q.id !== 8
+    );
+    const usOriginalQuestions = questions.filter((q) => q.id >= 46);
 
     console.log(`\n📊 Question breakdown:`);
-    console.log(`  Questions from original pack (moved): ${movedQuestions.length}`);
-    console.log(`    IDs: ${movedQuestions.map(q => q.id).sort((a,b) => a-b).join(', ')}`);
-    console.log(`  US Starter Pack original questions: ${usOriginalQuestions.length}`);
-    console.log(`    IDs: ${usOriginalQuestions.map(q => q.id).sort((a,b) => a-b).join(', ')}`);
+    console.log(
+      `  Questions from original pack (moved): ${movedQuestions.length}`
+    );
+    console.log(
+      `    IDs: ${movedQuestions
+        .map((q) => q.id)
+        .sort((a, b) => a - b)
+        .join(", ")}`
+    );
+    console.log(
+      `  US Starter Pack original questions: ${usOriginalQuestions.length}`
+    );
+    console.log(
+      `    IDs: ${usOriginalQuestions
+        .map((q) => q.id)
+        .sort((a, b) => a - b)
+        .join(", ")}`
+    );
 
     // Show all question IDs
     console.log(`\n📝 All question IDs in US pack:`);
-    console.log(`  ${questions.map(q => q.id).join(', ')}`);
-
+    console.log(`  ${questions.map((q) => q.id).join(", ")}`);
   } catch (error) {
     console.error("\n❌ Error:", error);
     throw error;
@@ -94,10 +119,10 @@ async function checkDuplicates() {
 
 checkDuplicates()
   .then(() => {
-    console.log('\n✅ Check completed');
+    console.log("\n✅ Check completed");
     process.exit(0);
   })
   .catch((error) => {
-    console.error('\n💥 Check failed:', error);
+    console.error("\n💥 Check failed:", error);
     process.exit(1);
   });

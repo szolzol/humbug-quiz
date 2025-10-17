@@ -59,10 +59,12 @@ export function QuestionPackSelector({
       const data = await response.json();
       const fetchedPacks = data.questionSets || [];
       setPacks(fetchedPacks);
-      
+
       // If current selected pack is not in the new list, select the first available pack
       if (fetchedPacks.length > 0) {
-        const isCurrentPackAvailable = fetchedPacks.some((p: QuestionPack) => p.slug === selectedPack);
+        const isCurrentPackAvailable = fetchedPacks.some(
+          (p: QuestionPack) => p.slug === selectedPack
+        );
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
           setSelectedPack(firstPack);

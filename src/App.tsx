@@ -233,15 +233,19 @@ function App() {
         setQuestionsLoading(true);
         // Add cache-busting and ensure fresh data on pack change
         const response = await fetch(`/api/questions/${selectedPack}`, {
-          cache: 'no-cache',
+          cache: "no-cache",
           headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
         });
         if (!response.ok) throw new Error("Failed to fetch questions");
         const data = await response.json();
-        console.log(`📦 Loaded ${data.questions?.length || 0} questions for pack: ${selectedPack}`);
+        console.log(
+          `📦 Loaded ${
+            data.questions?.length || 0
+          } questions for pack: ${selectedPack}`
+        );
         setApiQuestions(data.questions || []);
       } catch (error) {
         console.error("Error fetching questions:", error);

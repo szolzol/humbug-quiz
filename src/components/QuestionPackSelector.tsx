@@ -46,6 +46,16 @@ export function QuestionPackSelector({
 
   const currentLang = i18n.language as "en" | "hu";
 
+  // Sync internal state with parent's currentPack prop
+  useEffect(() => {
+    if (currentPack && currentPack !== selectedPack) {
+      console.log(
+        `🔄 QuestionPackSelector: Syncing to parent pack: ${currentPack}`
+      );
+      setSelectedPack(currentPack);
+    }
+  }, [currentPack]);
+
   // Refetch question packs when authentication state changes
   useEffect(() => {
     fetchQuestionPacks();
@@ -81,6 +91,7 @@ export function QuestionPackSelector({
   };
 
   const handlePackSelect = (packSlug: string) => {
+    console.log(`📦 User selected pack: ${packSlug}`);
     setSelectedPack(packSlug);
     if (onPackChange) {
       onPackChange(packSlug);

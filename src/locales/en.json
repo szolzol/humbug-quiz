@@ -55,7 +55,7 @@
     },
     "questions": {
         "title": "Questions",
-        "subtitle": "Browse through the questions! If you're the game master, click on the cards to view the answers and mark the correct answers that have been given.",
+        "subtitle": "Browse through the question packs available to you and start playing the game! If you're the game master, click on the card corners to view the answers and mark the correct answers that have been given.",
         "backgroundMusic": "HUMBUG! Main theme",
         "musicPlaying": "Now Playing...",
         "musicPaused": "Click to set the mood",
@@ -623,10 +623,10 @@
         "unlockCards": "Sign in to unlock all cards",
         "cardCount": "{{visible}}/{{total}} cards available",
         "ctaTitle": "Just...one...more...turn...",
-        "ctaDescription": "Discover all questions after signing in!",
-        "benefit1": "All 20+ cards instantly",
-        "benefit2": "Free and fast",
-        "benefit3": "Secure Google sign-in",
+        "ctaDescription": "Discover more card packs after signing in!",
+        "benefit1": "Access premium card packs instantly",
+        "benefit2": "Free for a limited time only",
+        "benefit3": "Fast & Easy Google sign-in",
         "trustBadge": "🔒 Secure authentication",
         "moreCards": "more cards"
     },

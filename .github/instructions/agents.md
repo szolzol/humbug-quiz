@@ -600,19 +600,56 @@ chore: update dependencies
 
 ## 💡 Future Considerations
 
-### Potential Enhancements
+### Completed Enhancements ✅
 
-1. **Progressive Web App (PWA)**
+1. **Progressive Web App (PWA)** ✅
 
-   - Add service worker for offline support
-   - Create app manifest
-   - Enable install prompt
+   - Service worker implemented for offline support
+   - App manifest configured
+   - Install prompt enabled
 
-2. **Analytics**
+2. **Authentication System** ✅
 
-   - Add Google Analytics or Plausible
-   - Track user interactions with questions
-   - Monitor audio player usage
+   - Google OAuth integration complete
+   - JWT-based session management
+   - HTTP-only cookie security
+
+3. **Database Integration** ✅
+
+   - Neon PostgreSQL serverless database
+   - Question pack management
+   - User authentication persistence
+
+4. **Question Pack System** ✅
+   - Multiple question packs (Free, International, Hungarian)
+   - Pack switching interface
+   - Access control based on authentication
+
+### Current Features (October 2025)
+
+- 📦 **28 Unique Questions** across 3 packs (FREE: 4, INT: 18, HUN: 6)
+- 🔐 **Google OAuth** for premium content access
+- 🗄️ **PostgreSQL Database** with Neon serverless
+- 🎨 **Quiz Pack Terminology** (renamed from "Starter Pack")
+- 🚀 **Vercel Deployment** with master/main branch strategy
+- 📱 **PWA Support** with offline capabilities
+
+### Planned Enhancements
+
+1. **Admin Interface** 🚧 (Next major feature on `main` branch)
+
+   - Question Pack CRUD operations
+   - In-app pack description editor
+   - Question management interface
+   - Access control settings
+   - Usage analytics dashboard
+
+2. **Analytics** 📊
+
+   - Track question pack usage
+   - Monitor user engagement
+   - Question difficulty metrics
+   - Session analytics
 
 3. **Performance Monitoring**
 
@@ -633,7 +670,58 @@ chore: update dependencies
 
 ---
 
-## 📝 Notes for AI Agents
+## � Database & Question Pack Management
+
+### Database Structure
+
+- **PostgreSQL** via Neon serverless
+- **Tables**: `users`, `question_sets`, `questions`, `answers`, `user_progress`
+- **Authentication**: JWT tokens stored in HTTP-only cookies
+- **Question Packs**: Stored in database, not JSON files
+
+### Important Database Scripts
+
+Located in `database/` folder:
+
+```bash
+# View current pack state
+node database/show-pack-descriptions.js
+node database/verify-quiz-rename.js
+
+# Update pack descriptions
+node database/update-pack-descriptions.js
+
+# Reorganization scripts (already executed in production)
+node database/reorganize-packs.js      # Pack reorganization
+node database/execute-cleanup.js       # Duplicate removal
+node database/rename-to-quiz.js        # Terminology update
+```
+
+### Question Pack Guidelines
+
+**Pack Distribution Rules**:
+
+- FREE pack: Must be accessible to all users (no authentication required)
+- INT/HUN packs: Require authentication (Google OAuth)
+- No question overlap between packs
+- Pack descriptions editable via database scripts
+
+**Naming Convention**:
+
+- Use "Quiz Pack" terminology (not "Starter Pack" or "Kérdéscsomag")
+- Slugs: `free`, `international`, `hun-quiz-pack`
+- Names: "Free Quiz Pack", "International Quiz Pack", "Hungarian Quiz Pack"
+
+### Database Changes Workflow
+
+1. **Development**: Test scripts on `main` branch
+2. **Testing**: Verify in pre-production (main → vercel.app)
+3. **Production**: Merge to `master` → deploy to humbug.hu
+4. **Scripts**: Always commit database scripts for reproducibility
+
+---
+
+## �📝 Notes for AI Agents
 
 ### When Modifying This Project
 
@@ -642,6 +730,27 @@ chore: update dependencies
 3. **Update translations** in both `hu.json` and `en.json`
 4. **Follow existing patterns** for consistency
 5. **Document new learnings** by updating this file
+6. **Branch strategy**: Develop on `main`, deploy from `master`
+7. **Database changes**: Test with scripts before direct SQL
+
+### Database Modification Guidelines
+
+- ✅ Always create scripts in `database/` folder
+- ✅ Use Neon serverless client (`@neondatabase/serverless`)
+- ✅ Test scripts on development database first
+- ✅ Document migrations in commit messages
+- ✅ Keep scripts idempotent (safe to re-run)
+- ❌ Never modify production database directly via SQL console
+- ❌ Don't commit `.env.local` files
+
+### Question Pack Guidelines
+
+- ✅ Use "Quiz Pack" terminology everywhere
+- ✅ Ensure free pack has 4 questions minimum
+- ✅ No duplicate questions across packs
+- ✅ Update both EN and HU descriptions
+- ❌ Don't hardcode question data in frontend
+- ❌ Don't rename packs without updating slugs in database
 
 ### Common AI Assistant Mistakes to Avoid
 
@@ -651,6 +760,9 @@ chore: update dependencies
 - ❌ Overriding Tailwind with inline styles
 - ❌ Ignoring accessibility requirements
 - ❌ Adding dependencies without checking bundle size
+- ❌ Modifying database without scripts
+- ❌ Using old "Starter Pack" terminology
+- ❌ Forgetting to update README/docs after changes
 
 ### Prompt Engineering Tips
 
@@ -661,12 +773,51 @@ When asking for help:
 - ✅ Include relevant code context
 - ✅ Mention if internationalization is affected
 - ✅ Ask for explanations, not just code
+- ✅ Specify if database changes are needed
+- ✅ Mention branch strategy (main vs master)
+
+---
+
+## 🎯 Current State Summary (October 2025)
+
+### Architecture
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: Vercel Serverless Functions
+- **Database**: Neon PostgreSQL (serverless)
+- **Auth**: Google OAuth with JWT sessions
+- **Deployment**: Vercel (master → production, main → staging)
+
+### Question Pack Status
+
+- **Total Questions**: 28 (down from 48 after cleanup)
+- **FREE**: 4 questions (public access)
+- **International**: 18 questions (authenticated)
+- **Hungarian**: 6 questions (authenticated)
+- **Terminology**: "Quiz Pack" (updated from "Starter Pack")
+
+### Recent Major Changes
+
+- ✅ Removed 20 duplicate questions
+- ✅ Reorganized packs for clear separation
+- ✅ Renamed all packs to "Quiz Pack" terminology
+- ✅ Updated pack descriptions for clarity
+- ✅ Created database management scripts
+- ✅ Documented all changes in README
+
+### Next Major Feature
+
+- 🚧 **Admin Interface** (planned for `main` branch development)
+  - Question pack CRUD
+  - Description editor
+  - Question management
+  - Access control settings
 
 ---
 
 <div align="center">
 
-**Last Updated**: January 2025
+**Last Updated**: October 18, 2025
 
 _This document should be updated as the project evolves_
 

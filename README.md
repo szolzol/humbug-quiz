@@ -38,11 +38,15 @@
 
 - 🎵 **Background Music Player** - Looping theme music with smart controls
 - 🎤 **Interactive Audio Rules** - Complete game explanations in Hungarian and English
-- 🃏 **Complete Question Database** - 22+ quiz questions across 15 diverse categories
+- 🃏 **Complete Question Database** - 28 quiz questions across 6 diverse categories
+- 📦 **Multiple Quiz Packs** - FREE (4), International (18), Hungarian (6) question packs
+- 🔐 **Google OAuth Authentication** - Secure login for premium content access
 - 🎨 **Game Show Aesthetics** - "Who Wants to be a Millionaire" inspired design
 - 🌐 **Bilingual Support** - Full Hungarian/English localization
 - 📱 **Fully Responsive** - Mobile-first design that works on all devices
 - ♿ **Accessibility Features** - Keyboard navigation, ARIA labels, screen reader support
+- 🗄️ **PostgreSQL Database** - Neon serverless database for question storage
+- 🚀 **Vercel Deployment** - Production-ready deployment with automatic CI/CD
 
 ---
 
@@ -402,10 +406,23 @@ humbug-quiz/
 │   └── questions/
 │       └── [slug].ts                # Question pack data API
 │
-├── database/                        # Database scripts
+├── database/                        # Database scripts & migrations
+│   ├── schema.sql                   # Complete database schema
+│   ├── reorganize-packs.js          # Question pack reorganization script
+│   ├── rename-to-quiz.js            # Pack renaming to "Quiz Pack" terminology
+│   ├── execute-cleanup.js           # Duplicate question cleanup (48→28)
+│   ├── update-pack-descriptions.js  # Pack description updater
+│   ├── show-pack-descriptions.js    # Pack description viewer
+│   ├── verify-quiz-rename.js        # Verification script for renaming
+│   ├── analyze-duplicates.js        # Duplicate question analyzer
+│   ├── find-hun-questions.js        # Hungarian question identifier
+│   ├── check-hun-questions.js       # Hungarian question ID checker
 │   ├── migrate-two-packs.js         # Migration script for question packs
 │   ├── fix-first-question.js        # Data fix scripts
 │   ├── check-first-question.js      # Database verification
+│   ├── README.md                    # Database documentation
+│   ├── SCHEMA_DOCUMENTATION.md      # Schema reference
+│   ├── STEP_BY_STEP_GUIDE.md        # Setup guide
 │   └── translations/                # Question pack translations
 │       ├── us-starter-pack-hu.js    # US pack with Hungarian translations
 │       └── hun-starter-pack-en.js   # Hungarian pack with English translations
@@ -788,7 +805,90 @@ For detailed PWA documentation, see [PWA_IMPLEMENTATION.md](./PWA_IMPLEMENTATION
 
 ---
 
-## 🚀 Deployment
+## � Question Pack Management
+
+### Current Question Pack Structure
+
+The application now features a reorganized question pack system with three distinct packs:
+
+| Pack              | Slug            | Questions | Access Level  | Description                                                                                  |
+| ----------------- | --------------- | --------- | ------------- | -------------------------------------------------------------------------------------------- |
+| **Free**          | `free`          | 4         | Public        | Free question pack available to visitor users - perfect for trying out the game              |
+| **International** | `international` | 18        | Authenticated | Original "Humbug!" quiz questions including general knowledge and some US specific questions |
+| **Hungarian**     | `hun-quiz-pack` | 6         | Authenticated | Hungary focused trivia covering the country with various topics                              |
+
+**Total Questions**: 28 unique questions (down from 48 after duplicate removal)
+
+### Pack Reorganization History
+
+**October 2025**: Major database reorganization completed:
+
+1. **Duplicate Removal**: Eliminated 20 duplicate questions (48 → 28 total)
+2. **Pack Renaming**:
+   - `us-starter-pack` → `international`
+   - `hun-starter-pack` → `hun-quiz-pack`
+3. **Terminology Update**: All "Starter Pack" / "Kezdőcsomag" → "Quiz Pack"
+4. **Question Distribution**:
+   - FREE pack: 4 exclusive questions (no overlap with premium packs)
+   - HUN pack: 6 Hungarian-specific questions (identified by keyword search)
+   - INT pack: 18 international/US questions (original US pack minus free questions)
+
+### Database Scripts
+
+Key database management scripts located in `database/`:
+
+```bash
+# View current pack descriptions
+node database/show-pack-descriptions.js
+
+# Update pack descriptions
+node database/update-pack-descriptions.js
+
+# Verify quiz pack renaming
+node database/verify-quiz-rename.js
+
+# Check for duplicate questions
+node database/analyze-duplicates.js
+
+# Reorganize question packs (already executed)
+node database/reorganize-packs.js
+
+# Clean up duplicate questions (already executed)
+node database/execute-cleanup.js
+```
+
+### Pack Description Updates
+
+Pack descriptions can be updated via database scripts. Current descriptions:
+
+**FREE Pack**:
+
+- EN: "Free question pack available to visitor users - perfect for trying out the game"
+- HU: "Ingyenes kérdéscsomag látogatók számára - ideális a játék kipróbálásához"
+
+**International Pack**:
+
+- EN: "Original \"Humbug!\" quiz questions including general knowledge and some US specific questions"
+- HU: "Eredeti \"Humbug!\" kérdések általános témakörökben, 1-2 USA specifikus kérdéssel"
+
+**Hungarian Pack**:
+
+- EN: "Hungary focused trivia covering the country with various topics"
+- HU: "Magyarország témájú kvíz kérdések változatos témákban"
+
+### Future: Admin Interface
+
+An admin interface for managing question packs is planned for future development on the `main` branch:
+
+- **Question Pack CRUD**: Create, edit, delete question packs
+- **Question Management**: Add, edit, remove individual questions
+- **Description Editor**: In-app editing of pack descriptions
+- **Access Control**: Manage pack visibility and authentication requirements
+- **Analytics**: Track pack usage and user engagement
+
+---
+
+## �🚀 Deployment
 
 ### Deployment Strategy
 

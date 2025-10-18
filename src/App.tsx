@@ -165,14 +165,16 @@ function App() {
   const handlePackChange = (newPack: string) => {
     console.log(`🔄 Pack changed to: ${newPack}`);
     setSelectedPack(newPack);
-
-    // Update URL without reload
-    const newUrl = `/pack/${newPack}`;
-    if (window.location.pathname !== newUrl) {
-      window.history.pushState({ pack: newPack }, "", newUrl);
-      console.log(`🔗 URL updated to: ${newUrl}`);
-    }
   };
+
+  // Sync URL with selectedPack (for both manual and automatic changes)
+  useEffect(() => {
+    const newUrl = `/pack/${selectedPack}`;
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState({ pack: selectedPack }, "", newUrl);
+      console.log(`🔗 URL synced to: ${newUrl}`);
+    }
+  }, [selectedPack]);
 
   // Handle OAuth callback - refresh session when redirected with ?auth=success
   useEffect(() => {

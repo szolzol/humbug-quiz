@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import i18n from "@/i18n";
 
 /**
  * User type definition
@@ -76,8 +77,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sessionStorage.setItem("auth_return_url", returnUrl);
 
     // Save current language to restore after OAuth (in case URL doesn't have ?lang param)
-    const currentLang = document.documentElement.lang || "en";
+    const currentLang = i18n.language || "en";
     sessionStorage.setItem("auth_return_lang", currentLang);
+    console.log(`🌐 Saving current language before OAuth: ${currentLang}`);
 
     window.location.href = "/api/auth/google";
   };

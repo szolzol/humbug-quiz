@@ -231,22 +231,26 @@ function App() {
 
         if (returnUrl && returnUrl !== "/") {
           console.log(`🔙 Restoring pre-auth URL: ${returnUrl}`);
-          console.log(`🌐 Restoring pre-auth language: ${returnLang || "en"}`);
           window.history.replaceState({}, "", returnUrl);
+
+          // If we have a saved language, always restore it first
+          if (returnLang) {
+            console.log(`🌐 Restoring saved language: ${returnLang}`);
+            i18n.changeLanguage(returnLang);
+          }
 
           // Re-initialize from restored URL
           const restoredState = urlState.initializeFromUrl();
           setSelectedPack(restoredState.pack);
           setSelectedCategories(restoredState.categories);
 
-          // If URL doesn't have lang param but we saved the language, restore it
-          if (!returnUrl.includes("lang=") && returnLang) {
+          // If URL has explicit lang param, that takes precedence
+          if (returnUrl.includes("lang=")) {
             console.log(
-              `🔄 URL has no lang param, restoring saved language: ${returnLang}`
+              `🔄 URL has lang param, using URL language: ${restoredState.lang}`
             );
-            i18n.changeLanguage(returnLang);
+            i18n.changeLanguage(restoredState.lang);
           }
-          // Otherwise language already synced by initializeFromUrl
         } else {
           // No saved URL, just clean the ?auth=success param
           const currentState = urlState.getState();

@@ -81,75 +81,79 @@ export function BackgroundMusicPlayer({
 
   return (
     <motion.div
-      className="mb-8 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20 rounded-2xl p-4 shadow-lg backdrop-blur-sm"
+      className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20 rounded-2xl p-4 shadow-lg backdrop-blur-sm"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}>
-      <div className="flex items-center gap-4">
-        {/* Play/Pause Button */}
-        <Button
-          onClick={togglePlay}
-          size="lg"
-          className="bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-full w-14 h-14 p-0 shadow-lg transition-all duration-300 hover:scale-105">
-          {isPlaying ? (
-            <Pause size={24} weight="fill" />
-          ) : (
-            <Play size={24} weight="fill" />
-          )}
-        </Button>
+      <div className="flex flex-col gap-3">
+        {/* Top Row: Play Button, Icon, Title */}
+        <div className="flex items-center gap-4">
+          {/* Play/Pause Button */}
+          <Button
+            onClick={togglePlay}
+            size="lg"
+            className="bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-full w-14 h-14 p-0 shadow-lg transition-all duration-300 hover:scale-105 flex-shrink-0">
+            {isPlaying ? (
+              <Pause size={24} weight="fill" />
+            ) : (
+              <Play size={24} weight="fill" />
+            )}
+          </Button>
 
-        {/* Title and Music Icon */}
-        <div className="flex-1 flex items-center gap-3">
-          <motion.div
-            animate={isPlaying ? { rotate: [0, 5, -5, 0] } : {}}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}>
-            <MusicNotes size={28} weight="fill" className="text-primary/80" />
-          </motion.div>
-          <div>
-            <h3 className="text-base font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {title}
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {isPlaying
-                ? t("questions.musicPlaying")
-                : t("questions.musicPaused")}
-            </p>
+          {/* Title and Music Icon */}
+          <div className="flex-1 flex items-center gap-3 min-w-0">
+            <motion.div
+              animate={isPlaying ? { rotate: [0, 5, -5, 0] } : {}}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="flex-shrink-0">
+              <MusicNotes size={28} weight="fill" className="text-primary/80" />
+            </motion.div>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent truncate">
+                {title}
+              </h3>
+              <p className="text-xs text-muted-foreground truncate">
+                {isPlaying
+                  ? t("questions.musicPlaying")
+                  : t("questions.musicPaused")}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Volume Controls - Show on hover or when playing */}
-        <motion.div
-          initial={{ opacity: 0, width: 0 }}
-          animate={{
-            opacity: showControls || isPlaying ? 1 : 0,
-            width: showControls || isPlaying ? "auto" : 0,
-          }}
-          transition={{ duration: 0.3 }}
-          className="flex items-center gap-2 overflow-hidden">
-          <button
-            onClick={toggleMute}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-accent/20 rounded-full">
-            {getVolumeIcon()}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={isMuted ? 0 : volume}
-            onChange={handleVolumeChange}
-            className="w-24 h-1.5 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-primary [&::-webkit-slider-thumb]:to-accent [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-primary [&::-moz-range-thumb]:to-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 hover:[&::-moz-range-thumb]:scale-110 transition-all"
-          />
-          <span className="text-xs font-medium text-muted-foreground w-10 text-right">
-            {Math.round((isMuted ? 0 : volume) * 100)}%
-          </span>
-        </motion.div>
+        {/* Bottom Row: Volume Controls - Show on hover or when playing */}
+        {(showControls || isPlaying) && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center gap-2 pl-[72px]">
+            <button
+              onClick={toggleMute}
+              className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-accent/20 rounded-full flex-shrink-0">
+              {getVolumeIcon()}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={isMuted ? 0 : volume}
+              onChange={handleVolumeChange}
+              className="flex-1 h-1.5 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-primary [&::-webkit-slider-thumb]:to-accent [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-primary [&::-moz-range-thumb]:to-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 hover:[&::-moz-range-thumb]:scale-110 transition-all"
+            />
+            <span className="text-xs font-medium text-muted-foreground w-10 text-right flex-shrink-0">
+              {Math.round((isMuted ? 0 : volume) * 100)}%
+            </span>
+          </motion.div>
+        )}
       </div>
 
       {/* Audio element with loop enabled */}

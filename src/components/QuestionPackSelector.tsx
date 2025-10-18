@@ -13,7 +13,10 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
+import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
+import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
 interface QuestionPack {
   id: number;
@@ -222,17 +225,36 @@ export function QuestionPackSelector({
           </span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[400px] sm:w-[540px]">
-        <SheetHeader>
-          <SheetTitle>{t("questionPacks.title", "Question Packs")}</SheetTitle>
-          <SheetDescription>
-            {t(
-              "questionPacks.description",
-              "Select which question pack you want to play with"
-            )}
-          </SheetDescription>
-        </SheetHeader>
-        <div className="mt-6">{renderPackList()}</div>
+      <SheetContent
+        side="left"
+        className="w-[75vw] sm:w-[400px] md:w-[540px] p-6 pt-12">
+        {/* Background Music Player - at the top */}
+        <div className="mb-4">
+          <BackgroundMusicPlayer
+            src={humbugMainTheme}
+            title={t("questions.backgroundMusic")}
+          />
+        </div>
+
+        <Separator className="my-4" />
+
+        {/* Question Packs Section */}
+        <div className="space-y-4">
+          <SheetHeader>
+            <SheetTitle>
+              {t("questionPacks.title", "Question Packs")}
+            </SheetTitle>
+            <SheetDescription>
+              {t(
+                "questionPacks.description",
+                "Select which question pack you want to play with"
+              )}
+            </SheetDescription>
+          </SheetHeader>
+
+          {/* Question Packs List */}
+          <div className="pt-2">{renderPackList()}</div>
+        </div>
       </SheetContent>
     </Sheet>
   );

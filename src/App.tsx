@@ -3,13 +3,11 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { LoginButton } from "@/components/LoginButton";
+import { QuestionPackSelector } from "@/components/QuestionPackSelector";
+import { Header } from "@/components/Header";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { CookieConsent } from "@/components/CookieConsent";
-import { QuestionPackSelector } from "@/components/QuestionPackSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useUrlState } from "@/hooks/useUrlState";
 import { Button } from "@/components/ui/button";
@@ -26,7 +24,6 @@ import {
 } from "@phosphor-icons/react";
 import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
 import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
-import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 
 // Studio light animation configurations
@@ -53,38 +50,6 @@ const studioLights = [
   },
 ];
 
-const questionsStudioLights = [
-  {
-    gradients: [
-      "radial-gradient(circle at 10% 20%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
-      "radial-gradient(circle at 90% 30%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
-      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
-      "radial-gradient(circle at 10% 20%, rgba(234, 179, 8, 0.25) 0%, transparent 40%)",
-    ],
-    duration: 10,
-    delay: 0,
-  },
-  {
-    gradients: [
-      "radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
-      "radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
-      "radial-gradient(circle at 70% 50%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
-      "radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.2) 0%, transparent 40%)",
-    ],
-    duration: 12,
-    delay: 1,
-  },
-  {
-    gradients: [
-      "radial-gradient(circle at 50% 10%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
-      "radial-gradient(circle at 50% 90%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
-      "radial-gradient(circle at 50% 10%, rgba(234, 179, 8, 0.15) 0%, transparent 35%)",
-    ],
-    duration: 8,
-    delay: 2,
-  },
-];
-
 // Reusable animated light component
 const AnimatedLight = ({
   gradients,
@@ -100,23 +65,6 @@ const AnimatedLight = ({
       delay,
     }}
     className="fixed inset-0 pointer-events-none z-0"
-  />
-);
-
-const AnimatedQuestionsLight = ({
-  gradients,
-  duration,
-  delay,
-}: (typeof questionsStudioLights)[0]) => (
-  <motion.div
-    animate={{ background: gradients }}
-    transition={{
-      duration,
-      repeat: Infinity,
-      ease: "easeInOut",
-      delay,
-    }}
-    className="absolute inset-0 pointer-events-none"
   />
 );
 
@@ -536,6 +484,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Fixed Header */}
+      <Header currentPack={selectedPack} onPackChange={handlePackChange} />
+
       {/* Blueish background tint overlay for atmospheric effect */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.02] pointer-events-none z-0" />
 
@@ -548,37 +499,21 @@ function App() {
       <div className="relative overflow-hidden">
         {/* Shared Background Image - covers both hero and game rules */}
         <div
-          className="absolute inset-0 bg-cover bg-no-repeat bg-fixed opacity-70 hero-background"
+          className="absolute inset-0 bg-cover bg-no-repeat bg-scroll md:bg-fixed opacity-70 hero-background"
           style={{
             backgroundImage: `url(${humbugMoodImage})`,
             backgroundPosition: "center 40%",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/50 via-70% to-background" />
 
         {/* Hero Section */}
         <motion.section
-          className="relative min-h-[35vh] flex items-center"
+          className="relative min-h-[35vh] flex items-center pt-14"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}>
-          <div className="container mx-auto px-6 py-8 relative z-10">
-            {/* Top Navigation Bar */}
-            <div className="absolute top-4 left-2 right-2 md:left-6 md:right-6 z-20 flex items-center justify-between">
-              {/* Left side - Question Pack Hamburger Menu */}
-              <QuestionPackSelector
-                variant="hamburger"
-                currentPack={selectedPack}
-                onPackChange={handlePackChange}
-              />
-
-              {/* Right side - Language & Login */}
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher />
-                <LoginButton />
-              </div>
-            </div>
-
+          <div className="container mx-auto px-4 sm:px-6 py-8 relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
@@ -676,7 +611,7 @@ function App() {
 
         {/* Game Rules */}
         <section className="relative py-14">
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -743,8 +678,8 @@ function App() {
         </section>
 
         {/* Game Features */}
-        <section className="relative py-24">
-          <div className="container mx-auto px-6 relative z-10">
+        <section className="relative py-12">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -783,18 +718,17 @@ function App() {
             </div>
           </div>
         </section>
+
+        {/* Smooth gradient transition to next section - taller for better blend */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 md:h-32 bg-gradient-to-b from-transparent via-40% via-background/60 to-background pointer-events-none z-10" />
       </div>
       {/* End of Combined Hero + Game Rules + Features Section */}
 
       {/* Sample Questions */}
       <section
         id="questions-section"
-        className="py-24 bg-gradient-to-b from-background to-muted/50 relative overflow-hidden">
-        {/* Studio Light Effects */}
-        {questionsStudioLights.map((light, index) => (
-          <AnimatedQuestionsLight key={index} {...light} />
-        ))}
-        <div className="container mx-auto px-6 relative z-10">
+        className="py-12 bg-gradient-to-b from-background via-background to-background/95 relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -807,22 +741,19 @@ function App() {
             </p>
           </motion.div>
 
-          {/* Question Pack Selector - Inline Version */}
-          <div className="max-w-3xl mx-auto mb-8">
+          {/* Question Pack Selector - Inline variant */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="mb-12 max-w-3xl mx-auto">
             <QuestionPackSelector
               variant="inline"
               currentPack={selectedPack}
               onPackChange={handlePackChange}
             />
-          </div>
-
-          {/* Background Music Player */}
-          <div className="max-w-3xl mx-auto mb-12">
-            <BackgroundMusicPlayer
-              src={humbugMainTheme}
-              title={t("questions.backgroundMusic")}
-            />
-          </div>
+          </motion.div>
 
           {/* Category Filter - Only visible for authenticated users */}
           {isAuthenticated && (
@@ -836,7 +767,7 @@ function App() {
             />
           )}
 
-          <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {questionsLoading ? (
               // Loading state
               <div className="col-span-full flex items-center justify-center py-16">
@@ -864,7 +795,7 @@ function App() {
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
                 className="col-span-full">
-                <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/10 p-12 text-center shadow-2xl">
+                <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/10 p-6 sm:p-8 md:p-12 text-center shadow-2xl">
                   {/* Decorative animated background */}
                   <motion.div
                     animate={{
@@ -882,7 +813,7 @@ function App() {
                     className="absolute inset-0 pointer-events-none"
                   />
 
-                  <div className="relative z-10 max-w-3xl mx-auto">
+                  <div className="relative z-10 max-w-3xl mx-auto px-4">
                     {/* Badge */}
                     <motion.div
                       initial={{ scale: 0 }}
@@ -911,7 +842,7 @@ function App() {
                       whileInView={{ y: 0, opacity: 1 }}
                       transition={{ duration: 0.6, delay: 0.3 }}
                       viewport={{ once: true }}
-                      className="text-4xl md:text-5xl font-black mb-4"
+                      className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 break-words max-w-full px-4"
                       style={{ fontFamily: "Space Grotesk, sans-serif" }}>
                       <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                         {t("auth.ctaTitle")}
@@ -934,7 +865,7 @@ function App() {
                       whileInView={{ y: 0, opacity: 1 }}
                       transition={{ duration: 0.6, delay: 0.5 }}
                       viewport={{ once: true }}
-                      className="flex flex-col md:flex-row gap-4 justify-center mb-8 text-sm md:text-base">
+                      className="flex flex-col md:flex-row gap-4 justify-start md:justify-center mb-8 text-sm md:text-base">
                       <div className="flex items-center gap-2 text-foreground">
                         <svg
                           className="w-5 h-5 text-primary flex-shrink-0"
@@ -1034,7 +965,7 @@ function App() {
 
       {/* Footer */}
       <footer className="py-16 bg-card/20 border-t border-border/30">
-        <div className="container mx-auto px-6 text-center">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -56,9 +56,9 @@
     "questions": {
         "title": "Feladványok",
         "subtitle": "Böngéssz a számodra elérhető kérdéscsomagok között és kezdj játszani! Ha Te vagy a játékmester, kattints a kártyák sarkára a válaszok megtekintéséhez és jelöld be az elhangzott helyes válaszokat.",
-        "backgroundMusic": "HUMBUG! háttérzene",
+        "backgroundMusic": "Háttérzene",
         "musicPlaying": "Most szól...",
-        "musicPaused": "Kattints a hangulat megteremtéséhez",
+        "musicPaused": "Hangulat bekapcs...",
         "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
         "totalAnswers": "Összesen {{count}} lehetséges válasz",
         "correctAnswers": "Helyes válaszok",
@@ -67,9 +67,9 @@
     "questionPacks": {
         "menu": "Kérdéscsomagok menü",
         "title": "Kérdéscsomagok",
-        "description": "Válaszd ki, hogy melyik kérdéscsomaggal szeretnél játszani",
+        "description": "Válaszd ki melyekkel játszanál:",
         "selectPack": "Kérdéscsomag kiválasztása",
-        "selectDescription": "Válaszd ki, melyik kérdéscsomaggal szeretnél játszani",
+        "selectDescription": "Válaszd ki melyekkel játszanál:",
         "questions": "kérdés",
         "noPacks": "Nincs elérhető kérdéscsomag",
         "currentPack": "Jelenlegi csomag",
@@ -119,7 +119,7 @@
         "ctaTitle": "Még egy kört mindenkinek...",
         "ctaDescription": "Fedezd fel az összes feladványt belépés után!",
         "benefit1": "Prémium kérdéscsomagok, azonnali hozzáféréssel",
-        "benefit2": "Korlátozott ideig ingyenes",
+        "benefit2": "Bevezetési időszakban teljesen ingyenes",
         "benefit3": "Egyszerű és gyors belépés Google fiókoddal",
         "trustBadge": "🔒 Biztonságos hitelesítés",
         "moreCards": "további kártya"

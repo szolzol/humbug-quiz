@@ -56,9 +56,9 @@
     "questions": {
         "title": "Questions",
         "subtitle": "Browse through the question packs available to you and start playing the game! If you're the game master, click on the card corners to view the answers and mark the correct answers that have been given.",
-        "backgroundMusic": "HUMBUG! Main theme",
+        "backgroundMusic": "Main theme",
         "musicPlaying": "Now Playing...",
-        "musicPaused": "Click to set the mood",
+        "musicPaused": "Set the mood...",
         "flipCard": "Game master? Click for the answers!",
         "totalAnswers": "Total of {{count}} possible answers",
         "correctAnswers": "Correct Answers",
@@ -67,9 +67,9 @@
     "questionPacks": {
         "menu": "Question packs menu",
         "title": "Question Packs",
-        "description": "Select which Question Pack you want to play with",
+        "description": "Select which one you want to play with",
         "selectPack": "Select Question Pack",
-        "selectDescription": "Choose which Question Pack you want to play with",
+        "selectDescription": "Choose which one you want to play with",
         "questions": "questions",
         "noPacks": "No question packs available",
         "currentPack": "Current Pack",

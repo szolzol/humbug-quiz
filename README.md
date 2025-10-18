@@ -1,4 +1,4 @@
-# 🎲 HUMBUG! - Quiz Party Game Landing Page
+# 🎲 HUMBUG! - Quiz Party Game
 
 ![HUMBUG! Banner](./src/assets/images/humbug-mood.png)
 

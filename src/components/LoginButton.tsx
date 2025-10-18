@@ -16,7 +16,16 @@ import { motion } from "framer-motion";
  * Displays Google login button when logged out
  * Shows user avatar and dropdown menu when logged in
  */
-export function LoginButton() {
+interface LoginButtonProps {
+  /**
+   * Display variant:
+   * - 'default': Shows icon on mobile, text on desktop
+   * - 'full': Always shows full text with icon
+   */
+  variant?: "default" | "full";
+}
+
+export function LoginButton({ variant = "default" }: LoginButtonProps) {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
   const { t } = useTranslation();
 
@@ -67,7 +76,10 @@ export function LoginButton() {
               />
             </g>
           </svg>
-          <span className="text-sm text-foreground hidden sm:inline">
+          <span
+            className={`text-sm text-foreground ${
+              variant === "full" ? "" : "hidden sm:inline"
+            }`}>
             {t("auth.signIn")}
           </span>
         </Button>
@@ -94,7 +106,10 @@ export function LoginButton() {
             alt={user.name}
             className="w-6 h-6 rounded-full border-2 border-primary"
           />
-          <span className="text-sm text-foreground hidden sm:inline">
+          <span
+            className={`text-sm text-foreground ${
+              variant === "full" ? "" : "hidden sm:inline"
+            }`}>
             {user.name}
           </span>
         </motion.button>

@@ -133,7 +133,7 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialState.categories
   );
-  
+
   // Ensure unauthenticated users start with free pack on mount
   useEffect(() => {
     if (!isAuthenticated && selectedPack !== "free") {
@@ -143,13 +143,13 @@ function App() {
     }
   }, []); // Only run once on mount
 
-    // Sync URL when pack changes
+  // Sync URL when pack changes
   const handlePackChange = (newPack: string) => {
     if (newPack === selectedPack) {
       console.log(` App: Pack already selected, skipping`);
       return;
     }
-    
+
     console.log(` App: Pack changing to:`, newPack);
     setSelectedPack(newPack);
     urlState.setState({ pack: newPack });
@@ -215,10 +215,30 @@ function App() {
 
     if (authStatus === "success") {
       console.log("🔄 Auth callback detected, refreshing session...");
-      refreshSession();
-      // Clean up auth param from URL but keep other params
-      const currentState = urlState.getState();
-      urlState.setState(currentState, true); // replace to remove ?auth=success
+
+      // Refresh session to update isAuthenticated
+      refreshSession().then(() => {
+        console.log("✅ Session refreshed after OAuth");
+
+        // Restore original URL from sessionStorage
+        const returnUrl = sessionStorage.getItem("auth_return_url");
+        sessionStorage.removeItem("auth_return_url"); // Clean up
+
+        if (returnUrl && returnUrl !== "/") {
+          console.log(`🔙 Restoring pre-auth URL: ${returnUrl}`);
+          window.history.replaceState({}, "", returnUrl);
+
+          // Re-initialize from restored URL
+          const restoredState = urlState.initializeFromUrl();
+          setSelectedPack(restoredState.pack);
+          setSelectedCategories(restoredState.categories);
+          // Language already synced by initializeFromUrl
+        } else {
+          // No saved URL, just clean the ?auth=success param
+          const currentState = urlState.getState();
+          urlState.setState(currentState, true);
+        }
+      });
     }
   }, [refreshSession, urlState]);
 
@@ -861,9 +881,6 @@ function App() {
                           d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                         />
                       </svg>
-                      <span className="text-sm font-semibold text-primary">
-                        +{questions.length - 4} {t("auth.moreCards")}
-                      </span>
                     </motion.div>
 
                     {/* Title */}
@@ -1038,5 +1055,3 @@ function App() {
 }
 
 export default App;
-
-

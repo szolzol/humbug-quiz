@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Menu } from "lucide-react";
 import {
@@ -45,15 +45,8 @@ export function QuestionPackSelector({
 
   const currentLang = i18n.language as "en" | "hu";
 
-  // Refetch question packs when authentication state changes
-  useEffect(() => {
-    console.log(
-      `🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`
-    );
-    fetchQuestionPacks();
-  }, [isAuthenticated]);
-
-  const fetchQuestionPacks = async () => {
+  // Memoize fetchQuestionPacks to prevent unnecessary re-renders
+  const fetchQuestionPacks = useCallback(async () => {
     try {
       setLoading(true);
       // Add timestamp cache-buster to ensure fresh data
@@ -120,7 +113,15 @@ export function QuestionPackSelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, currentPack, onPackChange]);
+
+  // Refetch question packs when authentication state changes
+  useEffect(() => {
+    console.log(
+      `🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`
+    );
+    fetchQuestionPacks();
+  }, [isAuthenticated, fetchQuestionPacks]);
 
   const handlePackSelect = (packSlug: string) => {
     console.log(`📦 QuestionPackSelector: User selected pack: ${packSlug}`);

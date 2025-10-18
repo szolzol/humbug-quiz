@@ -93,8 +93,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.setHeader("Set-Cookie", cookie);
 
-    // Redirect to home page
-    res.redirect(302, appUrl);
+    // Redirect to home page with auth success indicator
+    // Frontend will restore the original URL from sessionStorage
+    res.redirect(302, `${appUrl}/?auth=success`);
   } catch (error) {
     console.error("OAuth callback error:", error);
     res.status(500).json({ error: "Authentication failed" });

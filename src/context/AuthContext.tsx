@@ -68,8 +68,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Login function - redirects to Google OAuth
+   * Preserves current URL path and params for post-auth redirect
    */
   const login = () => {
+    // Save current URL (path + search params) to restore after OAuth
+    const returnUrl = window.location.pathname + window.location.search;
+    sessionStorage.setItem("auth_return_url", returnUrl);
+
     window.location.href = "/api/auth/google";
   };
 

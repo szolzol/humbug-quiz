@@ -1,14 +1,24 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useUrlState } from "@/hooks/useUrlState";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
+  const urlState = useUrlState();
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "hu" ? "en" : "hu";
+    console.log(`🌐 LanguageSwitcher: Changing language to ${newLang}`);
+
+    // Update i18n
     i18n.changeLanguage(newLang);
+
+    // Update localStorage
     localStorage.setItem("language", newLang);
+
+    // Update URL
+    urlState.setState({ lang: newLang as "en" | "hu" });
   };
 
   return (

@@ -11,6 +11,7 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { CookieConsent } from "@/components/CookieConsent";
 import { QuestionPackSelector } from "@/components/QuestionPackSelector";
 import { useAuth } from "@/hooks/useAuth";
+import { useUrlState } from "@/hooks/useUrlState";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -122,54 +123,68 @@ const AnimatedQuestionsLight = ({
 function App() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, login, refreshSession } = useAuth();
+  const urlState = useUrlState();
+
   const [isRulesOpen, setIsRulesOpen] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedPack, setSelectedPack] = useState<string>(() => {
-    // Initialize pack from URL on mount
-    const path = window.location.pathname;
-    const match = path.match(/^\/pack\/([^/]+)/);
-    if (match && match[1]) {
-      console.log(`🔗 App: Initializing from URL: pack = ${match[1]}`);
-      return match[1];
-    }
-    console.log(`🔗 App: No URL match, defaulting to "free"`);
-    return "free"; // Default to free pack
-  });
 
-  // Central pack change handler - updates state AND URL
+  // Initialize state from URL on mount
+  const initialState = urlState.initializeFromUrl();
+  const [selectedPack, setSelectedPack] = useState(initialState.pack);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialState.categories
+  );
+
+  // Sync URL when pack changes
   const handlePackChange = (newPack: string) => {
-    if (newPack === selectedPack) {
-      console.log(`⏭️ App: Pack "${newPack}" already selected, skipping`);
-      return;
-    }
-
-    console.log(`🔄 App: Pack changing: "${selectedPack}" → "${newPack}"`);
+    console.log(`� App: Pack changing to: ${newPack}`);
     setSelectedPack(newPack);
-
-    // Update URL (this will NOT trigger popstate)
-    const newUrl = `/pack/${newPack}`;
-    window.history.pushState({ pack: newPack }, "", newUrl);
-    console.log(`🔗 App: URL updated to: ${newUrl}`);
+    urlState.setState({ pack: newPack });
   };
 
-  // Handle browser back/forward navigation
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      const path = window.location.pathname;
-      const match = path.match(/^\/pack\/([^/]+)/);
-      const targetPack = match?.[1] || "free";
+  // Sync URL when categories change
+  const handleCategoriesChange = (newCategories: string[]) => {
+    console.log(`🔄 App: Categories changing to:`, newCategories);
+    setSelectedCategories(newCategories);
+    urlState.setState({ categories: newCategories });
+  };
 
-      if (targetPack !== selectedPack) {
-        console.log(
-          `⬅️ App: Browser navigation: "${selectedPack}" → "${targetPack}"`
-        );
-        setSelectedPack(targetPack); // Only update state, URL is already correct
+  // Handle category toggle
+  const handleCategoryToggle = (category: string) => {
+    const newCategories = selectedCategories.includes(category)
+      ? selectedCategories.filter((c) => c !== category)
+      : [...selectedCategories, category];
+    handleCategoriesChange(newCategories);
+  };
+
+  // Handle clear all categories
+  const handleClearCategories = () => {
+    handleCategoriesChange([]);
+  };
+
+  // Handle browser back/forward navigation - sync state from URL
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlData = urlState.getState();
+      console.log(
+        `⬅️ App: Browser navigation detected, syncing from URL:`,
+        urlData
+      );
+
+      if (urlData.pack !== selectedPack) {
+        setSelectedPack(urlData.pack);
       }
+      if (
+        JSON.stringify(urlData.categories) !==
+        JSON.stringify(selectedCategories)
+      ) {
+        setSelectedCategories(urlData.categories);
+      }
+      // Language is auto-synced by useUrlState
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [selectedPack]);
+  }, [selectedPack, selectedCategories, urlState]);
 
   // Switch to free pack when user logs out
   useEffect(() => {
@@ -187,11 +202,11 @@ function App() {
     if (authStatus === "success") {
       console.log("🔄 Auth callback detected, refreshing session...");
       refreshSession();
-      // Clean up URL but preserve the pack path
-      const path = window.location.pathname;
-      window.history.replaceState({}, document.title, path);
+      // Clean up auth param from URL but keep other params
+      const currentState = urlState.getState();
+      urlState.setState(currentState, true); // replace to remove ?auth=success
     }
-  }, [refreshSession]);
+  }, [refreshSession, urlState]);
 
   // Browser compatibility detection
   useEffect(() => {
@@ -409,22 +424,6 @@ function App() {
     acc[q.category] = (acc[q.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-
-  // Toggle category selection
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(category)) {
-        return prev.filter((c) => c !== category);
-      } else {
-        return [...prev, category];
-      }
-    });
-  };
-
-  // Clear all filters
-  const handleClearAll = () => {
-    setSelectedCategories([]);
-  };
 
   // Filter questions based on selected categories
   const filteredQuestions =
@@ -775,7 +774,7 @@ function App() {
               categories={uniqueCategories}
               selectedCategories={selectedCategories}
               onCategoryToggle={handleCategoryToggle}
-              onClearAll={handleClearAll}
+              onClearAll={handleClearCategories}
               categoryCounts={categoryCounts}
               totalQuestions={visibleQuestions.length}
             />

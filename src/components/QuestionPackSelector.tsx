@@ -95,11 +95,22 @@ export function QuestionPackSelector({
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
           console.log(
-            `   🔀 QuestionPackSelector: Auto-switching from "${currentPack}" to "${firstPack}"`
+            `   🔀 QuestionPackSelector: Current pack not available, switching from "${currentPack}" to "${firstPack}"`
           );
           if (onPackChange) {
+            console.log(
+              `   📞 QuestionPackSelector: Calling onPackChange("${firstPack}")`
+            );
             onPackChange(firstPack);
+          } else {
+            console.warn(
+              `   ⚠️ QuestionPackSelector: onPackChange callback is not defined!`
+            );
           }
+        } else {
+          console.log(
+            `   ✅ QuestionPackSelector: Current pack "${currentPack}" is still available, no change needed`
+          );
         }
       } else {
         console.log(`   ⚠️ No packs available!`);

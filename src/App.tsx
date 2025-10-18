@@ -129,52 +129,53 @@ function App() {
     const path = window.location.pathname;
     const match = path.match(/^\/pack\/([^/]+)/);
     if (match && match[1]) {
-      console.log(`🔗 Initializing from URL: pack = ${match[1]}`);
+      console.log(`🔗 App: Initializing from URL: pack = ${match[1]}`);
       return match[1];
     }
+    console.log(`🔗 App: No URL match, defaulting to "free"`);
     return "free"; // Default to free pack
   });
+
+  // Central pack change handler - updates state AND URL
+  const handlePackChange = (newPack: string) => {
+    if (newPack === selectedPack) {
+      console.log(`⏭️ App: Pack "${newPack}" already selected, skipping`);
+      return;
+    }
+    
+    console.log(`🔄 App: Pack changing: "${selectedPack}" → "${newPack}"`);
+    setSelectedPack(newPack);
+    
+    // Update URL (this will NOT trigger popstate)
+    const newUrl = `/pack/${newPack}`;
+    window.history.pushState({ pack: newPack }, "", newUrl);
+    console.log(`🔗 App: URL updated to: ${newUrl}`);
+  };
 
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const path = window.location.pathname;
       const match = path.match(/^\/pack\/([^/]+)/);
-      if (match && match[1]) {
-        console.log(`⬅️ Browser back/forward: switching to pack ${match[1]}`);
-        setSelectedPack(match[1]);
-      } else if (path === "/") {
-        console.log(`⬅️ Browser back/forward: switching to default pack`);
-        setSelectedPack("free");
+      const targetPack = match?.[1] || "free";
+      
+      if (targetPack !== selectedPack) {
+        console.log(`⬅️ App: Browser navigation: "${selectedPack}" → "${targetPack}"`);
+        setSelectedPack(targetPack); // Only update state, URL is already correct
       }
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+  }, [selectedPack]);
 
   // Switch to free pack when user logs out
   useEffect(() => {
-    if (!isAuthenticated) {
-      console.log(`🔓 User logged out, switching to free pack`);
+    if (!isAuthenticated && selectedPack !== "free") {
+      console.log(`🔓 App: User logged out, forcing free pack`);
       handlePackChange("free");
     }
   }, [isAuthenticated]);
-
-  // Update URL when pack changes
-  const handlePackChange = (newPack: string) => {
-    console.log(`🔄 Pack changed to: ${newPack}`);
-    setSelectedPack(newPack);
-  };
-
-  // Sync URL with selectedPack (for both manual and automatic changes)
-  useEffect(() => {
-    const newUrl = `/pack/${selectedPack}`;
-    if (window.location.pathname !== newUrl) {
-      window.history.pushState({ pack: selectedPack }, "", newUrl);
-      console.log(`🔗 URL synced to: ${newUrl}`);
-    }
-  }, [selectedPack]);
 
   // Handle OAuth callback - refresh session when redirected with ?auth=success
   useEffect(() => {

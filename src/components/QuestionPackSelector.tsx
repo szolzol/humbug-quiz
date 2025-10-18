@@ -40,25 +40,14 @@ export function QuestionPackSelector({
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [packs, setPacks] = useState<QuestionPack[]>([]);
-  const [selectedPack, setSelectedPack] = useState(currentPack);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const currentLang = i18n.language as "en" | "hu";
 
-  // Sync internal state with parent's currentPack prop
-  useEffect(() => {
-    if (currentPack && currentPack !== selectedPack) {
-      console.log(
-        `🔄 QuestionPackSelector: Syncing to parent pack: ${currentPack}`
-      );
-      setSelectedPack(currentPack);
-    }
-  }, [currentPack]);
-
   // Refetch question packs when authentication state changes
   useEffect(() => {
-    console.log(`🔐 Auth state changed: isAuthenticated = ${isAuthenticated}`);
+    console.log(`🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`);
     fetchQuestionPacks();
   }, [isAuthenticated]);
 
@@ -70,8 +59,9 @@ export function QuestionPackSelector({
       const origin =
         typeof window !== "undefined" ? window.location.origin : "";
       const url = `${origin}/api/question-sets?_t=${timestamp}`;
-      console.log(`📦 Fetching question packs from: ${url}`);
-      console.log(`   Current auth state: ${isAuthenticated}`);
+      console.log(`📦 QuestionPackSelector: Fetching packs from: ${url}`);
+      console.log(`   Current pack prop: ${currentPack}`);
+      console.log(`   Auth state: ${isAuthenticated}`);
 
       const response = await fetch(url, {
         cache: "no-cache",
@@ -85,25 +75,24 @@ export function QuestionPackSelector({
       const data = await response.json();
       const fetchedPacks = data.questionSets || [];
       console.log(
-        `✅ Fetched ${fetchedPacks.length} packs:`,
+        `✅ QuestionPackSelector: Fetched ${fetchedPacks.length} packs:`,
         fetchedPacks.map((p) => p.slug)
       );
       console.log(`   API says isAuthenticated: ${data.isAuthenticated}`);
       setPacks(fetchedPacks);
 
-      // If current selected pack is not in the new list, select the first available pack
+      // If current pack (from parent) is not in the new list, switch to first available
       if (fetchedPacks.length > 0) {
         const isCurrentPackAvailable = fetchedPacks.some(
-          (p: QuestionPack) => p.slug === selectedPack
+          (p: QuestionPack) => p.slug === currentPack
         );
         console.log(
-          `   Current pack "${selectedPack}" available: ${isCurrentPackAvailable}`
+          `   Current pack "${currentPack}" available in fetched packs: ${isCurrentPackAvailable}`
         );
 
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
-          console.log(`   🔀 Switching to first available pack: ${firstPack}`);
-          setSelectedPack(firstPack);
+          console.log(`   🔀 QuestionPackSelector: Auto-switching from "${currentPack}" to "${firstPack}"`);
           if (onPackChange) {
             onPackChange(firstPack);
           }
@@ -112,15 +101,14 @@ export function QuestionPackSelector({
         console.log(`   ⚠️ No packs available!`);
       }
     } catch (error) {
-      console.error("Error fetching question packs:", error);
+      console.error("QuestionPackSelector: Error fetching packs:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handlePackSelect = (packSlug: string) => {
-    console.log(`📦 User selected pack: ${packSlug}`);
-    setSelectedPack(packSlug);
+    console.log(`📦 QuestionPackSelector: User selected pack: ${packSlug}`);
     if (onPackChange) {
       onPackChange(packSlug);
     }
@@ -155,7 +143,7 @@ export function QuestionPackSelector({
     }
 
     return (
-      <RadioGroup value={selectedPack} onValueChange={handlePackSelect}>
+      <RadioGroup value={currentPack} onValueChange={handlePackSelect}>
         <div className="space-y-4">
           {packs
             .filter((pack) => pack.is_active)
@@ -166,7 +154,7 @@ export function QuestionPackSelector({
                 relative flex items-start space-x-3 rounded-lg border p-4 
                 transition-colors hover:bg-accent cursor-pointer
                 ${
-                  selectedPack === pack.slug
+                  currentPack === pack.slug
                     ? "border-primary bg-primary/5"
                     : "border-border"
                 }

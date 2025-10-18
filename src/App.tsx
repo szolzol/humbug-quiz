@@ -124,7 +124,47 @@ function App() {
   const { isAuthenticated, login, refreshSession } = useAuth();
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedPack, setSelectedPack] = useState<string>("us-starter-pack");
+  const [selectedPack, setSelectedPack] = useState<string>(() => {
+    // Initialize pack from URL on mount
+    const path = window.location.pathname;
+    const match = path.match(/^\/pack\/([^/]+)/);
+    if (match && match[1]) {
+      console.log(`🔗 Initializing from URL: pack = ${match[1]}`);
+      return match[1];
+    }
+    return "us-starter-pack";
+  });
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const path = window.location.pathname;
+      const match = path.match(/^\/pack\/([^/]+)/);
+      if (match && match[1]) {
+        console.log(`⬅️ Browser back/forward: switching to pack ${match[1]}`);
+        setSelectedPack(match[1]);
+      } else if (path === "/") {
+        console.log(`⬅️ Browser back/forward: switching to default pack`);
+        setSelectedPack("us-starter-pack");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // Update URL when pack changes
+  const handlePackChange = (newPack: string) => {
+    console.log(`🔄 Pack changed to: ${newPack}`);
+    setSelectedPack(newPack);
+
+    // Update URL without reload
+    const newUrl = `/pack/${newPack}`;
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState({ pack: newPack }, "", newUrl);
+      console.log(`🔗 URL updated to: ${newUrl}`);
+    }
+  };
 
   // Handle OAuth callback - refresh session when redirected with ?auth=success
   useEffect(() => {
@@ -134,8 +174,9 @@ function App() {
     if (authStatus === "success") {
       console.log("🔄 Auth callback detected, refreshing session...");
       refreshSession();
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Clean up URL but preserve the pack path
+      const path = window.location.pathname;
+      window.history.replaceState({}, document.title, path);
     }
   }, [refreshSession]);
 
@@ -460,7 +501,7 @@ function App() {
               <QuestionPackSelector
                 variant="hamburger"
                 currentPack={selectedPack}
-                onPackChange={setSelectedPack}
+                onPackChange={handlePackChange}
               />
 
               {/* Right side - Language & Login */}
@@ -703,7 +744,7 @@ function App() {
             <QuestionPackSelector
               variant="inline"
               currentPack={selectedPack}
-              onPackChange={setSelectedPack}
+              onPackChange={handlePackChange}
             />
           </div>
 

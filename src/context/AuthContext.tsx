@@ -73,19 +73,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const login = () => {
     const currentLang = i18n.language || "en";
-    
+
     // Build URL with guaranteed lang parameter
     let returnUrl = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
-    
+
     // Always ensure lang parameter is present
     params.set("lang", currentLang);
-    
+
     const queryString = params.toString();
     if (queryString) {
       returnUrl += "?" + queryString;
     }
-    
+
     console.log(`🌐 Saving URL with language: ${returnUrl}`);
     sessionStorage.setItem("auth_return_url", returnUrl);
 

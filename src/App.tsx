@@ -127,8 +127,13 @@ function App() {
 
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
-  // Initialize state from URL on mount
-  const initialState = urlState.initializeFromUrl();
+  // Initialize state from URL on mount - BUT SKIP if OAuth callback is in progress
+  const isOAuthCallback =
+    new URLSearchParams(window.location.search).get("auth") === "success";
+  const initialState = isOAuthCallback
+    ? { pack: "free", lang: "en" as "en" | "hu", categories: [] } // Temporary state, will be restored by OAuth callback
+    : urlState.initializeFromUrl();
+
   const [selectedPack, setSelectedPack] = useState(initialState.pack);
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialState.categories
@@ -222,7 +227,7 @@ function App() {
 
       if (returnUrl && returnUrl !== "/") {
         console.log(`🔙 Restoring pre-auth URL (with lang): ${returnUrl}`);
-        
+
         // Restore the URL (now guaranteed to have ?lang= parameter)
         window.history.replaceState({}, "", returnUrl);
 
@@ -231,8 +236,10 @@ function App() {
         setSelectedPack(urlParsed.pack);
         setSelectedCategories(urlParsed.categories);
         i18n.changeLanguage(urlParsed.lang); // Apply the language from URL
-        
-        console.log(`✅ Restored: pack=${urlParsed.pack}, lang=${urlParsed.lang}`);
+
+        console.log(
+          `✅ Restored: pack=${urlParsed.pack}, lang=${urlParsed.lang}`
+        );
       }
 
       // NOW refresh session (this will trigger QuestionPackSelector refetch)

@@ -101,7 +101,9 @@ export async function GET(request: Request) {
       ORDER BY q.order_index ASC
     `;
 
-    console.log(`✅ Returning ${questions.length} questions for pack: ${packSlug}`);
+    console.log(
+      `✅ Returning ${questions.length} questions for pack: ${packSlug}`
+    );
 
     return new Response(
       JSON.stringify({
@@ -118,7 +120,7 @@ export async function GET(request: Request) {
           // Shorter cache: 60s edge cache, 120s stale-while-revalidate
           // Vary header ensures different packs get different cache entries
           "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
-          "Vary": "Accept-Encoding",
+          Vary: "Accept-Encoding",
           // Add ETag based on packSlug to help with cache validation
           "X-Pack-Slug": packSlug,
         },

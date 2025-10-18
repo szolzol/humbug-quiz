@@ -233,7 +233,8 @@ function App() {
         setQuestionsLoading(true);
         // Use absolute URL with origin to ensure proper routing
         const timestamp = Date.now();
-        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
         const url = `${origin}/api/questions/${selectedPack}?_t=${timestamp}`;
         console.log(`🔄 Fetching questions from absolute URL: ${url}`);
         console.log(`   Origin: ${origin}`);
@@ -244,25 +245,33 @@ function App() {
           credentials: "same-origin",
           headers: {
             "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Accept": "application/json",
+            Pragma: "no-cache",
+            Accept: "application/json",
           },
         });
-        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+        console.log(
+          `📡 Response status: ${response.status} ${response.statusText}`
+        );
         console.log(`📡 Response headers:`, {
-          contentType: response.headers.get('content-type'),
-          packSlug: response.headers.get('x-pack-slug'),
-          cacheControl: response.headers.get('cache-control'),
+          contentType: response.headers.get("content-type"),
+          packSlug: response.headers.get("x-pack-slug"),
+          cacheControl: response.headers.get("cache-control"),
         });
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error(`❌ API Error Response:`, errorText);
-          throw new Error(`Failed to fetch questions: ${response.status} ${errorText}`);
+          throw new Error(
+            `Failed to fetch questions: ${response.status} ${errorText}`
+          );
         }
-        
+
         const data = await response.json();
-        console.log(`📦 Loaded ${data.questions?.length || 0} questions for pack: ${data.packSlug || selectedPack}`);
+        console.log(
+          `📦 Loaded ${data.questions?.length || 0} questions for pack: ${
+            data.packSlug || selectedPack
+          }`
+        );
         console.log(`📋 First question:`, {
           id: data.questions?.[0]?.id,
           en: data.questions?.[0]?.question_en?.substring(0, 60),
@@ -271,9 +280,15 @@ function App() {
 
         // Force new array reference to ensure React detects the change
         const newQuestions = [...(data.questions || [])];
-        console.log(`🔄 Setting ${newQuestions.length} questions to state (array ref: ${typeof newQuestions})`);
+        console.log(
+          `🔄 Setting ${
+            newQuestions.length
+          } questions to state (array ref: ${typeof newQuestions})`
+        );
         setApiQuestions(newQuestions);
-        console.log(`✅ State updated! apiQuestions should now have ${newQuestions.length} items`);
+        console.log(
+          `✅ State updated! apiQuestions should now have ${newQuestions.length} items`
+        );
       } catch (error) {
         console.error("Error fetching questions:", error);
         // Fallback to JSON questions if API fails
@@ -368,7 +383,7 @@ function App() {
     ...q,
     category: t(`categories.${q.category}`),
   }));
-  
+
   // Debug: Log the final rendered questions
   React.useEffect(() => {
     console.log(`🎯 Final rendering state:`, {
@@ -377,10 +392,12 @@ function App() {
       visibleQuestions: visibleQuestions.length,
       filteredQuestions: filteredQuestions.length,
       translatedQuestions: translatedQuestions.length,
-      firstQuestion: translatedQuestions[0] ? {
-        id: translatedQuestions[0].id,
-        question: translatedQuestions[0].question.substring(0, 60),
-      } : null,
+      firstQuestion: translatedQuestions[0]
+        ? {
+            id: translatedQuestions[0].id,
+            question: translatedQuestions[0].question.substring(0, 60),
+          }
+        : null,
     });
   }, [selectedPack, translatedQuestions, questions.length]);
 

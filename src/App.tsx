@@ -433,25 +433,8 @@ function App() {
         );
       } catch (error) {
         console.error("Error fetching questions:", error);
-        // Fallback to JSON questions if API fails
-        const fallbackQuestions = t("allQuestions", {
-          returnObjects: true,
-        }) as Array<{
-          id: string;
-          category: string;
-          question: string;
-          answers: string[];
-        }>;
-        // Convert fallback to API format
-        setApiQuestions(
-          fallbackQuestions.map((q) => ({
-            id: q.id,
-            category: q.category,
-            question_en: q.question,
-            question_hu: q.question,
-            answers: q.answers.map((a) => ({ answer_en: a, answer_hu: a })),
-          }))
-        );
+        // No fallback - questions must come from database
+        setApiQuestions([]);
       } finally {
         setQuestionsLoading(false);
       }

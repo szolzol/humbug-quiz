@@ -388,8 +388,6 @@ For local development, the project includes a custom Vite plugin (`apiRoutesPlug
 - Verify cookie domain settings
 - Check JWT_SECRET is consistent across deployments
 
-For detailed deployment documentation, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
-
 ---
 
 ## 📁 Project Structure
@@ -509,8 +507,6 @@ humbug-quiz/
 ├── tailwind.config.js               # Tailwind configuration
 ├── theme.json                       # Theme configuration
 ├── tsconfig.json                    # TypeScript configuration
-├── VERCEL_DEPLOYMENT.md             # Vercel deployment guide
-├── VERCEL_ENV_VARS.md               # Environment variables reference
 ├── vercel.json                      # Vercel deployment config
 └── vite.config.ts                   # Vite build configuration
 ```
@@ -958,8 +954,6 @@ This project is optimized for Vercel with automatic deployments:
    - Push to `master` → Production deployment (humbug.hu)
    - Push to `main` → Pre-production deployment (humbug-quiz.vercel.app)
    - Push to other branches → Preview deployment
-
-For comprehensive deployment documentation, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
 
 ### Custom Domain Setup
 

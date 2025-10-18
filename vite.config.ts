@@ -271,8 +271,8 @@ function apiRoutesPlugin(): PluginOption {
           return;
         }
 
-        // Handle /api/question-sets
-        if (req.url === "/api/question-sets") {
+        // Handle /api/question-sets (with or without query string)
+        if (req.url?.startsWith("/api/question-sets")) {
           try {
             if (!process.env.POSTGRES_POSTGRES_URL) {
               res.statusCode = 500;
@@ -315,7 +315,7 @@ function apiRoutesPlugin(): PluginOption {
             // Fetch question sets based on authentication
             let questionSets;
             if (isAuthenticated) {
-              // Authenticated: Show premium packs only
+              // Authenticated: Show ALL packs (free, premium, admin_only)
               questionSets = await sql`
                 SELECT 
                   id, slug, name_en, name_hu, description_en, description_hu,
@@ -323,7 +323,6 @@ function apiRoutesPlugin(): PluginOption {
                   display_order, question_count, total_plays, metadata
                 FROM question_sets
                 WHERE is_active = true AND is_published = true
-                  AND access_level IN ('premium', 'admin_only')
                 ORDER BY display_order ASC, created_at ASC
               `;
             } else {
@@ -368,7 +367,8 @@ function apiRoutesPlugin(): PluginOption {
         // Handle /api/questions/:slug
         if (req.url?.startsWith("/api/questions/")) {
           try {
-            const packSlug = req.url.split("/api/questions/")[1];
+            // Remove query string from slug
+            const packSlug = req.url.split("/api/questions/")[1].split("?")[0];
 
             if (!process.env.POSTGRES_POSTGRES_URL) {
               res.statusCode = 500;

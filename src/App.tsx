@@ -133,10 +133,24 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialState.categories
   );
+  
+  // Ensure unauthenticated users start with free pack on mount
+  useEffect(() => {
+    if (!isAuthenticated && selectedPack !== "free") {
+      console.log(` App: Unauthenticated user, forcing free pack`);
+      setSelectedPack("free");
+      urlState.setState({ pack: "free" }, true);
+    }
+  }, []); // Only run once on mount
 
-  // Sync URL when pack changes
+    // Sync URL when pack changes
   const handlePackChange = (newPack: string) => {
-    console.log(`� App: Pack changing to: ${newPack}`);
+    if (newPack === selectedPack) {
+      console.log(` App: Pack already selected, skipping`);
+      return;
+    }
+    
+    console.log(` App: Pack changing to:`, newPack);
     setSelectedPack(newPack);
     urlState.setState({ pack: newPack });
   };
@@ -1024,3 +1038,5 @@ function App() {
 }
 
 export default App;
+
+

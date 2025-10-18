@@ -218,53 +218,27 @@ function App() {
 
       // IMMEDIATELY restore URL BEFORE refreshSession to prevent race conditions
       const returnUrl = sessionStorage.getItem("auth_return_url");
-      const returnLang = sessionStorage.getItem("auth_return_lang") as
-        | "en"
-        | "hu"
-        | null;
-      
+      sessionStorage.removeItem("auth_return_url"); // Clean up
+
       if (returnUrl && returnUrl !== "/") {
-        console.log(`🔙 IMMEDIATELY restoring pre-auth URL: ${returnUrl}`);
+        console.log(`🔙 Restoring pre-auth URL (with lang): ${returnUrl}`);
         
-        // If we have a saved language, restore it first
-        if (returnLang) {
-          console.log(`🌐 Restoring saved language: ${returnLang}`);
-          i18n.changeLanguage(returnLang);
-        }
-        
-        // Restore the URL immediately
+        // Restore the URL (now guaranteed to have ?lang= parameter)
         window.history.replaceState({}, "", returnUrl);
 
-        // Parse state from restored URL
+        // Parse and apply state from restored URL
         const urlParsed = urlState.parseUrl();
         setSelectedPack(urlParsed.pack);
         setSelectedCategories(urlParsed.categories);
-
-        // ONLY if URL has explicit lang param, override the saved language
-        if (returnUrl.includes("lang=")) {
-          console.log(
-            `🔄 URL has explicit lang param, using: ${urlParsed.lang}`
-          );
-          i18n.changeLanguage(urlParsed.lang);
-        } else {
-          // No lang param in URL, ensure it's added with the restored language
-          const currentLang = returnLang || (i18n.language as "en" | "hu");
-          urlState.setState({ 
-            pack: urlParsed.pack, 
-            lang: currentLang, 
-            categories: urlParsed.categories 
-          }, true);
-        }
+        i18n.changeLanguage(urlParsed.lang); // Apply the language from URL
+        
+        console.log(`✅ Restored: pack=${urlParsed.pack}, lang=${urlParsed.lang}`);
       }
-      
-      // Clean up sessionStorage
-      sessionStorage.removeItem("auth_return_url");
-      sessionStorage.removeItem("auth_return_lang");
 
       // NOW refresh session (this will trigger QuestionPackSelector refetch)
       refreshSession().then(() => {
         console.log("✅ Session refreshed after OAuth");
-        
+
         // If no saved URL, clean the ?auth=success param
         if (!returnUrl || returnUrl === "/") {
           const currentState = urlState.getState();

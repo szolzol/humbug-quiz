@@ -72,14 +72,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Preserves current URL path and params for post-auth redirect
    */
   const login = () => {
-    // Save current URL (path + search params) to restore after OAuth
-    const returnUrl = window.location.pathname + window.location.search;
-    sessionStorage.setItem("auth_return_url", returnUrl);
-
-    // Save current language to restore after OAuth (in case URL doesn't have ?lang param)
     const currentLang = i18n.language || "en";
-    sessionStorage.setItem("auth_return_lang", currentLang);
-    console.log(`🌐 Saving current language before OAuth: ${currentLang}`);
+    
+    // Build URL with guaranteed lang parameter
+    let returnUrl = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    
+    // Always ensure lang parameter is present
+    params.set("lang", currentLang);
+    
+    const queryString = params.toString();
+    if (queryString) {
+      returnUrl += "?" + queryString;
+    }
+    
+    console.log(`🌐 Saving URL with language: ${returnUrl}`);
+    sessionStorage.setItem("auth_return_url", returnUrl);
 
     window.location.href = "/api/auth/google";
   };

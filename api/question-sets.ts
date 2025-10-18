@@ -65,7 +65,7 @@ export async function GET(request: Request) {
     let questionSets;
 
     if (isAuthenticated) {
-      // Authenticated users: Show only premium and admin_only packs
+      // Authenticated users: Show ALL packs (free, premium, admin_only)
       questionSets = await sql`
         SELECT 
           id,
@@ -86,7 +86,6 @@ export async function GET(request: Request) {
         FROM question_sets
         WHERE is_active = true 
           AND is_published = true
-          AND access_level IN ('premium', 'admin_only')
         ORDER BY display_order ASC, created_at ASC
       `;
     } else {

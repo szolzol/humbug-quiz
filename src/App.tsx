@@ -26,31 +26,41 @@ import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
 import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 
-// Studio light animation configurations
+// Enhanced Studio Light Animation - dramatic yellow spotlights
 const studioLights = [
   {
     gradients: [
-      "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
-      "radial-gradient(circle at 80% 60%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
-      "radial-gradient(circle at 50% 80%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
-      "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.15) 0%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 80% 30%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
     ],
-    duration: 12,
+    duration: 15,
     delay: 0,
   },
   {
     gradients: [
-      "radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
-      "radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
-      "radial-gradient(circle at 70% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
-      "radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
+      "radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
+      "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
     ],
-    duration: 15,
-    delay: 2,
+    duration: 18,
+    delay: 3,
+  },
+  {
+    gradients: [
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
+      "radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
+      "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
+    ],
+    duration: 20,
+    delay: 6,
   },
 ];
 
-// Reusable animated light component
+// Animated light component
 const AnimatedLight = ({
   gradients,
   duration,
@@ -487,25 +497,48 @@ function App() {
       {/* Fixed Header */}
       <Header currentPack={selectedPack} onPackChange={handlePackChange} />
 
-      {/* Blueish background tint overlay for atmospheric effect */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.02] pointer-events-none z-0" />
+      {/* LAYER 1: Deep Blue Base Background - Darker for mobile */}
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-950 -z-50" />
 
-      {/* Studio Light Animations */}
+      {/* LAYER 2: Studio Light Animations - Dramatic Yellow Spotlights */}
       {studioLights.map((light, index) => (
         <AnimatedLight key={index} {...light} />
       ))}
 
-      {/* Combined Hero + Game Rules Section with Shared Background */}
-      <div className="relative overflow-hidden">
-        {/* Shared Background Image - covers both hero and game rules */}
-        <div
-          className="absolute inset-0 bg-cover bg-no-repeat bg-scroll md:bg-fixed opacity-70 hero-background"
-          style={{
-            backgroundImage: `url(${humbugMoodImage})`,
-            backgroundPosition: "center 40%",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/50 via-70% to-background" />
+      {/* CONTENT SECTIONS */}
+      <div className="relative z-10">
+        {/* LAYER 3: Hero Background Image with Blue Overlay - Extends across entire page */}
+        <div className="absolute top-0 left-0 right-0 bottom-0 min-h-screen">
+          {/* Background Image - Higher opacity for better visibility */}
+          <div
+            className="absolute inset-0 bg-no-repeat opacity-100 bg-[length:150%_auto] sm:bg-[length:100%_auto]"
+            style={{
+              backgroundImage: `url(${humbugMoodImage})`,
+              backgroundPosition: "center top",
+              backgroundPositionY: "0px",
+            }}
+          />
+          {/* Desktop-specific positioning */}
+          <style>
+            {`
+              @media (min-width: 640px) {
+                .absolute.inset-0.bg-no-repeat {
+                  background-position-y: -280px !important;
+                }
+              }
+            `}
+          </style>
+          {/* Blue Overlay on top of image - reduced for better image visibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-blue-950/50 to-blue-950/50" />
+          {/* Gradual fade to dark blue background - stronger fade for darker sections */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.2) 15%, rgba(2, 6, 23, 0.5) 30%, rgba(2, 6, 23, 0.7) 45%, rgba(2, 6, 23, 0.85) 60%, rgba(2, 6, 23, 0.95) 75%, rgb(2, 6, 23) 90%)",
+            }}
+          />
+        </div>
 
         {/* Hero Section */}
         <motion.section
@@ -719,284 +752,281 @@ function App() {
           </div>
         </section>
 
-        {/* Smooth gradient transition to next section - taller for better blend */}
-        <div className="absolute bottom-0 left-0 right-0 h-48 md:h-32 bg-gradient-to-b from-transparent via-40% via-background/60 to-background pointer-events-none z-10" />
-      </div>
-      {/* End of Combined Hero + Game Rules + Features Section */}
+        {/* Sample Questions */}
+        <section id="questions-section" className="py-12 relative">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-6">
+                {t("questions.title")}
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                {t("questions.subtitle")}
+              </p>
+            </motion.div>
 
-      {/* Sample Questions */}
-      <section
-        id="questions-section"
-        className="py-12 bg-gradient-to-b from-background via-background to-background/95 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">{t("questions.title")}</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              {t("questions.subtitle")}
-            </p>
-          </motion.div>
+            {/* Question Pack Selector - Inline variant */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="mb-12 max-w-3xl mx-auto">
+              <QuestionPackSelector
+                variant="inline"
+                currentPack={selectedPack}
+                onPackChange={handlePackChange}
+              />
+            </motion.div>
 
-          {/* Question Pack Selector - Inline variant */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="mb-12 max-w-3xl mx-auto">
-            <QuestionPackSelector
-              variant="inline"
-              currentPack={selectedPack}
-              onPackChange={handlePackChange}
-            />
-          </motion.div>
-
-          {/* Category Filter - Only visible for authenticated users */}
-          {isAuthenticated && (
-            <CategoryFilter
-              categories={uniqueCategories}
-              selectedCategories={selectedCategories}
-              onCategoryToggle={handleCategoryToggle}
-              onClearAll={handleClearCategories}
-              categoryCounts={categoryCounts}
-              totalQuestions={visibleQuestions.length}
-            />
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
-            {questionsLoading ? (
-              // Loading state
-              <div className="col-span-full flex items-center justify-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              /* Show first 4 cards for anonymous users, all for authenticated */
-              (isAuthenticated
-                ? translatedQuestions
-                : translatedQuestions.slice(0, 4)
-              ).map((question, index) => (
-                <QuestionCard
-                  key={`${selectedPack}-${question.id}`}
-                  question={question}
-                  index={index}
-                />
-              ))
+            {/* Category Filter - Only visible for authenticated users */}
+            {isAuthenticated && (
+              <CategoryFilter
+                categories={uniqueCategories}
+                selectedCategories={selectedCategories}
+                onCategoryToggle={handleCategoryToggle}
+                onClearAll={handleClearCategories}
+                categoryCounts={categoryCounts}
+                totalQuestions={visibleQuestions.length}
+              />
             )}
 
-            {/* Hero-style CTA Section for anonymous users */}
-            {!isAuthenticated && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="col-span-full">
-                <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/10 p-6 sm:p-8 md:p-12 text-center shadow-2xl">
-                  {/* Decorative animated background */}
-                  <motion.div
-                    animate={{
-                      background: [
-                        "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
-                        "radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
-                        "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
-                      ],
-                    }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="absolute inset-0 pointer-events-none"
-                  />
-
-                  <div className="relative z-10 max-w-3xl mx-auto px-4">
-                    {/* Badge */}
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      viewport={{ once: true }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-6">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                    </motion.div>
-
-                    {/* Title */}
-                    <motion.h2
-                      initial={{ y: 20, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                      viewport={{ once: true }}
-                      className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 break-words max-w-full px-4"
-                      style={{ fontFamily: "Space Grotesk, sans-serif" }}>
-                      <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                        {t("auth.ctaTitle")}
-                      </span>
-                    </motion.h2>
-
-                    {/* Description */}
-                    <motion.p
-                      initial={{ y: 20, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.4 }}
-                      viewport={{ once: true }}
-                      className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                      {t("auth.ctaDescription")}
-                    </motion.p>
-
-                    {/* Benefits List */}
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.5 }}
-                      viewport={{ once: true }}
-                      className="flex flex-col md:flex-row gap-4 justify-start md:justify-center mb-8 text-sm md:text-base">
-                      <div className="flex items-center gap-2 text-foreground">
-                        <svg
-                          className="w-5 h-5 text-primary flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span>{t("auth.benefit1")}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-foreground">
-                        <svg
-                          className="w-5 h-5 text-primary flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span>{t("auth.benefit2")}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-foreground">
-                        <svg
-                          className="w-5 h-5 text-primary flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span>{t("auth.benefit3")}</span>
-                      </div>
-                    </motion.div>
-
-                    {/* CTA Button */}
-                    <motion.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, delay: 0.6 }}
-                      viewport={{ once: true }}>
-                      <Button
-                        onClick={login}
-                        size="lg"
-                        className="bg-primary hover:bg-accent text-background font-bold text-lg px-10 py-7 shadow-xl hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105">
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 18 18"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="mr-3">
-                          <g fill="none" fillRule="evenodd">
-                            <path
-                              d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
-                              fill="#4285F4"
-                            />
-                            <path
-                              d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"
-                              fill="#34A853"
-                            />
-                            <path
-                              d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
-                              fill="#FBBC05"
-                            />
-                            <path
-                              d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
-                              fill="#EA4335"
-                            />
-                          </g>
-                        </svg>
-                        {t("auth.signInWithGoogle")}
-                      </Button>
-                    </motion.div>
-
-                    {/* Trust badge */}
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.7 }}
-                      viewport={{ once: true }}
-                      className="text-xs text-muted-foreground mt-4">
-                      {t("auth.trustBadge")}
-                    </motion.p>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
+              {questionsLoading ? (
+                // Loading state
+                <div className="col-span-full flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 </div>
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </section>
+              ) : (
+                /* Show first 4 cards for anonymous users, all for authenticated */
+                (isAuthenticated
+                  ? translatedQuestions
+                  : translatedQuestions.slice(0, 4)
+                ).map((question, index) => (
+                  <QuestionCard
+                    key={`${selectedPack}-${question.id}`}
+                    question={question}
+                    index={index}
+                  />
+                ))
+              )}
 
-      {/* Footer */}
-      <footer className="py-16 bg-card/20 border-t border-border/30">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}>
-            <h3 className="text-2xl font-bold mb-4 text-primary">
-              {t("footer.title")}
-            </h3>
-            <p
-              className="text-sm text-muted-foreground mb-2"
-              dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
-            />
-            <p className="text-sm text-muted-foreground mb-2">
-              <span
-                dangerouslySetInnerHTML={{ __html: t("footer.otherProject") }}
-              />{" "}
-              -{" "}
-              <a
-                href="https://szolzol.github.io/darkoba-vue/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-accent transition-colors underline">
-                Play DarQba
-              </a>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {t("footer.copyright")}
-            </p>
-          </motion.div>
-        </div>
-      </footer>
+              {/* Hero-style CTA Section for anonymous users */}
+              {!isAuthenticated && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true }}
+                  className="col-span-full">
+                  <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/10 p-6 sm:p-8 md:p-12 text-center shadow-2xl">
+                    {/* Decorative animated background */}
+                    <motion.div
+                      animate={{
+                        background: [
+                          "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                          "radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                          "radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.1) 0%, transparent 50%)",
+                        ],
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="absolute inset-0 pointer-events-none"
+                    />
+
+                    <div className="relative z-10 max-w-3xl mx-auto px-4">
+                      {/* Badge */}
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        viewport={{ once: true }}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-6">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-primary"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
+                        </svg>
+                      </motion.div>
+
+                      {/* Title */}
+                      <motion.h2
+                        initial={{ y: 20, opacity: 0 }}
+                        whileInView={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        viewport={{ once: true }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 break-words max-w-full px-4"
+                        style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+                        <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                          {t("auth.ctaTitle")}
+                        </span>
+                      </motion.h2>
+
+                      {/* Description */}
+                      <motion.p
+                        initial={{ y: 20, opacity: 0 }}
+                        whileInView={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        viewport={{ once: true }}
+                        className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+                        {t("auth.ctaDescription")}
+                      </motion.p>
+
+                      {/* Benefits List */}
+                      <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        whileInView={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        viewport={{ once: true }}
+                        className="flex flex-col md:flex-row gap-4 justify-start md:justify-center mb-8 text-sm md:text-base">
+                        <div className="flex items-center gap-2 text-foreground">
+                          <svg
+                            className="w-5 h-5 text-primary flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span>{t("auth.benefit1")}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-foreground">
+                          <svg
+                            className="w-5 h-5 text-primary flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span>{t("auth.benefit2")}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-foreground">
+                          <svg
+                            className="w-5 h-5 text-primary flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span>{t("auth.benefit3")}</span>
+                        </div>
+                      </motion.div>
+
+                      {/* CTA Button */}
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.6 }}
+                        viewport={{ once: true }}>
+                        <Button
+                          onClick={login}
+                          size="lg"
+                          className="bg-primary hover:bg-accent text-background font-bold text-lg px-10 py-7 shadow-xl hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 transform hover:scale-105">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 18 18"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mr-3">
+                            <g fill="none" fillRule="evenodd">
+                              <path
+                                d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
+                                fill="#4285F4"
+                              />
+                              <path
+                                d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"
+                                fill="#34A853"
+                              />
+                              <path
+                                d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+                                fill="#FBBC05"
+                              />
+                              <path
+                                d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
+                                fill="#EA4335"
+                              />
+                            </g>
+                          </svg>
+                          {t("auth.signInWithGoogle")}
+                        </Button>
+                      </motion.div>
+
+                      {/* Trust badge */}
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.7 }}
+                        viewport={{ once: true }}
+                        className="text-xs text-muted-foreground mt-4">
+                        {t("auth.trustBadge")}
+                      </motion.p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-16 bg-card/20 border-t border-border/30">
+          <div className="container mx-auto px-4 sm:px-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}>
+              <h3 className="text-2xl font-bold mb-4 text-primary">
+                {t("footer.title")}
+              </h3>
+              <p
+                className="text-sm text-muted-foreground mb-2"
+                dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
+              />
+              <p className="text-sm text-muted-foreground mb-2">
+                <span
+                  dangerouslySetInnerHTML={{ __html: t("footer.otherProject") }}
+                />{" "}
+                -{" "}
+                <a
+                  href="https://szolzol.github.io/darkoba-vue/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-accent transition-colors underline">
+                  Play DarQba
+                </a>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t("footer.copyright")}
+              </p>
+            </motion.div>
+          </div>
+        </footer>
+      </div>
+      {/* End of Content Sections */}
 
       {/* Install Prompt for Mobile PWA */}
       <InstallPrompt />

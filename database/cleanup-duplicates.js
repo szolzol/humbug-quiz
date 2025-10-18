@@ -1,11 +1,15 @@
-import dotenv from "dotenv";
 import { neon } from "@neondatabase/serverless";
+import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
 
-const connectionString =
-  process.env.POSTGRES_POSTGRES_URL || process.env.POSTGRES_DATABASE_URL;
-const sql = neon(connectionString);
+const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+/**
+ * This script cleans up duplicate questions from the database.
+ * It uses SQL window functions to identify and remove duplicates,
+ * keeping only the first occurrence (lowest ID) of each question.
+ */
 
 async function cleanup() {
   console.log("🧹 Starting cleanup of duplicate questions...\n");
@@ -38,6 +42,7 @@ async function cleanup() {
     console.log(
       `Found ${duplicatesToDelete.length} duplicate questions to delete:\n`
     );
+
     duplicatesToDelete.forEach((q) => {
       console.log(`   - ID ${q.id}: ${q.question_en.substring(0, 60)}...`);
     });
@@ -57,7 +62,7 @@ async function cleanup() {
 
     console.log("🗑️  Deleting duplicate questions...\n");
 
-    const deleteResult = await sql`
+    await sql`
       DELETE FROM questions
       WHERE id = ANY(${idsToDelete})
     `;
@@ -100,4 +105,9 @@ async function cleanup() {
   }
 }
 
-cleanup();
+cleanup()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error("❌ Error:", err);
+    process.exit(1);
+  });

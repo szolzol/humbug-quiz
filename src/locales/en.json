@@ -67,9 +67,9 @@
     "questionPacks": {
         "menu": "Question packs menu",
         "title": "Question Packs",
-        "description": "Select which question pack you want to play with",
+        "description": "Select which Question Pack you want to play with",
         "selectPack": "Select Question Pack",
-        "selectDescription": "Choose which question pack you want to play with",
+        "selectDescription": "Choose which Question Pack you want to play with",
         "questions": "questions",
         "noPacks": "No question packs available",
         "currentPack": "Current Pack",

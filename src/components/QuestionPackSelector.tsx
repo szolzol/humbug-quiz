@@ -34,7 +34,7 @@ interface QuestionPackSelectorProps {
 
 export function QuestionPackSelector({
   onPackChange,
-  currentPack = "us-starter-pack",
+  currentPack = "international",
   variant = "hamburger",
 }: QuestionPackSelectorProps) {
   const { t, i18n } = useTranslation();
@@ -205,17 +205,7 @@ export function QuestionPackSelector({
   if (variant === "inline") {
     return (
       <div className="w-full">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">
-            {t("questionPacks.selectPack", "Select Question Pack")}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {t(
-              "questionPacks.selectDescription",
-              "Choose which question pack you want to play with"
-            )}
-          </p>
-        </div>
+        {/* Removed title and description as per user request */}
         {renderPackList()}
       </div>
     );

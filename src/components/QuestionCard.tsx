@@ -116,7 +116,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
   return (
     <motion.div
-      className="relative w-full min-w-0 aspect-[9/16] md:aspect-[4/3] perspective-1000"
+      className="relative w-full min-w-0 aspect-[3/4] md:aspect-[4/3] perspective-1000"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}

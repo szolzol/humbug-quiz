@@ -6,6 +6,7 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { QuestionPackSelector } from "@/components/QuestionPackSelector";
 import { Header } from "@/components/Header";
+import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { CookieConsent } from "@/components/CookieConsent";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +26,7 @@ import {
 import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
 import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
+import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
 // Enhanced Studio Light Animation - dramatic yellow spotlights
 const studioLights = [
@@ -493,9 +495,23 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden pb-16">
       {/* Fixed Header */}
       <Header currentPack={selectedPack} onPackChange={handlePackChange} />
+
+      {/* Background Music Player - Fixed bottom soundbar */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-50 border-t border-primary/20 shadow-lg"
+        style={{
+          backgroundColor: "rgba(21, 21, 31, 0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }}>
+        <BackgroundMusicPlayer
+          src={humbugMainTheme}
+          title={t("questions.backgroundMusic")}
+        />
+      </div>
 
       {/* LAYER 1: Deep Blue Base Background - Darker for mobile */}
       <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-950 -z-50" />
@@ -528,14 +544,14 @@ function App() {
               }
             `}
           </style>
-          {/* Blue Overlay on top of image - reduced for better image visibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-blue-950/50 to-blue-950/50" />
+          {/* Blue Overlay on top of image - stronger on mobile, lighter on desktop */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/75 to-blue-950/80 sm:from-blue-950/10 sm:via-blue-950/40 sm:to-blue-950/50" />
           {/* Gradual fade to dark blue background - stronger fade for darker sections */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.2) 15%, rgba(2, 6, 23, 0.5) 30%, rgba(2, 6, 23, 0.7) 45%, rgba(2, 6, 23, 0.85) 60%, rgba(2, 6, 23, 0.95) 75%, rgb(2, 6, 23) 90%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.3) 15%, rgba(2, 6, 23, 0.6) 30%, rgba(2, 6, 23, 0.75) 45%, rgba(2, 6, 23, 0.9) 60%, rgba(2, 6, 23, 0.97) 75%, rgb(2, 6, 23) 90%)",
             }}
           />
         </div>
@@ -990,43 +1006,43 @@ function App() {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="py-16 bg-card/20 border-t border-border/30">
-          <div className="container mx-auto px-4 sm:px-6 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}>
-              <h3 className="text-2xl font-bold mb-4 text-primary">
-                {t("footer.title")}
-              </h3>
-              <p
-                className="text-sm text-muted-foreground mb-2"
-                dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
-              />
-              <p className="text-sm text-muted-foreground mb-2">
-                <span
-                  dangerouslySetInnerHTML={{ __html: t("footer.otherProject") }}
-                />{" "}
-                -{" "}
-                <a
-                  href="https://szolzol.github.io/darkoba-vue/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:text-accent transition-colors underline">
-                  Play DarQba
-                </a>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t("footer.copyright")}
-              </p>
-            </motion.div>
-          </div>
-        </footer>
       </div>
       {/* End of Content Sections */}
+
+      {/* Footer - Outside content wrapper for proper visibility */}
+      <footer className="relative z-20 pt-16 pb-10 bg-slate-950 border-t border-primary/20">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}>
+            <h3 className="text-2xl font-bold mb-4 text-primary">
+              {t("footer.title")}
+            </h3>
+            <p
+              className="text-sm text-muted-foreground mb-2"
+              dangerouslySetInnerHTML={{ __html: t("footer.creators") }}
+            />
+            <p className="text-sm text-muted-foreground mb-2">
+              <span
+                dangerouslySetInnerHTML={{ __html: t("footer.otherProject") }}
+              />{" "}
+              -{" "}
+              <a
+                href="https://szolzol.github.io/darkoba-vue/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-accent transition-colors underline">
+                Play DarQba
+              </a>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t("footer.copyright")}
+            </p>
+          </motion.div>
+        </div>
+      </footer>
 
       {/* Install Prompt for Mobile PWA */}
       <InstallPrompt />

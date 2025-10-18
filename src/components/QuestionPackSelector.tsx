@@ -15,8 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
-import { BackgroundMusicPlayer } from "@/components/BackgroundMusicPlayer";
-import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
 interface QuestionPack {
   id: number;
@@ -228,16 +226,6 @@ export function QuestionPackSelector({
       <SheetContent
         side="left"
         className="w-[75vw] sm:w-[400px] md:w-[540px] p-6 pt-12">
-        {/* Background Music Player - at the top */}
-        <div className="mb-4">
-          <BackgroundMusicPlayer
-            src={humbugMainTheme}
-            title={t("questions.backgroundMusic")}
-          />
-        </div>
-
-        <Separator className="my-4" />
-
         {/* Question Packs Section */}
         <div className="space-y-4">
           <SheetHeader>

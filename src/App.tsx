@@ -216,43 +216,57 @@ function App() {
     if (authStatus === "success") {
       console.log("🔄 Auth callback detected, refreshing session...");
 
-      // Refresh session to update isAuthenticated
+      // IMMEDIATELY restore URL BEFORE refreshSession to prevent race conditions
+      const returnUrl = sessionStorage.getItem("auth_return_url");
+      const returnLang = sessionStorage.getItem("auth_return_lang") as
+        | "en"
+        | "hu"
+        | null;
+      
+      if (returnUrl && returnUrl !== "/") {
+        console.log(`🔙 IMMEDIATELY restoring pre-auth URL: ${returnUrl}`);
+        
+        // If we have a saved language, restore it first
+        if (returnLang) {
+          console.log(`🌐 Restoring saved language: ${returnLang}`);
+          i18n.changeLanguage(returnLang);
+        }
+        
+        // Restore the URL immediately
+        window.history.replaceState({}, "", returnUrl);
+
+        // Parse state from restored URL
+        const urlParsed = urlState.parseUrl();
+        setSelectedPack(urlParsed.pack);
+        setSelectedCategories(urlParsed.categories);
+
+        // ONLY if URL has explicit lang param, override the saved language
+        if (returnUrl.includes("lang=")) {
+          console.log(
+            `🔄 URL has explicit lang param, using: ${urlParsed.lang}`
+          );
+          i18n.changeLanguage(urlParsed.lang);
+        } else {
+          // No lang param in URL, ensure it's added with the restored language
+          const currentLang = returnLang || (i18n.language as "en" | "hu");
+          urlState.setState({ 
+            pack: urlParsed.pack, 
+            lang: currentLang, 
+            categories: urlParsed.categories 
+          }, true);
+        }
+      }
+      
+      // Clean up sessionStorage
+      sessionStorage.removeItem("auth_return_url");
+      sessionStorage.removeItem("auth_return_lang");
+
+      // NOW refresh session (this will trigger QuestionPackSelector refetch)
       refreshSession().then(() => {
         console.log("✅ Session refreshed after OAuth");
-
-        // Restore original URL from sessionStorage
-        const returnUrl = sessionStorage.getItem("auth_return_url");
-        const returnLang = sessionStorage.getItem("auth_return_lang") as
-          | "en"
-          | "hu"
-          | null;
-        sessionStorage.removeItem("auth_return_url"); // Clean up
-        sessionStorage.removeItem("auth_return_lang"); // Clean up
-
-        if (returnUrl && returnUrl !== "/") {
-          console.log(`🔙 Restoring pre-auth URL: ${returnUrl}`);
-          window.history.replaceState({}, "", returnUrl);
-
-          // If we have a saved language, always restore it first
-          if (returnLang) {
-            console.log(`🌐 Restoring saved language: ${returnLang}`);
-            i18n.changeLanguage(returnLang);
-          }
-
-          // Re-initialize from restored URL
-          const restoredState = urlState.initializeFromUrl();
-          setSelectedPack(restoredState.pack);
-          setSelectedCategories(restoredState.categories);
-
-          // If URL has explicit lang param, that takes precedence
-          if (returnUrl.includes("lang=")) {
-            console.log(
-              `🔄 URL has lang param, using URL language: ${restoredState.lang}`
-            );
-            i18n.changeLanguage(restoredState.lang);
-          }
-        } else {
-          // No saved URL, just clean the ?auth=success param
+        
+        // If no saved URL, clean the ?auth=success param
+        if (!returnUrl || returnUrl === "/") {
           const currentState = urlState.getState();
           urlState.setState(currentState, true);
         }

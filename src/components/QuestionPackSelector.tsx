@@ -47,7 +47,9 @@ export function QuestionPackSelector({
 
   // Refetch question packs when authentication state changes
   useEffect(() => {
-    console.log(`🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`);
+    console.log(
+      `🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`
+    );
     fetchQuestionPacks();
   }, [isAuthenticated]);
 
@@ -92,7 +94,9 @@ export function QuestionPackSelector({
 
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
-          console.log(`   🔀 QuestionPackSelector: Auto-switching from "${currentPack}" to "${firstPack}"`);
+          console.log(
+            `   🔀 QuestionPackSelector: Auto-switching from "${currentPack}" to "${firstPack}"`
+          );
           if (onPackChange) {
             onPackChange(firstPack);
           }

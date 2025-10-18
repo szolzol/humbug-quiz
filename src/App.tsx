@@ -142,10 +142,10 @@ function App() {
       console.log(`⏭️ App: Pack "${newPack}" already selected, skipping`);
       return;
     }
-    
+
     console.log(`🔄 App: Pack changing: "${selectedPack}" → "${newPack}"`);
     setSelectedPack(newPack);
-    
+
     // Update URL (this will NOT trigger popstate)
     const newUrl = `/pack/${newPack}`;
     window.history.pushState({ pack: newPack }, "", newUrl);
@@ -158,9 +158,11 @@ function App() {
       const path = window.location.pathname;
       const match = path.match(/^\/pack\/([^/]+)/);
       const targetPack = match?.[1] || "free";
-      
+
       if (targetPack !== selectedPack) {
-        console.log(`⬅️ App: Browser navigation: "${selectedPack}" → "${targetPack}"`);
+        console.log(
+          `⬅️ App: Browser navigation: "${selectedPack}" → "${targetPack}"`
+        );
         setSelectedPack(targetPack); // Only update state, URL is already correct
       }
     };

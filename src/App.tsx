@@ -132,7 +132,7 @@ function App() {
       console.log(`🔗 Initializing from URL: pack = ${match[1]}`);
       return match[1];
     }
-    return "us-starter-pack";
+    return "free"; // Default to free pack
   });
 
   // Handle browser back/forward navigation
@@ -145,13 +145,21 @@ function App() {
         setSelectedPack(match[1]);
       } else if (path === "/") {
         console.log(`⬅️ Browser back/forward: switching to default pack`);
-        setSelectedPack("us-starter-pack");
+        setSelectedPack("free");
       }
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  // Switch to free pack when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log(`🔓 User logged out, switching to free pack`);
+      handlePackChange("free");
+    }
+  }, [isAuthenticated]);
 
   // Update URL when pack changes
   const handlePackChange = (newPack: string) => {
@@ -789,7 +797,7 @@ function App() {
             )}
 
             {/* Hero-style CTA Section for anonymous users */}
-            {!isAuthenticated && questions.length > 4 && (
+            {!isAuthenticated && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

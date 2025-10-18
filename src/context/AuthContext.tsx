@@ -75,6 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const returnUrl = window.location.pathname + window.location.search;
     sessionStorage.setItem("auth_return_url", returnUrl);
 
+    // Save current language to restore after OAuth (in case URL doesn't have ?lang param)
+    const currentLang = document.documentElement.lang || "en";
+    sessionStorage.setItem("auth_return_lang", currentLang);
+
     window.location.href = "/api/auth/google";
   };
 

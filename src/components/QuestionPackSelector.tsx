@@ -58,16 +58,37 @@ export function QuestionPackSelector({
 
   // Refetch question packs when authentication state changes
   useEffect(() => {
+    console.log(`🔐 Auth state changed: isAuthenticated = ${isAuthenticated}`);
     fetchQuestionPacks();
   }, [isAuthenticated]);
 
   const fetchQuestionPacks = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/question-sets");
+      // Add timestamp cache-buster to ensure fresh data
+      const timestamp = Date.now();
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "";
+      const url = `${origin}/api/question-sets?_t=${timestamp}`;
+      console.log(`📦 Fetching question packs from: ${url}`);
+      console.log(`   Current auth state: ${isAuthenticated}`);
+
+      const response = await fetch(url, {
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch question packs");
       const data = await response.json();
       const fetchedPacks = data.questionSets || [];
+      console.log(
+        `✅ Fetched ${fetchedPacks.length} packs:`,
+        fetchedPacks.map((p) => p.slug)
+      );
+      console.log(`   API says isAuthenticated: ${data.isAuthenticated}`);
       setPacks(fetchedPacks);
 
       // If current selected pack is not in the new list, select the first available pack
@@ -75,13 +96,20 @@ export function QuestionPackSelector({
         const isCurrentPackAvailable = fetchedPacks.some(
           (p: QuestionPack) => p.slug === selectedPack
         );
+        console.log(
+          `   Current pack "${selectedPack}" available: ${isCurrentPackAvailable}`
+        );
+
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
+          console.log(`   🔀 Switching to first available pack: ${firstPack}`);
           setSelectedPack(firstPack);
           if (onPackChange) {
             onPackChange(firstPack);
           }
         }
+      } else {
+        console.log(`   ⚠️ No packs available!`);
       }
     } catch (error) {
       console.error("Error fetching question packs:", error);

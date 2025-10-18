@@ -221,26 +221,52 @@ function App() {
     if (authStatus === "success") {
       console.log("🔄 Auth callback detected, refreshing session...");
 
-      // IMMEDIATELY restore URL BEFORE refreshSession to prevent race conditions
-      const returnUrl = sessionStorage.getItem("auth_return_url");
-      sessionStorage.removeItem("auth_return_url"); // Clean up
+      // Get saved language from localStorage (most reliable)
+      const savedLang = localStorage.getItem("pre_auth_lang") as
+        | "en"
+        | "hu"
+        | null;
+      const returnUrl = localStorage.getItem("auth_return_url");
 
+      console.log(`📦 Retrieved from localStorage:`, { savedLang, returnUrl });
+
+      // FIRST: Restore language immediately
+      if (savedLang) {
+        console.log(`🌐 Restoring saved language: ${savedLang}`);
+        i18n.changeLanguage(savedLang);
+      }
+
+      // SECOND: Restore URL with the saved language
       if (returnUrl && returnUrl !== "/") {
-        console.log(`🔙 Restoring pre-auth URL (with lang): ${returnUrl}`);
+        console.log(`🔙 Restoring pre-auth URL: ${returnUrl}`);
 
-        // Restore the URL (now guaranteed to have ?lang= parameter)
-        window.history.replaceState({}, "", returnUrl);
+        // Build URL with saved language parameter
+        const urlParts = returnUrl.split("?");
+        const path = urlParts[0];
+        const urlParams = new URLSearchParams(urlParts[1] || "");
+
+        // Override lang param with saved language if we have one
+        if (savedLang) {
+          urlParams.set("lang", savedLang);
+        }
+
+        const finalUrl = `${path}?${urlParams.toString()}`;
+        console.log(`🔗 Final restored URL: ${finalUrl}`);
+
+        // Restore the URL
+        window.history.replaceState({}, "", finalUrl);
 
         // Parse and apply state from restored URL
         const urlParsed = urlState.parseUrl();
         setSelectedPack(urlParsed.pack);
         setSelectedCategories(urlParsed.categories);
-        i18n.changeLanguage(urlParsed.lang); // Apply the language from URL
 
-        console.log(
-          `✅ Restored: pack=${urlParsed.pack}, lang=${urlParsed.lang}`
-        );
+        console.log(`✅ Restored state:`, urlParsed);
       }
+
+      // Clean up localStorage
+      localStorage.removeItem("pre_auth_lang");
+      localStorage.removeItem("auth_return_url");
 
       // NOW refresh session (this will trigger QuestionPackSelector refetch)
       refreshSession().then(() => {
@@ -253,7 +279,7 @@ function App() {
         }
       });
     }
-  }, [refreshSession, urlState]);
+  }, [refreshSession, urlState, i18n]);
 
   // Browser compatibility detection
   useEffect(() => {

@@ -74,6 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = () => {
     const currentLang = i18n.language || "en";
 
+    // Save language to localStorage (survives redirects reliably)
+    localStorage.setItem("pre_auth_lang", currentLang);
+    console.log(`🌐 Saving language to localStorage: ${currentLang}`);
+
     // Build URL with guaranteed lang parameter
     let returnUrl = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
@@ -86,8 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       returnUrl += "?" + queryString;
     }
 
-    console.log(`🌐 Saving URL with language: ${returnUrl}`);
-    sessionStorage.setItem("auth_return_url", returnUrl);
+    console.log(`🔗 Saving return URL: ${returnUrl}`);
+    localStorage.setItem("auth_return_url", returnUrl);
 
     window.location.href = "/api/auth/google";
   };

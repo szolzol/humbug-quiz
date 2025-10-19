@@ -7,15 +7,31 @@ import { Pool } from "@neondatabase/serverless";
  * GET /api/admin/users - List all users with pagination and filters
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Verify admin access
-  const admin = await requireAdmin(req, res);
-  if (!admin) return; // Response already sent by requireAdmin
+  try {
+    console.log("🔍 Admin users endpoint called");
 
-  if (req.method === "GET") {
-    return handleGetUsers(req, res, admin);
+    // Verify admin access
+    const admin = await requireAdmin(req, res);
+    if (!admin) {
+      console.log("❌ Admin access denied");
+      return; // Response already sent by requireAdmin
+    }
+
+    console.log("✅ Admin access granted:", admin.email);
+
+    if (req.method === "GET") {
+      return handleGetUsers(req, res, admin);
+    }
+
+    res.status(405).json({ error: "Method not allowed" });
+  } catch (error) {
+    console.error("❌ Fatal error in admin users handler:", error);
+    res.status(500).json({
+      error: "Internal server error",
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
   }
-
-  res.status(405).json({ error: "Method not allowed" });
 }
 
 async function handleGetUsers(
@@ -23,7 +39,10 @@ async function handleGetUsers(
   res: VercelResponse,
   admin: any
 ) {
+  console.log("📊 Fetching users...");
+
   if (!process.env.POSTGRES_POSTGRES_URL) {
+    console.error("❌ Database not configured");
     return res.status(500).json({ error: "Database not configured" });
   }
 
@@ -32,12 +51,16 @@ async function handleGetUsers(
   });
 
   try {
+    console.log("✅ Database connection established");
+
     // Parse query parameters
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
     const role = req.query.role as string;
     const search = req.query.search as string;
     const isActive = req.query.is_active as string;
+
+    console.log("📋 Query params:", { page, limit, role, search, isActive });
 
     const offset = (page - 1) * limit;
 
@@ -104,6 +127,8 @@ async function handleGetUsers(
     ]);
     const users = usersResult.rows;
 
+    console.log(`✅ Fetched ${users.length} users`);
+
     // Calculate pagination metadata
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
@@ -122,7 +147,15 @@ async function handleGetUsers(
     });
   } catch (error) {
     console.error("❌ Error fetching users:", error);
-    res.status(500).json({ error: "Failed to fetch users" });
+    console.error("Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    res.status(500).json({
+      error: "Failed to fetch users",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
   } finally {
     await pool.end();
   }

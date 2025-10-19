@@ -77,7 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Save language to localStorage (survives redirects reliably)
     localStorage.setItem("pre_auth_lang", currentLang);
-    console.log(`🌐 Saving language to localStorage: ${currentLang}`);
 
     // Build URL with guaranteed lang parameter
     let returnUrl = window.location.pathname;
@@ -91,7 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       returnUrl += "?" + queryString;
     }
 
-    console.log(`🔗 Saving return URL: ${returnUrl}`);
     localStorage.setItem("auth_return_url", returnUrl);
 
     window.location.href = "/api/auth/google";

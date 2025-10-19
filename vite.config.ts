@@ -21,8 +21,6 @@ function apiRoutesPlugin(): PluginOption {
       server.middlewares.use(async (req, res, next) => {
         // Handle /api/auth/google
         if (req.url === "/api/auth/google") {
-          console.log("🔐 Auth Request: /api/auth/google");
-
           const clientId = process.env.GOOGLE_CLIENT_ID;
 
           // Dynamically detect the current domain from request headers
@@ -30,9 +28,6 @@ function apiRoutesPlugin(): PluginOption {
           const protocol = host.includes("localhost") ? "http" : "https";
           const appUrl = `${protocol}://${host}`;
           const redirectUri = `${appUrl}/api/auth/callback`;
-
-          console.log("📍 Using redirect URI:", redirectUri);
-          console.log("📍 Detected host:", host);
 
           if (!clientId) {
             res.statusCode = 500;
@@ -57,7 +52,6 @@ function apiRoutesPlugin(): PluginOption {
           googleAuthUrl.searchParams.append("access_type", "offline");
           googleAuthUrl.searchParams.append("prompt", "consent");
 
-          console.log("🔀 Redirecting to Google OAuth...");
           res.statusCode = 302;
           res.setHeader("Location", googleAuthUrl.toString());
           res.end();
@@ -66,8 +60,6 @@ function apiRoutesPlugin(): PluginOption {
 
         // Handle /api/auth/callback
         if (req.url?.startsWith("/api/auth/callback")) {
-          console.log("🔐 Auth Callback: /api/auth/callback");
-
           const url = new URL(req.url, `http://${req.headers.host}`);
           const code = url.searchParams.get("code");
           const error = url.searchParams.get("error");
@@ -156,7 +148,6 @@ function apiRoutesPlugin(): PluginOption {
                   last_login = NOW(),
                   updated_at = NOW()
               `;
-              console.log("💾 User saved to database:", userInfo.email);
             } catch (dbError) {
               console.error("❌ Database error:", dbError);
               // Continue even if DB save fails - user can still use the app
@@ -169,7 +160,6 @@ function apiRoutesPlugin(): PluginOption {
                 SELECT role FROM users WHERE id = ${userInfo.id} LIMIT 1
               `;
               userRole = dbUser?.role || "free";
-              console.log("👤 User role:", userRole);
             } catch (roleError) {
               console.error("❌ Error fetching user role:", roleError);
             }
@@ -185,8 +175,6 @@ function apiRoutesPlugin(): PluginOption {
             });
 
             const token = Buffer.from(sessionData).toString("base64");
-
-            console.log("✅ User authenticated:", userInfo.email);
 
             // Set cookie and redirect
             res.setHeader(
@@ -208,9 +196,6 @@ function apiRoutesPlugin(): PluginOption {
 
         // Handle /api/auth/session
         if (req.url === "/api/auth/session") {
-          console.log("🔐 Session Request: /api/auth/session");
-          console.log("📝 Cookie header:", req.headers.cookie);
-
           try {
             const cookies =
               req.headers.cookie?.split(";").reduce((acc, cookie) => {
@@ -219,18 +204,14 @@ function apiRoutesPlugin(): PluginOption {
                 return acc;
               }, {} as Record<string, string>) || {};
 
-            console.log("🍪 Parsed cookies:", Object.keys(cookies));
             const token = cookies.auth_token;
 
             if (!token) {
-              console.log("⚠️ No auth_token found in cookies");
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(JSON.stringify({ authenticated: false, user: null }));
               return;
             }
-
-            console.log("✅ Auth token found, decoding...");
 
             // Decode session token
             const sessionData = JSON.parse(
@@ -239,7 +220,6 @@ function apiRoutesPlugin(): PluginOption {
 
             // Check expiration
             if (sessionData.exp < Date.now()) {
-              console.log("⚠️ Token expired");
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(JSON.stringify({ authenticated: false, user: null }));
@@ -248,7 +228,6 @@ function apiRoutesPlugin(): PluginOption {
 
             // Verify user still exists and is active in database
             if (!process.env.POSTGRES_POSTGRES_URL) {
-              console.warn("⚠️ Database not configured, using token data only");
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(
@@ -284,12 +263,6 @@ function apiRoutesPlugin(): PluginOption {
                 return;
               }
 
-              console.log(
-                "✅ User session valid:",
-                dbUser.email,
-                "Role:",
-                dbUser.role
-              );
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(
@@ -308,10 +281,6 @@ function apiRoutesPlugin(): PluginOption {
             } catch (dbError) {
               console.error("❌ Database error during session check:", dbError);
               // Fallback to token data if DB fails
-              console.log(
-                "✅ User session valid (fallback):",
-                sessionData.email
-              );
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(
@@ -339,8 +308,6 @@ function apiRoutesPlugin(): PluginOption {
 
         // Handle /api/auth/logout
         if (req.url === "/api/auth/logout") {
-          console.log("🔐 Logout Request: /api/auth/logout");
-
           res.setHeader(
             "Set-Cookie",
             "auth_token=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax"
@@ -353,8 +320,6 @@ function apiRoutesPlugin(): PluginOption {
 
         // Handle /api/admin/auth/check
         if (req.url === "/api/admin/auth/check") {
-          console.log("🔐 Admin Auth Check: /api/admin/auth/check");
-
           try {
             const cookies =
               req.headers.cookie?.split(";").reduce((acc, cookie) => {

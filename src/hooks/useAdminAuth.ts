@@ -39,12 +39,6 @@ export function useAdminAuth(): AdminAuthStatus {
           isLoading: false,
           user: data.user,
         });
-
-        if (!data.hasAccess) {
-          console.warn("⚠️ No admin access");
-        } else {
-          console.log("✅ Admin access granted:", data.role);
-        }
       } catch (error) {
         console.error("❌ Admin auth check failed:", error);
         setAuthStatus({

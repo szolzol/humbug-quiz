@@ -89,13 +89,6 @@ export function useUrlState() {
       const mergedState = { ...currentState, ...newState };
       const newUrl = buildUrl(mergedState);
 
-      console.log(`🔗 URL State Update:`, {
-        from: window.location.pathname + window.location.search,
-        to: newUrl,
-        state: mergedState,
-        replace,
-      });
-
       // Update browser URL
       if (replace) {
         window.history.replaceState(mergedState, "", newUrl);
@@ -117,11 +110,6 @@ export function useUrlState() {
   const initializeFromUrl = useCallback(() => {
     const urlState = parseUrl();
 
-    console.log(`🔗 Initializing from URL:`, {
-      url: window.location.href,
-      state: urlState,
-    });
-
     // Sync i18n language
     if (urlState.lang !== i18n.language) {
       i18n.changeLanguage(urlState.lang);
@@ -130,9 +118,6 @@ export function useUrlState() {
     // If URL doesn't have proper format, set default
     if (!window.location.pathname.startsWith("/pack/")) {
       const defaultUrl = buildUrl(urlState);
-      console.log(
-        `🔗 Fixing URL format: "${window.location.pathname}" → "${defaultUrl}"`
-      );
       window.history.replaceState(urlState, "", defaultUrl);
     }
 

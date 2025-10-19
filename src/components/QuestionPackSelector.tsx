@@ -55,9 +55,6 @@ export function QuestionPackSelector({
       const origin =
         typeof window !== "undefined" ? window.location.origin : "";
       const url = `${origin}/api/question-sets?_t=${timestamp}`;
-      console.log(`📦 QuestionPackSelector: Fetching packs from: ${url}`);
-      console.log(`   Current pack prop: ${currentPack}`);
-      console.log(`   Auth state: ${isAuthenticated}`);
 
       const response = await fetch(url, {
         cache: "no-cache",
@@ -70,11 +67,6 @@ export function QuestionPackSelector({
       if (!response.ok) throw new Error("Failed to fetch question packs");
       const data = await response.json();
       const fetchedPacks = data.questionSets || [];
-      console.log(
-        `✅ QuestionPackSelector: Fetched ${fetchedPacks.length} packs:`,
-        fetchedPacks.map((p) => p.slug)
-      );
-      console.log(`   API says isAuthenticated: ${data.isAuthenticated}`);
       setPacks(fetchedPacks);
 
       // If current pack (from parent) is not in the new list, switch to first available
@@ -82,32 +74,13 @@ export function QuestionPackSelector({
         const isCurrentPackAvailable = fetchedPacks.some(
           (p: QuestionPack) => p.slug === currentPack
         );
-        console.log(
-          `   Current pack "${currentPack}" available in fetched packs: ${isCurrentPackAvailable}`
-        );
 
         if (!isCurrentPackAvailable) {
           const firstPack = fetchedPacks[0].slug;
-          console.log(
-            `   🔀 QuestionPackSelector: Current pack not available, switching from "${currentPack}" to "${firstPack}"`
-          );
           if (onPackChange) {
-            console.log(
-              `   📞 QuestionPackSelector: Calling onPackChange("${firstPack}")`
-            );
             onPackChange(firstPack);
-          } else {
-            console.warn(
-              `   ⚠️ QuestionPackSelector: onPackChange callback is not defined!`
-            );
           }
-        } else {
-          console.log(
-            `   ✅ QuestionPackSelector: Current pack "${currentPack}" is still available, no change needed`
-          );
         }
-      } else {
-        console.log(`   ⚠️ No packs available!`);
       }
     } catch (error) {
       console.error("QuestionPackSelector: Error fetching packs:", error);
@@ -118,14 +91,10 @@ export function QuestionPackSelector({
 
   // Refetch question packs when authentication state changes
   useEffect(() => {
-    console.log(
-      `🔐 QuestionPackSelector: Auth changed, isAuthenticated = ${isAuthenticated}`
-    );
     fetchQuestionPacks();
   }, [isAuthenticated, fetchQuestionPacks]);
 
   const handlePackSelect = (packSlug: string) => {
-    console.log(`📦 QuestionPackSelector: User selected pack: ${packSlug}`);
     if (onPackChange) {
       onPackChange(packSlug);
     }

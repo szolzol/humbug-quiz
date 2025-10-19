@@ -102,7 +102,6 @@ function App() {
   // Ensure unauthenticated users start with free pack on mount
   useEffect(() => {
     if (!isAuthenticated && selectedPack !== "free") {
-      console.log(` App: Unauthenticated user, forcing free pack`);
       setSelectedPack("free");
       urlState.setState({ pack: "free" }, true);
     }
@@ -111,18 +110,15 @@ function App() {
   // Sync URL when pack changes
   const handlePackChange = (newPack: string) => {
     if (newPack === selectedPack) {
-      console.log(` App: Pack already selected, skipping`);
       return;
     }
 
-    console.log(` App: Pack changing to:`, newPack);
     setSelectedPack(newPack);
     urlState.setState({ pack: newPack });
   };
 
   // Sync URL when categories change
   const handleCategoriesChange = (newCategories: string[]) => {
-    console.log(`🔄 App: Categories changing to:`, newCategories);
     setSelectedCategories(newCategories);
     urlState.setState({ categories: newCategories });
   };
@@ -144,10 +140,6 @@ function App() {
   useEffect(() => {
     const handlePopState = () => {
       const urlData = urlState.getState();
-      console.log(
-        `⬅️ App: Browser navigation detected, syncing from URL:`,
-        urlData
-      );
 
       if (urlData.pack !== selectedPack) {
         setSelectedPack(urlData.pack);
@@ -168,7 +160,6 @@ function App() {
   // Switch to free pack when user logs out
   useEffect(() => {
     if (!isAuthenticated && selectedPack !== "free") {
-      console.log(`🔓 App: User logged out, forcing free pack`);
       handlePackChange("free");
     }
   }, [isAuthenticated]);
@@ -179,8 +170,6 @@ function App() {
     const authStatus = params.get("auth");
 
     if (authStatus === "success") {
-      console.log("🔄 Auth callback detected, refreshing session...");
-
       // Get saved language from localStorage (most reliable)
       const savedLang = localStorage.getItem("pre_auth_lang") as
         | "en"
@@ -188,18 +177,13 @@ function App() {
         | null;
       const returnUrl = localStorage.getItem("auth_return_url");
 
-      console.log(`📦 Retrieved from localStorage:`, { savedLang, returnUrl });
-
       // FIRST: Restore language immediately
       if (savedLang) {
-        console.log(`🌐 Restoring saved language: ${savedLang}`);
         i18n.changeLanguage(savedLang);
       }
 
       // SECOND: Restore URL with the saved language
       if (returnUrl && returnUrl !== "/") {
-        console.log(`🔙 Restoring pre-auth URL: ${returnUrl}`);
-
         // Build URL with saved language parameter
         const urlParts = returnUrl.split("?");
         const path = urlParts[0];
@@ -211,7 +195,6 @@ function App() {
         }
 
         const finalUrl = `${path}?${urlParams.toString()}`;
-        console.log(`🔗 Final restored URL: ${finalUrl}`);
 
         // Restore the URL
         window.history.replaceState({}, "", finalUrl);
@@ -220,8 +203,6 @@ function App() {
         const urlParsed = urlState.parseUrl();
         setSelectedPack(urlParsed.pack);
         setSelectedCategories(urlParsed.categories);
-
-        console.log(`✅ Restored state:`, urlParsed);
       }
 
       // Clean up localStorage
@@ -230,8 +211,6 @@ function App() {
 
       // NOW refresh session (this will trigger QuestionPackSelector refetch)
       refreshSession().then(() => {
-        console.log("✅ Session refreshed after OAuth");
-
         // If no saved URL, clean the ?auth=success param
         if (!returnUrl || returnUrl === "/") {
           const currentState = urlState.getState();
@@ -295,8 +274,6 @@ function App() {
       userAgent: navigator.userAgent,
     };
 
-    console.log("🔍 Browser Compatibility Check:", browserInfo);
-
     // Show user-friendly notification for critical missing features
     if (!supportsOklch || !supportsBackdropFilter) {
       const message =
@@ -338,9 +315,6 @@ function App() {
         const origin =
           typeof window !== "undefined" ? window.location.origin : "";
         const url = `${origin}/api/questions/${selectedPack}?_t=${timestamp}`;
-        console.log(`🔄 Fetching questions from absolute URL: ${url}`);
-        console.log(`   Origin: ${origin}`);
-        console.log(`   Selected pack: ${selectedPack}`);
 
         const response = await fetch(url, {
           cache: "no-cache",
@@ -350,14 +324,6 @@ function App() {
             Pragma: "no-cache",
             Accept: "application/json",
           },
-        });
-        console.log(
-          `📡 Response status: ${response.status} ${response.statusText}`
-        );
-        console.log(`📡 Response headers:`, {
-          contentType: response.headers.get("content-type"),
-          packSlug: response.headers.get("x-pack-slug"),
-          cacheControl: response.headers.get("cache-control"),
         });
 
         if (!response.ok) {
@@ -369,28 +335,8 @@ function App() {
         }
 
         const data = await response.json();
-        console.log(
-          `📦 Loaded ${data.questions?.length || 0} questions for pack: ${
-            data.packSlug || selectedPack
-          }`
-        );
-        console.log(`📋 First question:`, {
-          id: data.questions?.[0]?.id,
-          en: data.questions?.[0]?.question_en?.substring(0, 60),
-          hu: data.questions?.[0]?.question_hu?.substring(0, 60),
-        });
-
-        // Force new array reference to ensure React detects the change
         const newQuestions = [...(data.questions || [])];
-        console.log(
-          `🔄 Setting ${
-            newQuestions.length
-          } questions to state (array ref: ${typeof newQuestions})`
-        );
         setApiQuestions(newQuestions);
-        console.log(
-          `✅ State updated! apiQuestions should now have ${newQuestions.length} items`
-        );
       } catch (error) {
         console.error("Error fetching questions:", error);
         // No fallback - questions must come from database
@@ -407,14 +353,6 @@ function App() {
   // This will re-compute when apiQuestions or i18n.language changes
   const currentLang = i18n.language as "en" | "hu";
   const questions = React.useMemo(() => {
-    console.log(
-      `🌐 Transforming ${apiQuestions.length} questions for language: ${currentLang}`
-    );
-    if (apiQuestions.length > 0) {
-      console.log(`   First question ID: ${apiQuestions[0].id}`);
-      console.log(`   EN: ${apiQuestions[0].question_en.substring(0, 60)}...`);
-      console.log(`   HU: ${apiQuestions[0].question_hu.substring(0, 60)}...`);
-    }
     return apiQuestions.map((q) => ({
       id: q.id,
       category: q.category,
@@ -452,23 +390,6 @@ function App() {
     ...q,
     category: t(`categories.${q.category}`),
   }));
-
-  // Debug: Log the final rendered questions
-  React.useEffect(() => {
-    console.log(`🎯 Final rendering state:`, {
-      selectedPack,
-      totalQuestions: questions.length,
-      visibleQuestions: visibleQuestions.length,
-      filteredQuestions: filteredQuestions.length,
-      translatedQuestions: translatedQuestions.length,
-      firstQuestion: translatedQuestions[0]
-        ? {
-            id: translatedQuestions[0].id,
-            question: translatedQuestions[0].question.substring(0, 60),
-          }
-        : null,
-    });
-  }, [selectedPack, translatedQuestions, questions.length]);
 
   // Feature cards configuration
   const features = [

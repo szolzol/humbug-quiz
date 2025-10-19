@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { requireAdmin } from "./lib/auth";
-import { Pool } from "@neondatabase/serverless";
+import { Pool, neon } from "@neondatabase/serverless";
+import { parse as parseCookie } from "cookie";
+import jwt from "jsonwebtoken";
 
 /**
  * Unified Admin API Handler
@@ -58,8 +60,7 @@ async function handleAuthCheck(req: VercelRequest, res: VercelResponse) {
   }
 
   // Parse cookies from request
-  const { parse } = await import("cookie");
-  const cookies = parse(req.headers.cookie || "");
+  const cookies = parseCookie(req.headers.cookie || "");
   const token = cookies.auth_token;
 
   if (!token) {
@@ -71,8 +72,6 @@ async function handleAuthCheck(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const jwt = await import("jsonwebtoken");
-
     // Verify and decode JWT token
     const decoded = jwt.verify(token, jwtSecret) as {
       userId: string;
@@ -92,7 +91,6 @@ async function handleAuthCheck(req: VercelRequest, res: VercelResponse) {
     // Double-check role from database if available
     if (process.env.POSTGRES_POSTGRES_URL) {
       try {
-        const { neon } = await import("@neondatabase/serverless");
         const sql = neon(process.env.POSTGRES_POSTGRES_URL);
 
         const [dbUser] = await sql`

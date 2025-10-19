@@ -440,7 +440,11 @@ function apiRoutesPlugin(): PluginOption {
         }
 
         // Handle /api/admin/users - Get all users with pagination and filters
-        if (req.url?.startsWith("/api/admin/users")) {
+        if (
+          req.method === "GET" &&
+          (req.url === "/api/admin/users" ||
+            req.url?.startsWith("/api/admin/users?"))
+        ) {
           try {
             // Check admin authentication
             const cookies =

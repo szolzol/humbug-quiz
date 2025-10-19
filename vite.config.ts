@@ -162,12 +162,25 @@ function apiRoutesPlugin(): PluginOption {
               // Continue even if DB save fails - user can still use the app
             }
 
-            // Create simple session token
+            // Fetch user role from database for session token
+            let userRole = "free";
+            try {
+              const [dbUser] = await sql`
+                SELECT role FROM users WHERE id = ${userInfo.id} LIMIT 1
+              `;
+              userRole = dbUser?.role || "free";
+              console.log("👤 User role:", userRole);
+            } catch (roleError) {
+              console.error("❌ Error fetching user role:", roleError);
+            }
+
+            // Create session token with role
             const sessionData = JSON.stringify({
               id: userInfo.id,
               email: userInfo.email,
               name: userInfo.name,
               picture: userInfo.picture,
+              role: userRole,
               exp: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
@@ -233,21 +246,80 @@ function apiRoutesPlugin(): PluginOption {
               return;
             }
 
-            console.log("✅ User session valid:", sessionData.email);
-            res.statusCode = 200;
-            res.setHeader("Content-Type", "application/json");
-            res.end(
-              JSON.stringify({
-                authenticated: true,
-                user: {
-                  id: sessionData.id,
-                  email: sessionData.email,
-                  name: sessionData.name,
-                  picture: sessionData.picture,
-                },
-              })
-            );
-            return;
+            // Verify user still exists and is active in database
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              console.warn("⚠️ Database not configured, using token data only");
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  authenticated: true,
+                  user: {
+                    id: sessionData.id,
+                    email: sessionData.email,
+                    name: sessionData.name,
+                    picture: sessionData.picture,
+                    role: sessionData.role || "free",
+                  },
+                })
+              );
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            try {
+              const [dbUser] = await sql`
+                SELECT id, email, name, picture, role, is_active
+                FROM users
+                WHERE id = ${sessionData.id}
+                LIMIT 1
+              `;
+
+              if (!dbUser || !dbUser.is_active) {
+                console.warn("⚠️ User not found or inactive:", sessionData.id);
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.end(JSON.stringify({ authenticated: false, user: null }));
+                return;
+              }
+
+              console.log("✅ User session valid:", dbUser.email, "Role:", dbUser.role);
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  authenticated: true,
+                  user: {
+                    id: dbUser.id,
+                    email: dbUser.email,
+                    name: dbUser.name,
+                    picture: dbUser.picture,
+                    role: dbUser.role,
+                  },
+                })
+              );
+              return;
+            } catch (dbError) {
+              console.error("❌ Database error during session check:", dbError);
+              // Fallback to token data if DB fails
+              console.log("✅ User session valid (fallback):", sessionData.email);
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  authenticated: true,
+                  user: {
+                    id: sessionData.id,
+                    email: sessionData.email,
+                    name: sessionData.name,
+                    picture: sessionData.picture,
+                    role: sessionData.role || "free",
+                  },
+                })
+              );
+              return;
+            }
           } catch (error) {
             console.error("❌ Session error:", error);
             res.statusCode = 200;
@@ -269,6 +341,129 @@ function apiRoutesPlugin(): PluginOption {
           res.setHeader("Location", "/");
           res.end();
           return;
+        }
+
+        // Handle /api/admin/auth/check
+        if (req.url === "/api/admin/auth/check") {
+          console.log("🔐 Admin Auth Check: /api/admin/auth/check");
+
+          try {
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  hasAccess: false,
+                  role: null,
+                  user: null,
+                })
+              );
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            // Check expiration
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  hasAccess: false,
+                  role: null,
+                  user: null,
+                })
+              );
+              return;
+            }
+
+            // Verify against database if configured
+            let userRole = sessionData.role || "free";
+            let userName = sessionData.name;
+            let userEmail = sessionData.email;
+            let userPicture = sessionData.picture;
+            let isActive = true;
+
+            if (process.env.POSTGRES_POSTGRES_URL) {
+              const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+              try {
+                const [dbUser] = await sql`
+                  SELECT id, email, name, picture, role, is_active
+                  FROM users
+                  WHERE id = ${sessionData.id}
+                  LIMIT 1
+                `;
+
+                if (!dbUser || !dbUser.is_active) {
+                  res.statusCode = 200;
+                  res.setHeader("Content-Type", "application/json");
+                  res.end(
+                    JSON.stringify({
+                      hasAccess: false,
+                      role: null,
+                      user: null,
+                    })
+                  );
+                  return;
+                }
+
+                userRole = dbUser.role;
+                userName = dbUser.name;
+                userEmail = dbUser.email;
+                userPicture = dbUser.picture;
+                isActive = dbUser.is_active;
+              } catch (dbError) {
+                console.error("❌ Database error during admin check:", dbError);
+                // Fallback to session data
+              }
+            }
+
+            // Check if user has admin or creator role
+            const isAdmin = userRole === "admin" || userRole === "creator";
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                hasAccess: isAdmin,
+                role: userRole,
+                user: isAdmin
+                  ? {
+                      id: sessionData.id,
+                      email: userEmail,
+                      name: userName,
+                      picture: userPicture,
+                    }
+                  : null,
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("❌ Admin auth check error:", error);
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                hasAccess: false,
+                role: null,
+                user: null,
+              })
+            );
+            return;
+          }
         }
 
         // Handle /api/question-sets (with or without query string)

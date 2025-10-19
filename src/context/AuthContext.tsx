@@ -9,6 +9,7 @@ export interface User {
   email: string;
   name: string;
   picture: string;
+  role?: "free" | "premium" | "admin" | "creator";
 }
 
 /**

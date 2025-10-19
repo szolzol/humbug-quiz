@@ -482,26 +482,26 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
     });
 
     if (category && category !== "all") {
-      whereClauses.push(`category = $${paramIndex}`);
+      whereClauses.push(`q.category = $${paramIndex}`);
       params.push(category);
       paramIndex++;
     }
 
     if (setId && setId !== "all" && setId !== "") {
-      whereClauses.push(`set_id = $${paramIndex}`);
+      whereClauses.push(`q.set_id = $${paramIndex}`);
       params.push(parseInt(setId)); // Convert to integer for database
       paramIndex++;
     }
 
     if (isActive === "active") {
-      whereClauses.push(`is_active = true`);
+      whereClauses.push(`q.is_active = true`);
     } else if (isActive === "inactive") {
-      whereClauses.push(`is_active = false`);
+      whereClauses.push(`q.is_active = false`);
     }
 
     if (search) {
       whereClauses.push(
-        `(question_text ILIKE $${paramIndex} OR correct_answer ILIKE $${paramIndex})`
+        `(q.question_en ILIKE $${paramIndex} OR q.question_hu ILIKE $${paramIndex})`
       );
       params.push(`%${search}%`);
       paramIndex++;
@@ -510,18 +510,20 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
     const whereClause =
       whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
-    let orderByClause = "ORDER BY updated_at DESC";
-    if (sort === "created_desc") orderByClause = "ORDER BY created_at DESC";
-    else if (sort === "created_asc") orderByClause = "ORDER BY created_at ASC";
-    else if (sort === "updated_asc") orderByClause = "ORDER BY updated_at ASC";
+    let orderByClause = "ORDER BY q.updated_at DESC";
+    if (sort === "created_desc") orderByClause = "ORDER BY q.created_at DESC";
+    else if (sort === "created_asc")
+      orderByClause = "ORDER BY q.created_at ASC";
+    else if (sort === "updated_asc")
+      orderByClause = "ORDER BY q.updated_at ASC";
 
-    const countQuery = `SELECT COUNT(*) as count FROM questions ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as count FROM questions q ${whereClause}`;
     const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
 
     params.push(limit, offset);
     const dataQuery = `
-      SELECT q.*, qs.name as set_name,
+      SELECT q.*, qs.name_en as set_name,
              (SELECT COUNT(*) FROM answers a WHERE a.question_id = q.id) as answer_count
       FROM questions q
       LEFT JOIN question_sets qs ON q.set_id = qs.id
@@ -794,9 +796,9 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
     // Transform snake_case to camelCase for frontend
     const packs = dataResult.rows.map((p) => ({
       id: p.id,
-      name: p.name,
+      name: p.name_en,
       slug: p.slug,
-      description: p.description,
+      description: p.description_en,
       category: p.category,
       difficulty: p.difficulty,
       isActive: p.is_active,
@@ -852,7 +854,7 @@ async function updatePack(
     let paramIndex = 1;
 
     if (name !== undefined) {
-      updates.push(`name = $${paramIndex}`);
+      updates.push(`name_en = $${paramIndex}`);
       params.push(name);
       paramIndex++;
     }
@@ -864,7 +866,7 @@ async function updatePack(
     }
 
     if (description !== undefined) {
-      updates.push(`description = $${paramIndex}`);
+      updates.push(`description_en = $${paramIndex}`);
       params.push(description);
       paramIndex++;
     }
@@ -933,7 +935,7 @@ async function deletePack(
 
   try {
     const result = await pool.query(
-      `DELETE FROM question_sets WHERE id = $1 RETURNING id, name`,
+      `DELETE FROM question_sets WHERE id = $1 RETURNING id, name_en`,
       [packId]
     );
 
@@ -943,7 +945,7 @@ async function deletePack(
 
     res.status(200).json({
       success: true,
-      message: `Pack "${result.rows[0].name}" deleted`,
+      message: `Pack "${result.rows[0].name_en}" deleted`,
     });
   } catch (error) {
     console.error("Error deleting pack:", error);

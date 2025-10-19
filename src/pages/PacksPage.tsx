@@ -394,7 +394,7 @@ export function PacksPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packs.reduce((sum, p) => sum + p.total_plays, 0)}
+              {packs.reduce((sum, p) => sum + (p.total_plays || 0), 0)}
             </div>
           </CardContent>
         </Card>

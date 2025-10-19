@@ -920,6 +920,7 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
       created_at: p.created_at,
       updated_at: p.updated_at,
       question_count: p.question_count,
+      total_plays: p.total_plays || 0,
     }));
 
     res.status(200).json({

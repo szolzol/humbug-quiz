@@ -891,28 +891,35 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
     params.push(limit, offset);
     const dataQuery = `
       SELECT qs.*, 
+             u.email as creator_email,
              (SELECT COUNT(*) FROM questions q WHERE q.set_id = qs.id) as question_count
       FROM question_sets qs
+      LEFT JOIN users u ON qs.creator_id = u.id
       ${whereClause}
-      ORDER BY created_at DESC
+      ORDER BY qs.created_at DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
 
     const dataResult = await pool.query(dataQuery, params);
 
-    // Transform snake_case to camelCase for frontend
+    // Transform to match frontend interface (keeping snake_case for compatibility)
     const packs = dataResult.rows.map((p) => ({
       id: p.id,
-      name: p.name_en,
       slug: p.slug,
-      description: p.description_en,
-      category: p.category,
-      difficulty: p.difficulty,
-      isActive: p.is_active,
-      isPremium: p.is_premium,
-      createdAt: p.created_at,
-      updatedAt: p.updated_at,
-      questionCount: p.question_count,
+      name_en: p.name_en,
+      name_hu: p.name_hu,
+      description_en: p.description_en,
+      description_hu: p.description_hu,
+      access_level: p.access_level,
+      pack_type: p.pack_type,
+      is_active: p.is_active,
+      is_published: p.is_published,
+      display_order: p.display_order,
+      creator_id: p.creator_id,
+      creator_email: p.creator_email,
+      created_at: p.created_at,
+      updated_at: p.updated_at,
+      question_count: p.question_count,
     }));
 
     res.status(200).json({

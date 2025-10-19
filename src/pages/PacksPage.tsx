@@ -516,9 +516,11 @@ export function PacksPage() {
                       )}
                       <div>
                         Updated{" "}
-                        {formatDistanceToNow(new Date(pack.updated_at), {
-                          addSuffix: true,
-                        })}
+                        {pack.updated_at
+                          ? formatDistanceToNow(new Date(pack.updated_at), {
+                              addSuffix: true,
+                            })
+                          : "Unknown"}
                       </div>
                     </div>
                   </div>

@@ -92,12 +92,13 @@ export function ActivityPage() {
         params.append("end_date", endDate);
       }
 
-      const response = await fetch(`/api/admin/activity?${params}`);
+      const response = await fetch(`/api/admin?resource=activity&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch activity logs");
       }
 
       const data = await response.json();
+      console.log("📊 Activity logs data:", data);
       setLogs(data.logs);
       setPagination(data.pagination);
     } catch (error) {

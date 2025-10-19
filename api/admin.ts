@@ -176,6 +176,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return handleAnswers(req, res, admin);
       case "packs":
         return handlePacks(req, res, admin);
+      case "activity":
+        return handleActivity(req, res, admin);
       default:
         return res.status(400).json({ error: `Unknown resource: ${resource}` });
     }
@@ -1072,6 +1074,129 @@ async function deletePack(
   } catch (error) {
     console.error("Error deleting pack:", error);
     res.status(500).json({ error: "Failed to delete pack" });
+  } finally {
+    await pool.end();
+  }
+}
+
+async function handleActivity(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
+  if (req.method === "GET") {
+    return await getActivityLogs(req, res);
+  }
+
+  return res.status(400).json({ error: "Invalid operation" });
+}
+
+async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
+  if (!process.env.POSTGRES_POSTGRES_URL) {
+    return res.status(500).json({ error: "Database not configured" });
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const actionType = req.query.action_type as string;
+    const entityType = req.query.entity_type as string;
+    const adminUser = req.query.admin_user as string;
+    const startDate = req.query.start_date as string;
+    const endDate = req.query.end_date as string;
+
+    const offset = (page - 1) * limit;
+
+    const whereClauses: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (actionType && actionType !== "all") {
+      whereClauses.push(`al.action_type = $${paramIndex}`);
+      params.push(actionType);
+      paramIndex++;
+    }
+
+    if (entityType && entityType !== "all") {
+      whereClauses.push(`al.entity_type = $${paramIndex}`);
+      params.push(entityType);
+      paramIndex++;
+    }
+
+    if (adminUser && adminUser !== "all") {
+      whereClauses.push(`al.user_id = $${paramIndex}`);
+      params.push(adminUser);
+      paramIndex++;
+    }
+
+    if (startDate) {
+      whereClauses.push(`al.created_at >= $${paramIndex}`);
+      params.push(startDate);
+      paramIndex++;
+    }
+
+    if (endDate) {
+      whereClauses.push(`al.created_at <= $${paramIndex}`);
+      params.push(endDate + " 23:59:59");
+      paramIndex++;
+    }
+
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    const countQuery = `SELECT COUNT(*) as count FROM activity_logs al ${whereClause}`;
+    const countResult = await pool.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].count);
+
+    params.push(limit, offset);
+    const dataQuery = `
+      SELECT al.*, 
+             u.name as admin_name,
+             u.email as admin_email,
+             u.picture as admin_picture
+      FROM activity_logs al
+      LEFT JOIN users u ON al.user_id = u.id
+      ${whereClause}
+      ORDER BY al.created_at DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    const dataResult = await pool.query(dataQuery, params);
+
+    // Transform to match frontend interface
+    const logs = dataResult.rows.map((log) => ({
+      id: log.id,
+      userId: log.user_id,
+      actionType: log.action_type,
+      entityType: log.entity_type,
+      entityId: log.entity_id,
+      details: log.details,
+      ipAddress: log.ip_address,
+      userAgent: log.user_agent,
+      createdAt: log.created_at,
+      adminName: log.admin_name,
+      adminEmail: log.admin_email,
+      adminPicture: log.admin_picture,
+    }));
+
+    res.status(200).json({
+      logs,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching activity logs:", error);
+    res.status(500).json({ error: "Failed to fetch activity logs" });
   } finally {
     await pool.end();
   }

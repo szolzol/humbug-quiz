@@ -144,6 +144,14 @@ export function QuestionsPage() {
       }
 
       const data = await response.json();
+      console.log("🔍 RAW API RESPONSE:", data);
+      console.log("🔍 First question:", data.questions?.[0]);
+      console.log("🔍 First question dates:", {
+        createdAt: data.questions?.[0]?.createdAt,
+        updatedAt: data.questions?.[0]?.updatedAt,
+        createdAtType: typeof data.questions?.[0]?.createdAt,
+        updatedAtType: typeof data.questions?.[0]?.updatedAt,
+      });
       setQuestions(data.questions);
       setPagination(data.pagination);
     } catch (error) {
@@ -343,9 +351,13 @@ export function QuestionsPage() {
                   </TableCell>
                   <TableCell>{getCategoryBadge(question.category)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(question.createdAt), {
-                      addSuffix: true,
-                    })}
+                    {question.createdAt ? (
+                      formatDistanceToNow(new Date(question.createdAt), {
+                        addSuffix: true,
+                      })
+                    ) : (
+                      <span className="text-red-500">No date</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{question.answerCount}</Badge>
@@ -383,9 +395,13 @@ export function QuestionsPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(question.updatedAt), {
-                      addSuffix: true,
-                    })}
+                    {question.updatedAt ? (
+                      formatDistanceToNow(new Date(question.updatedAt), {
+                        addSuffix: true,
+                      })
+                    ) : (
+                      <span className="text-red-500">No date</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Button

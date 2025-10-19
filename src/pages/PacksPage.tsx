@@ -170,7 +170,7 @@ export function PacksPage() {
         params.append("is_published", "false");
       }
 
-      const response = await fetch(`/api/admin/packs?${params}`);
+      const response = await fetch(`/api/admin?resource=packs&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch packs");
       }
@@ -231,7 +231,7 @@ export function PacksPage() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/packs/${packToDelete.id}`, {
+      const response = await fetch(`/api/admin?resource=packs&id=${packToDelete.id}`, {
         method: "DELETE",
       });
 

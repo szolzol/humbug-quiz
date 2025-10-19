@@ -85,7 +85,7 @@ export function UsersPage() {
         search: searchQuery,
       });
 
-      const response = await fetch(`/api/admin/users?${params}`);
+      const response = await fetch(`/api/admin?resource=users&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }

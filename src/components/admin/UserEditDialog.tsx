@@ -90,7 +90,7 @@ export function UserEditDialog({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
+      const response = await fetch(`/api/admin?resource=users&id=${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export function UserEditDialog({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
+      const response = await fetch(`/api/admin?resource=users&id=${user.id}`, {
         method: "DELETE",
       });
 

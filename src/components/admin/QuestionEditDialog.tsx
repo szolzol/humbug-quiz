@@ -231,8 +231,8 @@ export function QuestionEditDialog({
       console.log("📤 Saving question payload:", payload);
 
       const url = question
-        ? `/api/admin/questions/${question.id}`
-        : `/api/admin/questions`;
+        ? `/api/admin?resource=questions&id=${question.id}`
+        : `/api/admin?resource=questions`;
       const method = question ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -271,7 +271,7 @@ export function QuestionEditDialog({
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/questions/${question.id}`, {
+      const response = await fetch(`/api/admin?resource=questions&id=${question.id}`, {
         method: "DELETE",
       });
 

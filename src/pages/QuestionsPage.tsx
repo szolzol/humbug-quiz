@@ -138,7 +138,7 @@ export function QuestionsPage() {
         sort: sortBy,
       });
 
-      const response = await fetch(`/api/admin/questions?${params}`);
+      const response = await fetch(`/api/admin?resource=questions&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch questions");
       }

@@ -44,9 +44,10 @@ interface User {
   name: string;
   picture: string;
   role: "free" | "premium" | "admin" | "creator";
-  is_active: boolean;
-  created_at: string;
-  last_login: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastLogin: string;
 }
 
 interface UserEditDialogProps {
@@ -79,13 +80,13 @@ export function UserEditDialog({
   React.useEffect(() => {
     if (user) {
       setRole(user.role);
-      setIsActive(user.is_active);
+      setIsActive(user.isActive);
     }
   }, [user]);
 
   if (!user) return null;
 
-  const hasChanges = role !== user.role || isActive !== user.is_active;
+  const hasChanges = role !== user.role || isActive !== user.isActive;
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -167,16 +168,20 @@ export function UserEditDialog({
                 <div className="flex gap-2 mt-1">
                   <p className="text-xs text-muted-foreground">
                     Joined{" "}
-                    {formatDistanceToNow(new Date(user.created_at), {
-                      addSuffix: true,
-                    })}
+                    {user.createdAt
+                      ? formatDistanceToNow(new Date(user.createdAt), {
+                          addSuffix: true,
+                        })
+                      : "Unknown"}
                   </p>
                   <span className="text-xs text-muted-foreground">•</span>
                   <p className="text-xs text-muted-foreground">
                     Last login{" "}
-                    {formatDistanceToNow(new Date(user.last_login), {
-                      addSuffix: true,
-                    })}
+                    {user.lastLogin
+                      ? formatDistanceToNow(new Date(user.lastLogin), {
+                          addSuffix: true,
+                        })
+                      : "Never"}
                   </p>
                 </div>
               </div>

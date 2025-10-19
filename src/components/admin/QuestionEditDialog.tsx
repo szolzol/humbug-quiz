@@ -137,7 +137,7 @@ export function QuestionEditDialog({
     setIsLoadingAnswers(true);
     try {
       const response = await fetch(
-        `/api/admin/questions/${questionId}/answers`
+        `/api/admin?resource=answers&question_id=${questionId}`
       );
       if (!response.ok) throw new Error("Failed to load answers");
 

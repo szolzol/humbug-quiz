@@ -39,9 +39,10 @@ interface User {
   name: string;
   picture: string;
   role: "free" | "premium" | "admin" | "creator";
-  is_active: boolean;
-  created_at: string;
-  last_login: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastLogin: string;
 }
 
 interface Pagination {
@@ -244,20 +245,23 @@ export function UsersPage() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={user.is_active ? "default" : "secondary"}
-                          className="font-normal">
-                          {user.is_active ? "Active" : "Inactive"}
+                          variant={user.isActive ? "default" : "secondary"}>
+                          {user.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {formatDistanceToNow(new Date(user.created_at), {
-                          addSuffix: true,
-                        })}
+                        {user.createdAt
+                          ? formatDistanceToNow(new Date(user.createdAt), {
+                              addSuffix: true,
+                            })
+                          : "No date"}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {formatDistanceToNow(new Date(user.last_login), {
-                          addSuffix: true,
-                        })}
+                        {user.lastLogin
+                          ? formatDistanceToNow(new Date(user.lastLogin), {
+                              addSuffix: true,
+                            })
+                          : "Never"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button

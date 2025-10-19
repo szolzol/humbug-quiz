@@ -172,6 +172,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return handleUsers(req, res, admin);
       case "questions":
         return handleQuestions(req, res, admin);
+      case "answers":
+        return handleAnswers(req, res, admin);
       case "packs":
         return handlePacks(req, res, admin);
       default:
@@ -284,7 +286,7 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
 
     params.push(limit, offset);
     const dataQuery = `
-      SELECT id, email, name, picture, role, is_active, created_at, updated_at
+      SELECT id, email, name, picture, role, is_active, created_at, updated_at, last_login
       FROM users
       ${whereClause}
       ORDER BY created_at DESC
@@ -303,6 +305,7 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
       isActive: u.is_active,
       createdAt: u.created_at,
       updatedAt: u.updated_at,
+      lastLogin: u.last_login,
     }));
 
     res.status(200).json({
@@ -449,6 +452,61 @@ async function handleQuestions(
   return res.status(400).json({ error: "Invalid operation" });
 }
 
+async function handleAnswers(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
+  const questionId = req.query.question_id as string;
+
+  if (req.method === "GET" && questionId) {
+    return await getAnswersList(req, res, questionId);
+  }
+
+  return res.status(400).json({ error: "Invalid operation" });
+}
+
+async function getAnswersList(
+  req: VercelRequest,
+  res: VercelResponse,
+  questionId: string
+) {
+  if (!process.env.POSTGRES_POSTGRES_URL) {
+    return res.status(500).json({ error: "Database not configured" });
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    const result = await pool.query(
+      `SELECT id, answer_en, answer_hu, order_index, is_alternative, times_given, created_at
+       FROM answers
+       WHERE question_id = $1
+       ORDER BY order_index ASC`,
+      [questionId]
+    );
+
+    const answers = result.rows.map((a) => ({
+      id: a.id,
+      answer_en: a.answer_en,
+      answer_hu: a.answer_hu,
+      order_index: a.order_index,
+      is_alternative: a.is_alternative,
+      times_given: a.times_given || 0,
+      created_at: a.created_at,
+    }));
+
+    res.status(200).json({ answers });
+  } catch (error) {
+    console.error("Error fetching answers:", error);
+    res.status(500).json({ error: "Failed to fetch answers" });
+  } finally {
+    await pool.end();
+  }
+}
+
 async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -591,34 +649,41 @@ async function updateQuestion(
 
   try {
     const {
-      question_text,
-      correct_answer,
-      wrong_answers,
+      question_en,
+      question_hu,
       category,
       difficulty,
       is_active,
-      audio_file,
+      source_name,
+      source_url,
+      answers,
     } = req.body;
 
     const updates: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
 
-    if (question_text !== undefined) {
-      updates.push(`question_text = $${paramIndex}`);
-      params.push(question_text);
+    if (question_en !== undefined) {
+      updates.push(`question_en = $${paramIndex}`);
+      params.push(question_en);
       paramIndex++;
     }
 
-    if (correct_answer !== undefined) {
-      updates.push(`correct_answer = $${paramIndex}`);
-      params.push(correct_answer);
+    if (question_hu !== undefined) {
+      updates.push(`question_hu = $${paramIndex}`);
+      params.push(question_hu);
       paramIndex++;
     }
 
-    if (wrong_answers !== undefined) {
-      updates.push(`wrong_answers = $${paramIndex}`);
-      params.push(JSON.stringify(wrong_answers));
+    if (source_name !== undefined) {
+      updates.push(`source_name = $${paramIndex}`);
+      params.push(source_name);
+      paramIndex++;
+    }
+
+    if (source_url !== undefined) {
+      updates.push(`source_url = $${paramIndex}`);
+      params.push(source_url);
       paramIndex++;
     }
 
@@ -640,29 +705,71 @@ async function updateQuestion(
       paramIndex++;
     }
 
-    if (audio_file !== undefined) {
-      updates.push(`audio_file = $${paramIndex}`);
-      params.push(audio_file);
-      paramIndex++;
-    }
-
-    if (updates.length === 0) {
+    if (updates.length === 0 && !answers) {
       return res.status(400).json({ error: "No fields to update" });
     }
 
-    updates.push(`updated_at = NOW()`);
-    params.push(questionId);
+    if (updates.length > 0) {
+      updates.push(`updated_at = NOW()`);
+      params.push(questionId);
 
-    const query = `UPDATE questions SET ${updates.join(
-      ", "
-    )} WHERE id = $${paramIndex} RETURNING *`;
-    const result = await pool.query(query, params);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Question not found" });
+      const query = `UPDATE questions SET ${updates.join(
+        ", "
+      )} WHERE id = $${paramIndex} RETURNING *`;
+      await pool.query(query, params);
     }
 
-    res.status(200).json({ success: true, question: result.rows[0] });
+    // Handle answers if provided
+    if (answers && Array.isArray(answers)) {
+      // Delete existing answers that are not in the new list
+      const answerIds = answers
+        .filter((a) => a.id)
+        .map((a) => a.id)
+        .join(",");
+      if (answerIds) {
+        await pool.query(
+          `DELETE FROM answers WHERE question_id = $1 AND id NOT IN (${answerIds})`,
+          [questionId]
+        );
+      } else {
+        await pool.query(`DELETE FROM answers WHERE question_id = $1`, [
+          questionId,
+        ]);
+      }
+
+      // Update or insert answers
+      for (const answer of answers) {
+        if (answer.id) {
+          // Update existing answer
+          await pool.query(
+            `UPDATE answers SET answer_en = $1, answer_hu = $2, order_index = $3, is_alternative = $4 WHERE id = $5`,
+            [
+              answer.answer_en,
+              answer.answer_hu,
+              answer.order_index,
+              answer.is_alternative || false,
+              answer.id,
+            ]
+          );
+        } else {
+          // Insert new answer
+          await pool.query(
+            `INSERT INTO answers (question_id, answer_en, answer_hu, order_index, is_alternative) VALUES ($1, $2, $3, $4, $5)`,
+            [
+              questionId,
+              answer.answer_en,
+              answer.answer_hu,
+              answer.order_index,
+              answer.is_alternative || false,
+            ]
+          );
+        }
+      }
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Question updated successfully" });
   } catch (error) {
     console.error("Error updating question:", error);
     res.status(500).json({ error: "Failed to update question" });
@@ -768,7 +875,7 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
 
     if (search) {
       whereClauses.push(
-        `(name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`
+        `(name_en ILIKE $${paramIndex} OR name_hu ILIKE $${paramIndex} OR description_en ILIKE $${paramIndex} OR description_hu ILIKE $${paramIndex})`
       );
       params.push(`%${search}%`);
       paramIndex++;

@@ -176,6 +176,8 @@ export function PacksPage() {
       }
 
       const data = await response.json();
+      console.log("📦 Packs API response:", data);
+      console.log("📦 First pack:", data.packs?.[0]);
       let filteredPacks = data.packs || [];
 
       // Client-side search filter
@@ -382,7 +384,12 @@ export function PacksPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packs.reduce((sum, p) => sum + p.question_count, 0)}
+              {packs
+                .reduce(
+                  (sum, p) => sum + (parseInt(String(p.question_count)) || 0),
+                  0
+                )
+                .toLocaleString()}
             </div>
           </CardContent>
         </Card>
@@ -394,7 +401,12 @@ export function PacksPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packs.reduce((sum, p) => sum + (p.total_plays || 0), 0)}
+              {packs
+                .reduce(
+                  (sum, p) => sum + (parseInt(String(p.total_plays)) || 0),
+                  0
+                )
+                .toLocaleString()}
             </div>
           </CardContent>
         </Card>

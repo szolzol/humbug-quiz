@@ -844,9 +844,10 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
-    const category = req.query.category as string;
+    const packType = req.query.pack_type as string;
+    const accessLevel = req.query.access_level as string;
     const isActive = req.query.is_active as string;
-    const isPremium = req.query.is_premium as string;
+    const isPublished = req.query.is_published as string;
     const search = req.query.search as string;
 
     const offset = (page - 1) * limit;
@@ -855,22 +856,28 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
     const params: any[] = [];
     let paramIndex = 1;
 
-    if (category && category !== "all") {
-      whereClauses.push(`category = $${paramIndex}`);
-      params.push(category);
+    if (packType && packType !== "all") {
+      whereClauses.push(`pack_type = $${paramIndex}`);
+      params.push(packType);
       paramIndex++;
     }
 
-    if (isActive === "active") {
-      whereClauses.push(`is_active = true`);
-    } else if (isActive === "inactive") {
-      whereClauses.push(`is_active = false`);
+    if (accessLevel && accessLevel !== "all") {
+      whereClauses.push(`access_level = $${paramIndex}`);
+      params.push(accessLevel);
+      paramIndex++;
     }
 
-    if (isPremium === "premium") {
-      whereClauses.push(`is_premium = true`);
-    } else if (isPremium === "free") {
-      whereClauses.push(`is_premium = false`);
+    if (isActive !== undefined) {
+      whereClauses.push(`is_active = $${paramIndex}`);
+      params.push(isActive === "true");
+      paramIndex++;
+    }
+
+    if (isPublished !== undefined) {
+      whereClauses.push(`is_published = $${paramIndex}`);
+      params.push(isPublished === "true");
+      paramIndex++;
     }
 
     if (search) {
@@ -919,8 +926,8 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
       creator_email: p.creator_email,
       created_at: p.created_at,
       updated_at: p.updated_at,
-      question_count: p.question_count,
-      total_plays: p.total_plays || 0,
+      question_count: parseInt(p.question_count) || 0,
+      total_plays: parseInt(p.total_plays) || 0,
     }));
 
     res.status(200).json({

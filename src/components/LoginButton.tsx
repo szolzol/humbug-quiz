@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Crown } from "lucide-react";
 
 /**
  * LoginButton Component
@@ -28,6 +30,7 @@ interface LoginButtonProps {
 export function LoginButton({ variant = "default" }: LoginButtonProps) {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Loading state
   if (isLoading) {
@@ -124,15 +127,31 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
             {/* Show admin badge for admin/creator users only */}
             {user.role &&
               (user.role === "admin" || user.role === "creator") && (
-                <div className="flex items-center gap-1 mt-1">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                    👑 {user.role}
-                  </span>
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate("/admin");
+                  }}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/30 hover:border-yellow-500/50 transition-colors cursor-pointer mt-1">
+                  <Crown size={12} />
+                  {user.role}
+                </button>
               )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {/* Admin Panel link for admin/creator users */}
+        {user.role && (user.role === "admin" || user.role === "creator") && (
+          <>
+            <DropdownMenuItem
+              onClick={() => navigate("/admin")}
+              className="cursor-pointer">
+              <Crown className="mr-2 h-4 w-4 text-yellow-500" />
+              Admin Panel
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem
           onClick={logout}
           className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">

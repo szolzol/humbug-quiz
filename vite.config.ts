@@ -439,6 +439,232 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // Handle /api/admin/users - Get all users with pagination and filters
+        if (req.url?.startsWith("/api/admin/users")) {
+          try {
+            // Check admin authentication
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode and verify admin access
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin role from database
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Database not configured" }));
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            const [adminUser] = await sql`
+              SELECT role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden: Admin access required" }));
+              return;
+            }
+
+            // Parse query parameters
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const page = parseInt(url.searchParams.get("page") || "1");
+            const limit = parseInt(url.searchParams.get("limit") || "50");
+            const roleFilter = url.searchParams.get("role") || "all";
+            const statusFilter = url.searchParams.get("status") || "all";
+            const searchQuery = url.searchParams.get("search") || "";
+            const offset = (page - 1) * limit;
+
+            // Build query dynamically with filters
+            let countQuery;
+            let usersQuery;
+
+            if (roleFilter !== "all" && statusFilter !== "all" && searchQuery) {
+              // All three filters
+              const searchPattern = `%${searchQuery}%`;
+              const isActive = statusFilter === "active";
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE role = ${roleFilter} 
+                  AND is_active = ${isActive}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE role = ${roleFilter} 
+                  AND is_active = ${isActive}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (roleFilter !== "all" && statusFilter !== "all") {
+              // Role and status filters
+              const isActive = statusFilter === "active";
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE role = ${roleFilter} AND is_active = ${isActive}
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE role = ${roleFilter} AND is_active = ${isActive}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (roleFilter !== "all" && searchQuery) {
+              // Role and search filters
+              const searchPattern = `%${searchQuery}%`;
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE role = ${roleFilter}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE role = ${roleFilter}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (statusFilter !== "all" && searchQuery) {
+              // Status and search filters
+              const isActive = statusFilter === "active";
+              const searchPattern = `%${searchQuery}%`;
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE is_active = ${isActive}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE is_active = ${isActive}
+                  AND (name ILIKE ${searchPattern} OR email ILIKE ${searchPattern})
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (roleFilter !== "all") {
+              // Role filter only
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE role = ${roleFilter}
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE role = ${roleFilter}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (statusFilter !== "all") {
+              // Status filter only
+              const isActive = statusFilter === "active";
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE is_active = ${isActive}
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE is_active = ${isActive}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else if (searchQuery) {
+              // Search filter only
+              const searchPattern = `%${searchQuery}%`;
+              countQuery = sql`
+                SELECT COUNT(*) as total 
+                FROM users 
+                WHERE name ILIKE ${searchPattern} OR email ILIKE ${searchPattern}
+              `;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                WHERE name ILIKE ${searchPattern} OR email ILIKE ${searchPattern}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            } else {
+              // No filters
+              countQuery = sql`SELECT COUNT(*) as total FROM users`;
+              usersQuery = sql`
+                SELECT id, email, name, picture, role, is_active, created_at, last_login
+                FROM users
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+              `;
+            }
+
+            // Execute queries
+            const [countResult] = await countQuery;
+            const total = parseInt(countResult.total);
+            const users = await usersQuery;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                users,
+                pagination: {
+                  page,
+                  limit,
+                  total,
+                  totalPages: Math.ceil(total / limit),
+                },
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("❌ Error fetching users:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
         // Handle /api/question-sets (with or without query string)
         if (req.url?.startsWith("/api/question-sets")) {
           try {

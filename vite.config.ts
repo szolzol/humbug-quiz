@@ -1211,6 +1211,192 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // Handle /api/admin/questions - Get all questions with pagination and filters
+        if (
+          req.method === "GET" &&
+          (req.url === "/api/admin/questions" ||
+            req.url?.startsWith("/api/admin/questions?"))
+        ) {
+          try {
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Parse query parameters
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const page = parseInt(url.searchParams.get("page") || "1");
+            const limit = parseInt(url.searchParams.get("limit") || "50");
+            const search = url.searchParams.get("search") || "";
+            const category = url.searchParams.get("category") || "all";
+            const difficulty = url.searchParams.get("difficulty") || "all";
+            const isActive = url.searchParams.get("is_active") || "all";
+
+            const offset = (page - 1) * limit;
+
+            // Build WHERE clause
+            let whereClause = "";
+            const conditions: string[] = [];
+
+            if (search) {
+              conditions.push(
+                `(q.question_en ILIKE '%${search}%' OR q.question_hu ILIKE '%${search}%')`
+              );
+            }
+
+            if (category !== "all") {
+              conditions.push(`q.category = '${category}'`);
+            }
+
+            if (difficulty !== "all") {
+              conditions.push(`q.difficulty = '${difficulty}'`);
+            }
+
+            if (isActive !== "all") {
+              conditions.push(
+                `q.is_active = ${isActive === "active" ? "true" : "false"}`
+              );
+            }
+
+            if (conditions.length > 0) {
+              whereClause = `WHERE ${conditions.join(" AND ")}`;
+            }
+
+            // Get total count
+            const countQuery = `
+              SELECT COUNT(*) as total
+              FROM questions q
+              ${whereClause}
+            `;
+
+            const countResult = await sql.unsafe(countQuery);
+            const total = parseInt((countResult as any)[0].total);
+
+            // Get questions with answer counts
+            const questionsQuery = `
+              SELECT 
+                q.id,
+                q.set_id,
+                q.question_en,
+                q.question_hu,
+                q.category,
+                q.difficulty,
+                q.source_name,
+                q.source_url,
+                q.order_index,
+                q.is_active,
+                q.created_at,
+                q.updated_at,
+                q.times_played,
+                q.times_completed,
+                qs.name as set_name,
+                COUNT(a.id) as answer_count
+              FROM questions q
+              LEFT JOIN question_sets qs ON q.set_id = qs.id
+              LEFT JOIN answers a ON q.id = a.question_id
+              ${whereClause}
+              GROUP BY q.id, qs.name
+              ORDER BY q.created_at DESC
+              LIMIT ${limit} OFFSET ${offset}
+            `;
+
+            const questions = (await sql.unsafe(
+              questionsQuery
+            )) as unknown as any[];
+
+            // Calculate pagination
+            const totalPages = Math.ceil(total / limit);
+            const hasNext = page < totalPages;
+            const hasPrev = page > 1;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                questions: questions.map((q: any) => ({
+                  id: q.id,
+                  setId: q.set_id,
+                  setName: q.set_name,
+                  questionEn: q.question_en,
+                  questionHu: q.question_hu,
+                  category: q.category,
+                  difficulty: q.difficulty,
+                  sourceName: q.source_name,
+                  sourceUrl: q.source_url,
+                  orderIndex: q.order_index,
+                  isActive: q.is_active,
+                  createdAt: q.created_at,
+                  updatedAt: q.updated_at,
+                  timesPlayed: q.times_played,
+                  timesCompleted: q.times_completed,
+                  answerCount: parseInt(q.answer_count),
+                })),
+                pagination: {
+                  page,
+                  limit,
+                  total,
+                  totalPages,
+                  hasNext,
+                  hasPrev,
+                },
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("❌ Error fetching questions:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
         // Handle /api/question-sets (with or without query string)
         if (req.url?.startsWith("/api/question-sets")) {
           try {

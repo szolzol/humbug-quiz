@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import type { IncomingMessage, ServerResponse } from "http";
+import jwt from "jsonwebtoken";
 
 export interface AuthUser {
   id: string;
@@ -16,6 +17,7 @@ export interface AdminUser extends AuthUser {
 
 /**
  * Parse and verify session cookie
+ * Supports both JWT (Vercel) and base64 (localhost) formats
  */
 export function parseSessionCookie(
   cookieHeader: string | undefined
@@ -33,7 +35,31 @@ export function parseSessionCookie(
   if (!token) return null;
 
   try {
-    // Decode base64 token
+    // Try JWT first (Vercel production format)
+    if (process.env.JWT_SECRET) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
+          userId: string;
+          email: string;
+          name: string;
+          picture: string;
+          role?: string;
+        };
+
+        return {
+          id: decoded.userId,
+          email: decoded.email,
+          name: decoded.name,
+          picture: decoded.picture,
+          role: (decoded.role as AuthUser["role"]) || "free",
+          isActive: true, // Will be verified against DB
+        };
+      } catch (jwtError) {
+        // Not a JWT or invalid, try base64 format
+      }
+    }
+
+    // Fallback to base64 format (localhost dev server)
     const sessionData = JSON.parse(
       Buffer.from(token, "base64").toString("utf-8")
     );

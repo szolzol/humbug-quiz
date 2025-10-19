@@ -318,6 +318,64 @@ function apiRoutesPlugin(): PluginOption {
           return;
         }
 
+        // Handle unified /api/admin?resource=xxx endpoint
+        if (req.url?.startsWith("/api/admin?resource=")) {
+          try {
+            // Dynamically import the admin handler
+            const adminModule = await import("./api/admin.ts");
+            const handler = adminModule.default;
+
+            // Create mock Vercel request/response objects
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const mockReq = {
+              method: req.method,
+              url: req.url,
+              headers: req.headers,
+              query: Object.fromEntries(url.searchParams.entries()),
+              body: await new Promise((resolve) => {
+                let body = "";
+                req.on("data", (chunk) => (body += chunk));
+                req.on("end", () => {
+                  try {
+                    resolve(body ? JSON.parse(body) : {});
+                  } catch {
+                    resolve({});
+                  }
+                });
+              }),
+            };
+
+            const mockRes = {
+              status: (code: number) => {
+                res.statusCode = code;
+                return mockRes;
+              },
+              json: (data: any) => {
+                res.setHeader("Content-Type", "application/json");
+                res.end(JSON.stringify(data));
+              },
+              setHeader: (name: string, value: string) => {
+                res.setHeader(name, value);
+              },
+            };
+
+            await handler(mockReq as any, mockRes as any);
+            return;
+          } catch (error) {
+            console.error("❌ Admin API error:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                error: "Internal server error",
+                message:
+                  error instanceof Error ? error.message : "Unknown error",
+              })
+            );
+            return;
+          }
+        }
+
         // Handle /api/admin/auth/check
         if (req.url === "/api/admin/auth/check") {
           try {

@@ -293,8 +293,20 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
 
     const dataResult = await pool.query(dataQuery, params);
 
+    // Transform snake_case to camelCase for frontend
+    const users = dataResult.rows.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      picture: u.picture,
+      role: u.role,
+      isActive: u.is_active,
+      createdAt: u.created_at,
+      updatedAt: u.updated_at,
+    }));
+
     res.status(200).json({
-      users: dataResult.rows,
+      users,
       pagination: {
         page,
         limit,
@@ -509,7 +521,10 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
 
     params.push(limit, offset);
     const dataQuery = `
-      SELECT * FROM questions
+      SELECT q.*, qs.name as set_name,
+             (SELECT COUNT(*) FROM answers a WHERE a.question_id = q.id) as answer_count
+      FROM questions q
+      LEFT JOIN question_sets qs ON q.set_id = qs.id
       ${whereClause}
       ${orderByClause}
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
@@ -517,8 +532,29 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
 
     const dataResult = await pool.query(dataQuery, params);
 
+    // Transform snake_case to camelCase for frontend
+    const questions = dataResult.rows.map((q) => ({
+      id: q.id,
+      questionEn: q.question_en,
+      questionHu: q.question_hu,
+      category: q.category,
+      difficulty: q.difficulty,
+      setId: q.set_id,
+      setName: q.set_name,
+      sourceUrl: q.source_url,
+      sourceName: q.source_name,
+      orderIndex: q.order_index,
+      isActive: q.is_active,
+      createdAt: q.created_at,
+      updatedAt: q.updated_at,
+      timesPlayed: q.times_played || 0,
+      timesCompleted: q.times_completed || 0,
+      answerCount: parseInt(q.answer_count) || 0,
+      metadata: q.metadata,
+    }));
+
     res.status(200).json({
-      questions: dataResult.rows,
+      questions,
       pagination: {
         page,
         limit,
@@ -755,8 +791,23 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
 
     const dataResult = await pool.query(dataQuery, params);
 
+    // Transform snake_case to camelCase for frontend
+    const packs = dataResult.rows.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      description: p.description,
+      category: p.category,
+      difficulty: p.difficulty,
+      isActive: p.is_active,
+      isPremium: p.is_premium,
+      createdAt: p.created_at,
+      updatedAt: p.updated_at,
+      questionCount: p.question_count,
+    }));
+
     res.status(200).json({
-      packs: dataResult.rows,
+      packs,
       pagination: {
         page,
         limit,

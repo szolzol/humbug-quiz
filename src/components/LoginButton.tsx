@@ -121,6 +121,7 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            {/* Show admin badge for admin/creator users only */}
             {user.role &&
               (user.role === "admin" || user.role === "creator") && (
                 <div className="flex items-center gap-1 mt-1">

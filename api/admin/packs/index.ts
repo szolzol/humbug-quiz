@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { requireAdmin } from "../../_lib/auth";
+import { requireAdmin } from "../_auth";
 import { Pool } from "@neondatabase/serverless";
 
 /**

@@ -231,9 +231,12 @@ export function PacksPage() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin?resource=packs&id=${packToDelete.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin?resource=packs&id=${packToDelete.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();

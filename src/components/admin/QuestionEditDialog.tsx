@@ -271,9 +271,12 @@ export function QuestionEditDialog({
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin?resource=questions&id=${question.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin?resource=questions&id=${question.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();

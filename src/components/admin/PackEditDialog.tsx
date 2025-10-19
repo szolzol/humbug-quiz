@@ -203,7 +203,9 @@ export function PackEditDialog({
         display_order: displayOrder,
       };
 
-      const url = pack ? `/api/admin?resource=packs&id=${pack.id}` : "/api/admin?resource=packs";
+      const url = pack
+        ? `/api/admin?resource=packs&id=${pack.id}`
+        : "/api/admin?resource=packs";
       const method = pack ? "PUT" : "POST";
 
       const response = await fetch(url, {

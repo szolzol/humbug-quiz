@@ -108,7 +108,10 @@ async function getAuthUser(req: VercelRequest): Promise<AuthUser | null> {
   }
 }
 
-async function requireAdmin(req: VercelRequest, res: VercelResponse): Promise<AdminUser | null> {
+async function requireAdmin(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<AdminUser | null> {
   const user = await getAuthUser(req);
 
   if (!user) {
@@ -133,7 +136,7 @@ async function requireAdmin(req: VercelRequest, res: VercelResponse): Promise<Ad
 /**
  * Unified Admin API Endpoint
  * Handles all admin operations via resource and id parameters
- * 
+ *
  * Routes:
  * GET    /api/admin?resource=users&page=1&limit=50
  * GET    /api/admin?resource=questions&category=history
@@ -208,7 +211,11 @@ async function handleAuthCheck(req: VercelRequest, res: VercelResponse) {
   });
 }
 
-async function handleUsers(req: VercelRequest, res: VercelResponse, admin: AdminUser) {
+async function handleUsers(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
@@ -231,7 +238,9 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -253,7 +262,9 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
     }
 
     if (search) {
-      whereClauses.push(`(email ILIKE $${paramIndex} OR name ILIKE $${paramIndex})`);
+      whereClauses.push(
+        `(email ILIKE $${paramIndex} OR name ILIKE $${paramIndex})`
+      );
       params.push(`%${search}%`);
       paramIndex++;
     }
@@ -264,7 +275,8 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
       whereClauses.push(`is_active = false`);
     }
 
-    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     const countQuery = `SELECT COUNT(*) as count FROM users ${whereClause}`;
     const countResult = await pool.query(countQuery, params);
@@ -298,12 +310,19 @@ async function getUsersList(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function updateUser(req: VercelRequest, res: VercelResponse, userId: string, admin: AdminUser) {
+async function updateUser(
+  req: VercelRequest,
+  res: VercelResponse,
+  userId: string,
+  admin: AdminUser
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
     const { role, is_active } = req.body;
@@ -353,7 +372,12 @@ async function updateUser(req: VercelRequest, res: VercelResponse, userId: strin
   }
 }
 
-async function deleteUser(req: VercelRequest, res: VercelResponse, userId: string, admin: AdminUser) {
+async function deleteUser(
+  req: VercelRequest,
+  res: VercelResponse,
+  userId: string,
+  admin: AdminUser
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
@@ -362,16 +386,23 @@ async function deleteUser(req: VercelRequest, res: VercelResponse, userId: strin
     return res.status(400).json({ error: "Cannot delete your own account" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
-    const result = await pool.query(`DELETE FROM users WHERE id = $1 RETURNING id, email`, [userId]);
+    const result = await pool.query(
+      `DELETE FROM users WHERE id = $1 RETURNING id, email`,
+      [userId]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({ success: true, message: `User ${result.rows[0].email} deleted` });
+    res
+      .status(200)
+      .json({ success: true, message: `User ${result.rows[0].email} deleted` });
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Failed to delete user" });
@@ -380,7 +411,11 @@ async function deleteUser(req: VercelRequest, res: VercelResponse, userId: strin
   }
 }
 
-async function handleQuestions(req: VercelRequest, res: VercelResponse, admin: AdminUser) {
+async function handleQuestions(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
@@ -403,7 +438,9 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -439,12 +476,15 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
     }
 
     if (search) {
-      whereClauses.push(`(question_text ILIKE $${paramIndex} OR correct_answer ILIKE $${paramIndex})`);
+      whereClauses.push(
+        `(question_text ILIKE $${paramIndex} OR correct_answer ILIKE $${paramIndex})`
+      );
       params.push(`%${search}%`);
       paramIndex++;
     }
 
-    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     let orderByClause = "ORDER BY updated_at DESC";
     if (sort === "created_desc") orderByClause = "ORDER BY created_at DESC";
@@ -482,15 +522,29 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function updateQuestion(req: VercelRequest, res: VercelResponse, questionId: string) {
+async function updateQuestion(
+  req: VercelRequest,
+  res: VercelResponse,
+  questionId: string
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
-    const { question_text, correct_answer, wrong_answers, category, difficulty, is_active, audio_file } = req.body;
+    const {
+      question_text,
+      correct_answer,
+      wrong_answers,
+      category,
+      difficulty,
+      is_active,
+      audio_file,
+    } = req.body;
 
     const updates: string[] = [];
     const params: any[] = [];
@@ -545,7 +599,9 @@ async function updateQuestion(req: VercelRequest, res: VercelResponse, questionI
     updates.push(`updated_at = NOW()`);
     params.push(questionId);
 
-    const query = `UPDATE questions SET ${updates.join(", ")} WHERE id = $${paramIndex} RETURNING *`;
+    const query = `UPDATE questions SET ${updates.join(
+      ", "
+    )} WHERE id = $${paramIndex} RETURNING *`;
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
@@ -561,15 +617,24 @@ async function updateQuestion(req: VercelRequest, res: VercelResponse, questionI
   }
 }
 
-async function deleteQuestion(req: VercelRequest, res: VercelResponse, questionId: string) {
+async function deleteQuestion(
+  req: VercelRequest,
+  res: VercelResponse,
+  questionId: string
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
-    const result = await pool.query(`DELETE FROM questions WHERE id = $1 RETURNING id`, [questionId]);
+    const result = await pool.query(
+      `DELETE FROM questions WHERE id = $1 RETURNING id`,
+      [questionId]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Question not found" });
@@ -584,7 +649,11 @@ async function deleteQuestion(req: VercelRequest, res: VercelResponse, questionI
   }
 }
 
-async function handlePacks(req: VercelRequest, res: VercelResponse, admin: AdminUser) {
+async function handlePacks(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
@@ -607,7 +676,9 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -642,12 +713,15 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
     }
 
     if (search) {
-      whereClauses.push(`(name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`);
+      whereClauses.push(
+        `(name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`
+      );
       params.push(`%${search}%`);
       paramIndex++;
     }
 
-    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     const countQuery = `SELECT COUNT(*) as count FROM question_sets ${whereClause}`;
     const countResult = await pool.query(countQuery, params);
@@ -682,15 +756,29 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-async function updatePack(req: VercelRequest, res: VercelResponse, packId: string) {
+async function updatePack(
+  req: VercelRequest,
+  res: VercelResponse,
+  packId: string
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
-    const { name, slug, description, category, difficulty, is_active, is_premium } = req.body;
+    const {
+      name,
+      slug,
+      description,
+      category,
+      difficulty,
+      is_active,
+      is_premium,
+    } = req.body;
 
     const updates: string[] = [];
     const params: any[] = [];
@@ -745,7 +833,9 @@ async function updatePack(req: VercelRequest, res: VercelResponse, packId: strin
     updates.push(`updated_at = NOW()`);
     params.push(packId);
 
-    const query = `UPDATE question_sets SET ${updates.join(", ")} WHERE id = $${paramIndex} RETURNING *`;
+    const query = `UPDATE question_sets SET ${updates.join(
+      ", "
+    )} WHERE id = $${paramIndex} RETURNING *`;
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
@@ -761,21 +851,35 @@ async function updatePack(req: VercelRequest, res: VercelResponse, packId: strin
   }
 }
 
-async function deletePack(req: VercelRequest, res: VercelResponse, packId: string) {
+async function deletePack(
+  req: VercelRequest,
+  res: VercelResponse,
+  packId: string
+) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
   }
 
-  const pool = new Pool({ connectionString: process.env.POSTGRES_POSTGRES_URL });
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
 
   try {
-    const result = await pool.query(`DELETE FROM question_sets WHERE id = $1 RETURNING id, name`, [packId]);
+    const result = await pool.query(
+      `DELETE FROM question_sets WHERE id = $1 RETURNING id, name`,
+      [packId]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Pack not found" });
     }
 
-    res.status(200).json({ success: true, message: `Pack "${result.rows[0].name}" deleted` });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Pack "${result.rows[0].name}" deleted`,
+      });
   } catch (error) {
     console.error("Error deleting pack:", error);
     res.status(500).json({ error: "Failed to delete pack" });

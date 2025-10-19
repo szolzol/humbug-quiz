@@ -1341,7 +1341,10 @@ function apiRoutesPlugin(): PluginOption {
               LEFT JOIN question_sets qs ON q.set_id = qs.id
               LEFT JOIN answers a ON q.id = a.question_id
               ${whereClause}
-              GROUP BY q.id, qs.name
+              GROUP BY q.id, q.set_id, q.question_en, q.question_hu, q.category, 
+                       q.difficulty, q.source_name, q.source_url, q.order_index, 
+                       q.is_active, q.created_at, q.updated_at, q.times_played, 
+                       q.times_completed, qs.name
               ORDER BY q.created_at DESC
               LIMIT ${limit} OFFSET ${offset}
             `;
@@ -1390,9 +1393,22 @@ function apiRoutesPlugin(): PluginOption {
             return;
           } catch (error) {
             console.error("❌ Error fetching questions:", error);
+            console.error(
+              "Error details:",
+              error instanceof Error ? error.message : String(error)
+            );
+            console.error(
+              "Stack trace:",
+              error instanceof Error ? error.stack : "No stack trace"
+            );
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ error: "Internal server error" }));
+            res.end(
+              JSON.stringify({
+                error: "Internal server error",
+                message: error instanceof Error ? error.message : String(error),
+              })
+            );
             return;
           }
         }

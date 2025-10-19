@@ -28,9 +28,10 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       email: string;
       name: string;
       picture: string;
+      role?: string; // Role might not exist in old tokens
     };
 
-    // Return user info
+    // Return user info with role
     res.status(200).json({
       authenticated: true,
       user: {
@@ -38,6 +39,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
         email: decoded.email,
         name: decoded.name,
         picture: decoded.picture,
+        role: decoded.role || "free", // Default to 'free' if not present
       },
     });
   } catch (error) {

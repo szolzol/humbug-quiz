@@ -70,13 +70,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const userData = await userResponse.json();
     const { id, email, name, picture } = userData;
 
-    // Create JWT token with user info
+    // Save or update user in database and fetch role
+    let userRole = "free"; // Default role
+
+    if (process.env.POSTGRES_POSTGRES_URL) {
+      try {
+        const { neon } = await import("@neondatabase/serverless");
+        const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+        // Insert or update user in database
+        await sql`
+          INSERT INTO users (id, email, name, picture, last_login)
+          VALUES (${id}, ${email}, ${name}, ${picture}, NOW())
+          ON CONFLICT (id) 
+          DO UPDATE SET 
+            name = EXCLUDED.name,
+            picture = EXCLUDED.picture,
+            last_login = NOW(),
+            updated_at = NOW()
+        `;
+
+        // Fetch user role from database
+        const [dbUser] = await sql`
+          SELECT role FROM users WHERE id = ${id} LIMIT 1
+        `;
+
+        if (dbUser?.role) {
+          userRole = dbUser.role;
+        }
+      } catch (dbError) {
+        console.error("❌ Database error during OAuth:", dbError);
+        // Continue with default role if DB fails
+      }
+    }
+
+    // Create JWT token with user info AND role
     const token = jwt.sign(
       {
         userId: id,
         email,
         name,
         picture,
+        role: userRole, // Include role from database
       },
       jwtSecret,
       { expiresIn: "7d" } // Token valid for 7 days

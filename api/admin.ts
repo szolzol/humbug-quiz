@@ -16,30 +16,38 @@ import jwt from "jsonwebtoken";
  * - GET /api/admin?endpoint=activity&...filters
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const endpoint = req.query.endpoint as string;
+  try {
+    const endpoint = req.query.endpoint as string;
 
-  // Route to appropriate handler based on endpoint parameter
-  switch (endpoint) {
-    case "auth-check":
-      return handleAuthCheck(req, res);
+    // Route to appropriate handler based on endpoint parameter
+    switch (endpoint) {
+      case "auth-check":
+        return handleAuthCheck(req, res);
 
-    case "users":
-      return handleUsers(req, res);
+      case "users":
+        return handleUsers(req, res);
 
-    case "questions":
-      return handleQuestions(req, res);
+      case "questions":
+        return handleQuestions(req, res);
 
-    case "packs":
-      return handlePacks(req, res);
+      case "packs":
+        return handlePacks(req, res);
 
-    case "activity":
-      return handleActivity(req, res);
+      case "activity":
+        return handleActivity(req, res);
 
-    default:
-      res.status(404).json({
-        error: "Not found",
-        message: "Invalid admin endpoint",
-      });
+      default:
+        res.status(404).json({
+          error: "Not found",
+          message: "Invalid admin endpoint",
+        });
+    }
+  } catch (error) {
+    console.error("❌ Admin handler error:", error);
+    res.status(500).json({
+      error: "Internal server error",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
 
@@ -48,100 +56,111 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
  * GET /api/admin?endpoint=auth-check
  */
 async function handleAuthCheck(req: VercelRequest, res: VercelResponse) {
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (!jwtSecret) {
-    return res.status(500).json({
-      hasAccess: false,
-      role: null,
-      user: null,
-      error: "JWT secret not configured",
-    });
-  }
-
-  // Parse cookies from request
-  const cookies = parseCookie(req.headers.cookie || "");
-  const token = cookies.auth_token;
-
-  if (!token) {
-    return res.status(200).json({
-      hasAccess: false,
-      role: null,
-      user: null,
-    });
-  }
-
   try {
-    // Verify and decode JWT token
-    const decoded = jwt.verify(token, jwtSecret) as {
-      userId: string;
-      email: string;
-      name: string;
-      picture: string;
-      role?: string;
-    };
+    const jwtSecret = process.env.JWT_SECRET;
 
-    // Get role from token (or query database if needed)
-    let userRole = decoded.role || "free";
-    let userName = decoded.name;
-    let userEmail = decoded.email;
-    let userPicture = decoded.picture;
-    let isActive = true;
+    if (!jwtSecret) {
+      return res.status(500).json({
+        hasAccess: false,
+        role: null,
+        user: null,
+        error: "JWT secret not configured",
+      });
+    }
 
-    // Double-check role from database if available
-    if (process.env.POSTGRES_POSTGRES_URL) {
-      try {
-        const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+    // Parse cookies from request
+    const cookies = parseCookie(req.headers.cookie || "");
+    const token = cookies.auth_token;
 
-        const [dbUser] = await sql`
+    if (!token) {
+      return res.status(200).json({
+        hasAccess: false,
+        role: null,
+        user: null,
+      });
+    }
+
+    try {
+      // Verify and decode JWT token
+      const decoded = jwt.verify(token, jwtSecret) as {
+        userId: string;
+        email: string;
+        name: string;
+        picture: string;
+        role?: string;
+      };
+
+      // Get role from token (or query database if needed)
+      let userRole = decoded.role || "free";
+      let userName = decoded.name;
+      let userEmail = decoded.email;
+      let userPicture = decoded.picture;
+      let isActive = true;
+
+      // Double-check role from database if available
+      if (process.env.POSTGRES_POSTGRES_URL) {
+        try {
+          const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+          const [dbUser] = await sql`
           SELECT id, email, name, picture, role, is_active
           FROM users
           WHERE id = ${decoded.userId}
           LIMIT 1
         `;
 
-        if (!dbUser || !dbUser.is_active) {
-          return res.status(200).json({
-            hasAccess: false,
-            role: null,
-            user: null,
-          });
-        }
-
-        // Use database values (most up-to-date)
-        userRole = dbUser.role;
-        userName = dbUser.name;
-        userEmail = dbUser.email;
-        userPicture = dbUser.picture;
-        isActive = dbUser.is_active;
-      } catch (dbError) {
-        console.error("❌ Database error during admin check:", dbError);
-        // Fallback to token data if database fails
-      }
-    }
-
-    // Check if user has admin or creator role
-    const isAdmin = userRole === "admin" || userRole === "creator";
-
-    res.status(200).json({
-      hasAccess: isAdmin,
-      role: userRole,
-      user: isAdmin
-        ? {
-            id: decoded.userId,
-            email: userEmail,
-            name: userName,
-            picture: userPicture,
+          if (!dbUser || !dbUser.is_active) {
+            return res.status(200).json({
+              hasAccess: false,
+              role: null,
+              user: null,
+            });
           }
-        : null,
-    });
-  } catch (error) {
-    // Token invalid or expired
-    console.error("❌ Admin auth check error:", error);
-    res.status(200).json({
+
+          // Use database values (most up-to-date)
+          userRole = dbUser.role;
+          userName = dbUser.name;
+          userEmail = dbUser.email;
+          userPicture = dbUser.picture;
+          isActive = dbUser.is_active;
+        } catch (dbError) {
+          console.error("❌ Database error during admin check:", dbError);
+          // Fallback to token data if database fails
+        }
+      }
+
+      // Check if user has admin or creator role
+      const isAdmin = userRole === "admin" || userRole === "creator";
+
+      res.status(200).json({
+        hasAccess: isAdmin,
+        role: userRole,
+        user: isAdmin
+          ? {
+              id: decoded.userId,
+              email: userEmail,
+              name: userName,
+              picture: userPicture,
+            }
+          : null,
+      });
+    } catch (error) {
+      // Token invalid or expired
+      console.error("❌ Admin auth check error:", error);
+      res.status(200).json({
+        hasAccess: false,
+        role: null,
+        user: null,
+      });
+    }
+  } catch (outerError) {
+    // Catch any errors from the entire function
+    console.error("❌ Fatal error in handleAuthCheck:", outerError);
+    res.status(500).json({
       hasAccess: false,
       role: null,
       user: null,
+      error: outerError instanceof Error ? outerError.message : "Unknown error",
     });
   }
 }

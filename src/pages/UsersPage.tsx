@@ -31,6 +31,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Search, Filter, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { UserEditDialog } from "../components/admin/UserEditDialog";
 
 interface User {
   id: string;
@@ -69,6 +70,8 @@ export function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Fetch users
   const fetchUsers = async () => {
@@ -257,7 +260,13 @@ export function UsersPage() {
                         })}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingUser(user);
+                            setIsEditDialogOpen(true);
+                          }}>
                           <Edit size={16} className="mr-1" />
                           Edit
                         </Button>
@@ -310,6 +319,14 @@ export function UsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* User Edit Dialog */}
+      <UserEditDialog
+        user={editingUser}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUserUpdated={fetchUsers}
+      />
     </div>
   );
 }

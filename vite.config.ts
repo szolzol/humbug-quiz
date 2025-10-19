@@ -667,6 +667,370 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // Handle PUT /api/admin/users/:id - Update user
+        if (
+          req.method === "PUT" &&
+          req.url?.match(/^\/api\/admin\/users\/[^/]+$/)
+        ) {
+          try {
+            const userId = req.url.split("/").pop()!;
+
+            // Check admin authentication
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Database not configured" }));
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            // Verify admin role
+            const [adminUser] = await sql`
+              SELECT role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Get request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk.toString();
+            }
+            const updates = JSON.parse(body);
+
+            // Get current user data for activity logging
+            const [currentUser] = await sql`
+              SELECT id, email, name, role, is_active
+              FROM users
+              WHERE id = ${userId}
+              LIMIT 1
+            `;
+
+            if (!currentUser) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "User not found" }));
+              return;
+            }
+
+            // Track changes for activity log
+            const changes: Record<string, any> = {};
+
+            // Prepare update based on what changed
+            let updateQuery;
+
+            if (
+              updates.role !== undefined &&
+              updates.role !== currentUser.role &&
+              updates.is_active !== undefined &&
+              updates.is_active !== currentUser.is_active
+            ) {
+              // Both role and is_active changed
+              // Only creator can promote to admin
+              if (updates.role === "admin" && adminUser.role !== "creator") {
+                res.statusCode = 403;
+                res.setHeader("Content-Type", "application/json");
+                res.end(
+                  JSON.stringify({
+                    error: "Only creators can promote users to admin",
+                  })
+                );
+                return;
+              }
+
+              changes.role = { from: currentUser.role, to: updates.role };
+              changes.is_active = {
+                from: currentUser.is_active,
+                to: updates.is_active,
+              };
+
+              updateQuery = sql`
+                UPDATE users 
+                SET role = ${updates.role}, 
+                    is_active = ${updates.is_active},
+                    updated_at = NOW()
+                WHERE id = ${userId}
+              `;
+            } else if (
+              updates.role !== undefined &&
+              updates.role !== currentUser.role
+            ) {
+              // Only role changed
+              if (updates.role === "admin" && adminUser.role !== "creator") {
+                res.statusCode = 403;
+                res.setHeader("Content-Type", "application/json");
+                res.end(
+                  JSON.stringify({
+                    error: "Only creators can promote users to admin",
+                  })
+                );
+                return;
+              }
+
+              changes.role = { from: currentUser.role, to: updates.role };
+
+              updateQuery = sql`
+                UPDATE users 
+                SET role = ${updates.role}, 
+                    updated_at = NOW()
+                WHERE id = ${userId}
+              `;
+            } else if (
+              updates.is_active !== undefined &&
+              updates.is_active !== currentUser.is_active
+            ) {
+              // Only is_active changed
+              changes.is_active = {
+                from: currentUser.is_active,
+                to: updates.is_active,
+              };
+
+              updateQuery = sql`
+                UPDATE users 
+                SET is_active = ${updates.is_active}, 
+                    updated_at = NOW()
+                WHERE id = ${userId}
+              `;
+            } else {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "No valid updates provided" }));
+              return;
+            }
+
+            // Execute update
+            await updateQuery;
+
+            // Log activity
+            const activityDetails = {
+              changes,
+              targetUser: {
+                id: currentUser.id,
+                email: currentUser.email,
+                name: currentUser.name,
+              },
+            };
+
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id,
+                action_type,
+                entity_type,
+                entity_id,
+                details,
+                ip_address,
+                user_agent
+              ) VALUES (
+                ${sessionData.id},
+                'update',
+                'user',
+                ${userId},
+                ${JSON.stringify(activityDetails)},
+                ${req.socket.remoteAddress || null},
+                ${req.headers["user-agent"] || null}
+              )
+            `;
+
+            // Get updated user
+            const [updatedUser] = await sql`
+              SELECT id, email, name, picture, role, is_active, created_at, last_login, updated_at
+              FROM users
+              WHERE id = ${userId}
+              LIMIT 1
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ user: updatedUser }));
+            return;
+          } catch (error) {
+            console.error("❌ Error updating user:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle DELETE /api/admin/users/:id - Delete user
+        if (
+          req.method === "DELETE" &&
+          req.url?.match(/^\/api\/admin\/users\/[^/]+$/)
+        ) {
+          try {
+            const userId = req.url.split("/").pop()!;
+
+            // Check admin authentication
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Database not configured" }));
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            // Verify admin role
+            const [adminUser] = await sql`
+              SELECT role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Prevent self-deletion
+            if (userId === sessionData.id) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Cannot delete your own account" })
+              );
+              return;
+            }
+
+            // Get user data for activity logging
+            const [userToDelete] = await sql`
+              SELECT id, email, name, role
+              FROM users
+              WHERE id = ${userId}
+              LIMIT 1
+            `;
+
+            if (!userToDelete) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "User not found" }));
+              return;
+            }
+
+            // Delete user (CASCADE will handle related records)
+            await sql`DELETE FROM users WHERE id = ${userId}`;
+
+            // Log activity
+            const activityDetails = {
+              deletedUser: {
+                id: userToDelete.id,
+                email: userToDelete.email,
+                name: userToDelete.name,
+                role: userToDelete.role,
+              },
+            };
+
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id,
+                action_type,
+                entity_type,
+                entity_id,
+                details,
+                ip_address,
+                user_agent
+              ) VALUES (
+                ${sessionData.id},
+                'delete',
+                'user',
+                ${userId},
+                ${JSON.stringify(activityDetails)},
+                ${req.socket.remoteAddress || null},
+                ${req.headers["user-agent"] || null}
+              )
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true }));
+            return;
+          } catch (error) {
+            console.error("❌ Error deleting user:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
         // Handle /api/question-sets (with or without query string)
         if (req.url?.startsWith("/api/question-sets")) {
           try {

@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import type { IncomingMessage, ServerResponse } from "http";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import jwt from "jsonwebtoken";
 
 export interface AuthUser {
@@ -139,20 +140,29 @@ export async function getAuthUser(
  * Returns user or sends 401 response
  */
 export async function requireAuth(
-  req: IncomingMessage,
-  res: ServerResponse
+  req: IncomingMessage | VercelRequest,
+  res: ServerResponse | VercelResponse
 ): Promise<AuthUser | null> {
   const user = await getAuthUser(req);
 
   if (!user) {
-    res.statusCode = 401;
-    res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
+    if ("status" in res) {
+      // VercelResponse
+      res.status(401).json({
         error: "Unauthorized",
         message: "Authentication required. Please log in.",
-      })
-    );
+      });
+    } else {
+      // ServerResponse
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Authentication required. Please log in.",
+        })
+      );
+    }
     return null;
   }
 
@@ -164,23 +174,31 @@ export async function requireAuth(
  * Returns user or sends 403 response
  */
 export async function requireAdmin(
-  req: IncomingMessage,
-  res: ServerResponse
+  req: IncomingMessage | VercelRequest,
+  res: ServerResponse | VercelResponse
 ): Promise<AdminUser | null> {
   const user = await requireAuth(req, res);
 
   if (!user) return null;
 
   if (user.role !== "admin" && user.role !== "creator") {
-    res.statusCode = 403;
-    res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
+    if ("status" in res) {
+      // VercelResponse
+      res.status(403).json({
         error: "Forbidden",
-        message:
-          "Admin access required. You do not have permission to access this resource.",
-      })
-    );
+        message: "Admin or creator access required. Your role: " + user.role,
+      });
+    } else {
+      // ServerResponse
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Forbidden",
+          message: "Admin or creator access required. Your role: " + user.role,
+        })
+      );
+    }
     return null;
   }
 

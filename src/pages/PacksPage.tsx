@@ -170,7 +170,7 @@ export function PacksPage() {
         params.append("is_published", "false");
       }
 
-      const response = await fetch(`/api/admin/packs?${params}`);
+      const response = await fetch(`/api/admin?endpoint=packs&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch packs");
       }

@@ -92,7 +92,7 @@ export function ActivityPage() {
         params.append("end_date", endDate);
       }
 
-      const response = await fetch(`/api/admin/activity?${params}`);
+      const response = await fetch(`/api/admin?endpoint=activity&${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch activity logs");
       }

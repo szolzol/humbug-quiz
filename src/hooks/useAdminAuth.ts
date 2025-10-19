@@ -27,7 +27,7 @@ export function useAdminAuth(): AdminAuthStatus {
   useEffect(() => {
     async function checkAdminAccess() {
       try {
-        const response = await fetch("/api/admin/auth/check", {
+        const response = await fetch("/api/admin?endpoint=auth-check", {
           credentials: "include",
         });
 

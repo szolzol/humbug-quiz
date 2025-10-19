@@ -2095,6 +2095,567 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // ================================================================
+        // PACK MANAGEMENT API ENDPOINTS
+        // ================================================================
+
+        // Handle GET /api/admin/packs - List all packs (admin only)
+        if (
+          req.method === "GET" &&
+          (req.url === "/api/admin/packs" ||
+            req.url?.startsWith("/api/admin/packs?"))
+        ) {
+          try {
+            // Verify admin permissions (same auth as other admin endpoints)
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              adminUser.role !== "admin" ||
+              !adminUser.is_active
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden" }));
+              return;
+            }
+
+            // Parse query parameters for filtering
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const packType = url.searchParams.get("pack_type") || "all";
+            const accessLevel = url.searchParams.get("access_level") || "all";
+            const isActive = url.searchParams.get("is_active") || "all";
+            const isPublished = url.searchParams.get("is_published") || "all";
+
+            // Build WHERE clause
+            const conditions: string[] = [];
+            if (packType !== "all")
+              conditions.push(`pack_type = '${packType}'`);
+            if (accessLevel !== "all")
+              conditions.push(`access_level = '${accessLevel}'`);
+            if (isActive !== "all")
+              conditions.push(`is_active = ${isActive === "active"}`);
+            if (isPublished !== "all")
+              conditions.push(`is_published = ${isPublished === "published"}`);
+
+            const whereClause =
+              conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+            // Use Pool for dynamic query
+            const pool = new Pool({
+              connectionString: process.env.POSTGRES_POSTGRES_URL!,
+            });
+
+            const packsQuery = `
+              SELECT 
+                id, slug, name_en, name_hu, description_en, description_hu,
+                access_level, pack_type, is_active, is_published,
+                cover_image_url, icon_url, display_order,
+                creator_id, created_at, updated_at, published_at,
+                question_count, total_plays, metadata
+              FROM question_sets
+              ${whereClause}
+              ORDER BY display_order ASC, created_at DESC
+            `;
+
+            const result = await pool.query(packsQuery);
+            const packs = result.rows;
+            await pool.end();
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: true,
+                packs,
+                total: packs.length,
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("Error fetching packs:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle GET /api/admin/packs/:id - Get single pack details
+        if (
+          req.method === "GET" &&
+          req.url?.match(/^\/api\/admin\/packs\/\d+$/)
+        ) {
+          try {
+            // Auth check (same as above)
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role FROM users WHERE id = ${sessionData.id}
+            `;
+
+            if (!adminUser || adminUser.role !== "admin") {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden" }));
+              return;
+            }
+
+            // Get pack ID from URL
+            const packId = parseInt(req.url.split("/").pop()!);
+
+            // Fetch pack details
+            const [pack] = await sql`
+              SELECT 
+                id, slug, name_en, name_hu, description_en, description_hu,
+                access_level, pack_type, is_active, is_published,
+                cover_image_url, icon_url, display_order,
+                creator_id, created_at, updated_at, published_at,
+                question_count, total_plays, metadata
+              FROM question_sets
+              WHERE id = ${packId}
+            `;
+
+            if (!pack) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Pack not found" }));
+              return;
+            }
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true, pack }));
+            return;
+          } catch (error) {
+            console.error("Error fetching pack:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle POST /api/admin/packs - Create new pack
+        if (req.method === "POST" && req.url === "/api/admin/packs") {
+          try {
+            // Auth check
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, name FROM users WHERE id = ${sessionData.id}
+            `;
+
+            if (!adminUser || adminUser.role !== "admin") {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden" }));
+              return;
+            }
+
+            // Parse request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk;
+            }
+            const data = JSON.parse(body);
+
+            // Validate required fields
+            if (!data.slug || !data.name_en || !data.name_hu) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Missing required fields" }));
+              return;
+            }
+
+            // Create new pack
+            const [newPack] = await sql`
+              INSERT INTO question_sets (
+                slug, name_en, name_hu, description_en, description_hu,
+                access_level, pack_type, is_active, is_published,
+                display_order, creator_id
+              ) VALUES (
+                ${data.slug},
+                ${data.name_en},
+                ${data.name_hu},
+                ${data.description_en || ""},
+                ${data.description_hu || ""},
+                ${data.access_level || "free"},
+                ${data.pack_type || "quiz"},
+                ${data.is_active !== undefined ? data.is_active : true},
+                ${data.is_published !== undefined ? data.is_published : false},
+                ${data.display_order || 0},
+                ${adminUser.id}
+              )
+              RETURNING *
+            `;
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id, action_type, entity_type, entity_id, details
+              ) VALUES (
+                ${adminUser.id},
+                'create',
+                'pack',
+                ${newPack.id},
+                ${{
+                  pack_name: data.name_en,
+                  pack_type: data.pack_type || "quiz",
+                  access_level: data.access_level || "free",
+                  admin_name: adminUser.name,
+                }}
+              )
+            `;
+
+            res.statusCode = 201;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true, pack: newPack }));
+            return;
+          } catch (error) {
+            console.error("Error creating pack:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle PUT /api/admin/packs/:id - Update pack
+        if (
+          req.method === "PUT" &&
+          req.url?.match(/^\/api\/admin\/packs\/\d+$/)
+        ) {
+          try {
+            // Auth check
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, name FROM users WHERE id = ${sessionData.id}
+            `;
+
+            if (!adminUser || adminUser.role !== "admin") {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden" }));
+              return;
+            }
+
+            // Get pack ID
+            const packId = parseInt(req.url.split("/").pop()!);
+
+            // Parse request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk;
+            }
+            const data = JSON.parse(body);
+
+            // Get old pack data for activity log
+            const [oldPack] = await sql`
+              SELECT * FROM question_sets WHERE id = ${packId}
+            `;
+
+            if (!oldPack) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Pack not found" }));
+              return;
+            }
+
+            // Update pack
+            const [updatedPack] = await sql`
+              UPDATE question_sets
+              SET
+                slug = ${data.slug || oldPack.slug},
+                name_en = ${data.name_en || oldPack.name_en},
+                name_hu = ${data.name_hu || oldPack.name_hu},
+                description_en = ${
+                  data.description_en !== undefined
+                    ? data.description_en
+                    : oldPack.description_en
+                },
+                description_hu = ${
+                  data.description_hu !== undefined
+                    ? data.description_hu
+                    : oldPack.description_hu
+                },
+                access_level = ${data.access_level || oldPack.access_level},
+                pack_type = ${data.pack_type || oldPack.pack_type},
+                is_active = ${
+                  data.is_active !== undefined
+                    ? data.is_active
+                    : oldPack.is_active
+                },
+                is_published = ${
+                  data.is_published !== undefined
+                    ? data.is_published
+                    : oldPack.is_published
+                },
+                display_order = ${
+                  data.display_order !== undefined
+                    ? data.display_order
+                    : oldPack.display_order
+                },
+                updated_at = NOW()
+              WHERE id = ${packId}
+              RETURNING *
+            `;
+
+            // Build changes log
+            const changes: any = {};
+            if (data.name_en && data.name_en !== oldPack.name_en)
+              changes.name_en = { old: oldPack.name_en, new: data.name_en };
+            if (data.name_hu && data.name_hu !== oldPack.name_hu)
+              changes.name_hu = { old: oldPack.name_hu, new: data.name_hu };
+            if (data.access_level && data.access_level !== oldPack.access_level)
+              changes.access_level = {
+                old: oldPack.access_level,
+                new: data.access_level,
+              };
+            if (data.pack_type && data.pack_type !== oldPack.pack_type)
+              changes.pack_type = {
+                old: oldPack.pack_type,
+                new: data.pack_type,
+              };
+            if (
+              data.is_active !== undefined &&
+              data.is_active !== oldPack.is_active
+            )
+              changes.is_active = {
+                old: oldPack.is_active,
+                new: data.is_active,
+              };
+            if (
+              data.is_published !== undefined &&
+              data.is_published !== oldPack.is_published
+            )
+              changes.is_published = {
+                old: oldPack.is_published,
+                new: data.is_published,
+              };
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id, action_type, entity_type, entity_id, details
+              ) VALUES (
+                ${adminUser.id},
+                'update',
+                'pack',
+                ${packId},
+                ${{
+                  pack_name: updatedPack.name_en,
+                  changes,
+                  admin_name: adminUser.name,
+                }}
+              )
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true, pack: updatedPack }));
+            return;
+          } catch (error) {
+            console.error("Error updating pack:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle DELETE /api/admin/packs/:id - Delete pack
+        if (
+          req.method === "DELETE" &&
+          req.url?.match(/^\/api\/admin\/packs\/\d+$/)
+        ) {
+          try {
+            // Auth check
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, name FROM users WHERE id = ${sessionData.id}
+            `;
+
+            if (!adminUser || adminUser.role !== "admin") {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Forbidden" }));
+              return;
+            }
+
+            // Get pack ID
+            const packId = parseInt(req.url.split("/").pop()!);
+
+            // Get pack details for logging
+            const [pack] = await sql`
+              SELECT name_en, question_count FROM question_sets WHERE id = ${packId}
+            `;
+
+            if (!pack) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Pack not found" }));
+              return;
+            }
+
+            // Check if pack has questions
+            if (pack.question_count > 0) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({
+                  error:
+                    "Cannot delete pack with questions. Remove questions first.",
+                })
+              );
+              return;
+            }
+
+            // Delete pack
+            await sql`
+              DELETE FROM question_sets WHERE id = ${packId}
+            `;
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id, action_type, entity_type, entity_id, details
+              ) VALUES (
+                ${adminUser.id},
+                'delete',
+                'pack',
+                ${packId},
+                ${{
+                  pack_name: pack.name_en,
+                  admin_name: adminUser.name,
+                }}
+              )
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: true,
+                message: "Pack deleted successfully",
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("Error deleting pack:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
         // Handle /api/question-sets (with or without query string)
         if (req.url?.startsWith("/api/question-sets")) {
           try {

@@ -32,6 +32,18 @@ CREATE TYPE grant_source AS ENUM ('signup', 'purchase', 'admin', 'promotion', 'c
 -- Question difficulty (for future use)
 CREATE TYPE difficulty_level AS ENUM ('easy', 'medium', 'hard', 'expert');
 
+-- Pack type enum (content type classification)
+CREATE TYPE pack_type AS ENUM (
+  'quiz',              -- Standard trivia quiz (default)
+  'challenge',         -- Timed challenges or competitive mode
+  'learning',          -- Educational content with explanations
+  'party',             -- Party game mode with special rules
+  'kids',              -- Kid-friendly content
+  'expert',            -- Advanced/expert level content
+  'seasonal',          -- Holiday or seasonal content
+  'custom'             -- User-created or special packs
+);
+
 -- Game session status
 CREATE TYPE session_status AS ENUM ('in_progress', 'completed', 'abandoned');
 
@@ -112,6 +124,7 @@ CREATE TABLE question_sets (
   
   -- Access control
   access_level access_level DEFAULT 'free' NOT NULL,
+  pack_type pack_type DEFAULT 'quiz' NOT NULL,
   is_active BOOLEAN DEFAULT true NOT NULL,
   is_published BOOLEAN DEFAULT false NOT NULL,
   
@@ -149,6 +162,7 @@ CREATE TABLE question_sets (
 -- Indexes
 CREATE INDEX idx_question_sets_slug ON question_sets(slug);
 CREATE INDEX idx_question_sets_access_level ON question_sets(access_level);
+CREATE INDEX idx_question_sets_pack_type ON question_sets(pack_type);
 CREATE INDEX idx_question_sets_is_active ON question_sets(is_active, is_published);
 CREATE INDEX idx_question_sets_creator ON question_sets(creator_id);
 CREATE INDEX idx_question_sets_display_order ON question_sets(display_order);

@@ -12,6 +12,12 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -23,8 +29,11 @@ import {
   ChevronRight,
   Plus,
   Search,
+  Filter,
   FileQuestion,
+  Edit2,
 } from "lucide-react";
+import { QuestionEditDialog } from "../components/admin/QuestionEditDialog";
 
 interface Question {
   id: number;
@@ -69,8 +78,41 @@ export function QuestionsPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [packFilter, setPackFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("updated_desc");
+
+  // Available question sets for filter
+  const [questionSets, setQuestionSets] = useState<
+    Array<{
+      id: number;
+      name_en: string;
+      name_hu: string;
+      slug: string;
+    }>
+  >([]);
+
+  // Edit dialog state
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
+    null
+  );
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Fetch question sets for filter
+  useEffect(() => {
+    const fetchQuestionSets = async () => {
+      try {
+        const response = await fetch("/api/question-sets");
+        if (response.ok) {
+          const data = await response.json();
+          setQuestionSets(data.sets || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch question sets:", error);
+      }
+    };
+    fetchQuestionSets();
+  }, []);
 
   // Debounced search
   useEffect(() => {
@@ -90,9 +132,10 @@ export function QuestionsPage() {
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
         category: categoryFilter,
-        difficulty: difficultyFilter,
+        set_id: packFilter,
         is_active: statusFilter,
         search: searchQuery,
+        sort: sortBy,
       });
 
       const response = await fetch(`/api/admin/questions?${params}`);
@@ -112,7 +155,7 @@ export function QuestionsPage() {
 
   useEffect(() => {
     fetchQuestions();
-  }, [pagination.page, categoryFilter, difficultyFilter, statusFilter]);
+  }, [pagination.page, categoryFilter, packFilter, statusFilter, sortBy]);
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
@@ -131,113 +174,135 @@ export function QuestionsPage() {
     );
   };
 
-  const getDifficultyBadge = (difficulty: string | null) => {
-    if (!difficulty) return <Badge variant="outline">—</Badge>;
+  const handleEditQuestion = (question: Question) => {
+    setSelectedQuestion(question);
+    setIsEditDialogOpen(true);
+  };
 
-    const colors: Record<string, string> = {
-      easy: "bg-green-50 text-green-700 border-green-200",
-      medium: "bg-yellow-50 text-yellow-700 border-yellow-200",
-      hard: "bg-red-50 text-red-700 border-red-200",
-    };
-
-    return (
-      <Badge variant="outline" className={colors[difficulty] || ""}>
-        {difficulty}
-      </Badge>
-    );
+  const handleNewQuestion = () => {
+    setSelectedQuestion(null);
+    setIsEditDialogOpen(true);
   };
 
   return (
     <div className="p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Question Management</h1>
-          <p className="text-muted-foreground">
-            Manage quiz questions and answers
-          </p>
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Question Management</h1>
+            <p className="text-muted-foreground">
+              Manage quiz questions and answers
+            </p>
+          </div>
+          <Button onClick={handleNewQuestion}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Question
+          </Button>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          New Question
-        </Button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="col-span-1 md:col-span-2 lg:col-span-1">
-            <label className="text-sm font-medium mb-2 block">Search</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search questions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter size={20} />
+            Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-5">
+            <div className="md:col-span-1">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  size={16}
+                />
+                <Input
+                  placeholder="Search questions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All categories</SelectItem>
+                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="travel">Travel</SelectItem>
+                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="technology">Technology</SelectItem>
+                  <SelectItem value="gastronomy">Gastronomy</SelectItem>
+                  <SelectItem value="culture">Culture</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Select value={packFilter} onValueChange={setPackFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All packs" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All packs</SelectItem>
+                  {questionSets.map((set) => (
+                    <SelectItem key={set.id} value={set.id.toString()}>
+                      {set.name_en || set.name_hu || "Unnamed Pack"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="created_desc">Created (Newest)</SelectItem>
+                  <SelectItem value="created_asc">Created (Oldest)</SelectItem>
+                  <SelectItem value="updated_desc">Updated (Newest)</SelectItem>
+                  <SelectItem value="updated_asc">Updated (Oldest)</SelectItem>
+                  <SelectItem value="played_desc">Most Played</SelectItem>
+                  <SelectItem value="played_asc">Least Played</SelectItem>
+                  <SelectItem value="completed_desc">Most Completed</SelectItem>
+                  <SelectItem value="completed_asc">Least Completed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Category</label>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All categories</SelectItem>
-                <SelectItem value="entertainment">Entertainment</SelectItem>
-                <SelectItem value="travel">Travel</SelectItem>
-                <SelectItem value="sports">Sports</SelectItem>
-                <SelectItem value="technology">Technology</SelectItem>
-                <SelectItem value="gastronomy">Gastronomy</SelectItem>
-                <SelectItem value="culture">Culture</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Difficulty</label>
-            <Select
-              value={difficultyFilter}
-              onValueChange={setDifficultyFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All difficulties" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All difficulties</SelectItem>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Status</label>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Questions Table */}
-      <div className="bg-white rounded-lg border">
+      <Card>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Question</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Difficulty</TableHead>
+              <TableHead>Created</TableHead>
               <TableHead>Answers</TableHead>
               <TableHead>Set</TableHead>
               <TableHead>Stats</TableHead>
@@ -277,8 +342,10 @@ export function QuestionsPage() {
                     </div>
                   </TableCell>
                   <TableCell>{getCategoryBadge(question.category)}</TableCell>
-                  <TableCell>
-                    {getDifficultyBadge(question.difficulty)}
+                  <TableCell className="text-sm text-muted-foreground">
+                    {formatDistanceToNow(new Date(question.createdAt), {
+                      addSuffix: true,
+                    })}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{question.answerCount}</Badge>
@@ -321,7 +388,11 @@ export function QuestionsPage() {
                     })}
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditQuestion(question)}>
+                      <Edit2 className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </TableCell>
@@ -366,7 +437,15 @@ export function QuestionsPage() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
+
+      {/* Edit Dialog */}
+      <QuestionEditDialog
+        question={selectedQuestion}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onQuestionUpdated={fetchQuestions}
+      />
     </div>
   );
 }

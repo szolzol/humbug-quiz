@@ -5,7 +5,7 @@ import { defineConfig, PluginOption, ViteDevServer } from "vite";
 import sparkPlugin from "@github/spark/spark-vite-plugin";
 import createIconImportProxy from "@github/spark/vitePhosphorIconProxyPlugin";
 import { resolve } from "path";
-import { neon } from "@neondatabase/serverless";
+import { neon, Pool } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
 // Load environment variables for development
@@ -1249,6 +1249,7 @@ function apiRoutesPlugin(): PluginOption {
 
             // Verify admin permissions
             const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
             const [adminUser] = await sql`
               SELECT id, role, is_active
               FROM users
@@ -1275,8 +1276,9 @@ function apiRoutesPlugin(): PluginOption {
             const limit = parseInt(url.searchParams.get("limit") || "50");
             const search = url.searchParams.get("search") || "";
             const category = url.searchParams.get("category") || "all";
-            const difficulty = url.searchParams.get("difficulty") || "all";
+            const setId = url.searchParams.get("set_id") || "all";
             const isActive = url.searchParams.get("is_active") || "all";
+            const sort = url.searchParams.get("sort") || "updated_desc";
 
             const offset = (page - 1) * limit;
 
@@ -1294,8 +1296,8 @@ function apiRoutesPlugin(): PluginOption {
               conditions.push(`q.category = '${category}'`);
             }
 
-            if (difficulty !== "all") {
-              conditions.push(`q.difficulty = '${difficulty}'`);
+            if (setId !== "all") {
+              conditions.push(`q.set_id = ${parseInt(setId)}`);
             }
 
             if (isActive !== "all") {
@@ -1308,17 +1310,52 @@ function apiRoutesPlugin(): PluginOption {
               whereClause = `WHERE ${conditions.join(" AND ")}`;
             }
 
-            // Get total count
-            const countQuery = `
-              SELECT COUNT(*) as total
-              FROM questions q
-              ${whereClause}
-            `;
+            // Build ORDER BY clause
+            let orderByClause = "ORDER BY q.updated_at DESC";
+            switch (sort) {
+              case "created_desc":
+                orderByClause = "ORDER BY q.created_at DESC";
+                break;
+              case "created_asc":
+                orderByClause = "ORDER BY q.created_at ASC";
+                break;
+              case "updated_desc":
+                orderByClause = "ORDER BY q.updated_at DESC";
+                break;
+              case "updated_asc":
+                orderByClause = "ORDER BY q.updated_at ASC";
+                break;
+              case "played_desc":
+                orderByClause = "ORDER BY q.times_played DESC";
+                break;
+              case "played_asc":
+                orderByClause = "ORDER BY q.times_played ASC";
+                break;
+              case "completed_desc":
+                orderByClause = "ORDER BY q.times_completed DESC";
+                break;
+              case "completed_asc":
+                orderByClause = "ORDER BY q.times_completed ASC";
+                break;
+            }
 
-            const countResult = await sql.unsafe(countQuery);
-            const total = parseInt((countResult as any)[0].total);
+            // Get total count
+            let countResult: any;
+            if (conditions.length === 0) {
+              countResult = await sql`SELECT COUNT(*) as total FROM questions`;
+            } else {
+              const countQuery = `SELECT COUNT(*) as total FROM questions q ${whereClause}`;
+              countResult = await sql.unsafe(countQuery);
+            }
+
+            const total = parseInt(countResult[0]?.total || "0");
 
             // Get questions with answer counts
+            // Use Pool for raw SQL execution since sql.unsafe() doesn't work as expected
+            const pool = new Pool({
+              connectionString: process.env.POSTGRES_POSTGRES_URL!,
+            });
+
             const questionsQuery = `
               SELECT 
                 q.id,
@@ -1335,23 +1372,23 @@ function apiRoutesPlugin(): PluginOption {
                 q.updated_at,
                 q.times_played,
                 q.times_completed,
-                qs.name as set_name,
-                COUNT(a.id) as answer_count
+                question_sets.name_en as set_name,
+                COUNT(answers.id) as answer_count
               FROM questions q
-              LEFT JOIN question_sets qs ON q.set_id = qs.id
-              LEFT JOIN answers a ON q.id = a.question_id
+              LEFT JOIN question_sets ON q.set_id = question_sets.id
+              LEFT JOIN answers ON q.id = answers.question_id
               ${whereClause}
               GROUP BY q.id, q.set_id, q.question_en, q.question_hu, q.category, 
                        q.difficulty, q.source_name, q.source_url, q.order_index, 
                        q.is_active, q.created_at, q.updated_at, q.times_played, 
-                       q.times_completed, qs.name
-              ORDER BY q.created_at DESC
+                       q.times_completed, question_sets.name_en
+              ${orderByClause}
               LIMIT ${limit} OFFSET ${offset}
             `;
 
-            const questions = (await sql.unsafe(
-              questionsQuery
-            )) as unknown as any[];
+            const result = await pool.query(questionsQuery);
+            const questions = result.rows as any[];
+            await pool.end();
 
             // Calculate pagination
             const totalPages = Math.ceil(total / limit);
@@ -1392,14 +1429,488 @@ function apiRoutesPlugin(): PluginOption {
             );
             return;
           } catch (error) {
-            console.error("❌ Error fetching questions:", error);
+            console.error("Error fetching questions:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                error: "Internal server error",
+              })
+            );
+            return;
+          }
+        }
+
+        // Handle /api/admin/questions/:id - Get single question with answers
+        if (
+          req.method === "GET" &&
+          req.url?.match(/^\/api\/admin\/questions\/\d+\/answers/)
+        ) {
+          try {
+            const questionId = parseInt(req.url.split("/")[4]);
+
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Get answers for question
+            const answers = await sql`
+              SELECT 
+                id,
+                answer_en,
+                answer_hu,
+                order_index,
+                is_alternative,
+                parent_answer_id,
+                times_given,
+                created_at
+              FROM answers
+              WHERE question_id = ${questionId}
+              ORDER BY order_index ASC
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ answers }));
+            return;
+          } catch (error) {
+            console.error("Error fetching answers:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle POST /api/admin/questions - Create new question
+        if (req.method === "POST" && req.url === "/api/admin/questions") {
+          try {
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Parse request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk.toString();
+            }
+            const data = JSON.parse(body);
+
+            // Validate required fields
+            if (!data.question_en || !data.question_hu || !data.category) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Missing required fields" }));
+              return;
+            }
+
+            if (!data.answers || data.answers.length === 0) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "At least one answer is required" })
+              );
+              return;
+            }
+
+            // Get default question set (id=1) - or you can make this selectable
+            const [defaultSet] = await sql`
+              SELECT id FROM question_sets ORDER BY id ASC LIMIT 1
+            `;
+
+            if (!defaultSet) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "No question sets available" }));
+              return;
+            }
+
+            // Get max order_index for the set
+            const [maxOrder] = await sql`
+              SELECT COALESCE(MAX(order_index), -1) as max_order
+              FROM questions
+              WHERE set_id = ${defaultSet.id}
+            `;
+
+            const newOrderIndex = (maxOrder?.max_order || -1) + 1;
+
+            // Create question
+            const [newQuestion] = await sql`
+              INSERT INTO questions (
+                set_id,
+                question_en,
+                question_hu,
+                category,
+                difficulty,
+                source_name,
+                source_url,
+                order_index,
+                is_active
+              ) VALUES (
+                ${defaultSet.id},
+                ${data.question_en},
+                ${data.question_hu},
+                ${data.category},
+                ${data.difficulty || null},
+                ${data.source_name || null},
+                ${data.source_url || null},
+                ${newOrderIndex},
+                ${data.is_active !== undefined ? data.is_active : true}
+              )
+              RETURNING id
+            `;
+
+            // Create answers
+            for (const answer of data.answers) {
+              await sql`
+                INSERT INTO answers (
+                  question_id,
+                  answer_en,
+                  answer_hu,
+                  order_index,
+                  is_alternative
+                ) VALUES (
+                  ${newQuestion.id},
+                  ${answer.answer_en},
+                  ${answer.answer_hu},
+                  ${answer.order_index},
+                  ${answer.is_alternative || false}
+                )
+              `;
+            }
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id,
+                action_type,
+                entity_type,
+                entity_id,
+                details
+              ) VALUES (
+                ${sessionData.id},
+                'create',
+                'question',
+                ${newQuestion.id.toString()},
+                ${JSON.stringify({
+                  question_en: data.question_en,
+                  question_hu: data.question_hu,
+                  category: data.category,
+                  difficulty: data.difficulty,
+                  answer_count: data.answers.length,
+                })}
+              )
+            `;
+
+            res.statusCode = 201;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ id: newQuestion.id, success: true }));
+            return;
+          } catch (error) {
+            console.error("Error creating question:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle PUT /api/admin/questions/:id - Update question
+        if (
+          req.method === "PUT" &&
+          req.url?.match(/^\/api\/admin\/questions\/\d+$/)
+        ) {
+          try {
+            const questionId = parseInt(req.url.split("/")[4]);
+
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Get existing question for logging
+            const [existingQuestion] = await sql`
+              SELECT question_en, question_hu, category, difficulty, is_active
+              FROM questions
+              WHERE id = ${questionId}
+            `;
+
+            if (!existingQuestion) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Question not found" }));
+              return;
+            }
+
+            // Parse request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk.toString();
+            }
+            const data = JSON.parse(body);
+
+            console.log("📝 Updating question", questionId, "with data:", {
+              question_en: data.question_en?.substring(0, 50),
+              question_hu: data.question_hu?.substring(0, 50),
+              category: data.category,
+              difficulty: data.difficulty,
+              answersCount: data.answers?.length,
+            });
+
+            // Update question
+            await sql`
+              UPDATE questions
+              SET
+                question_en = ${data.question_en},
+                question_hu = ${data.question_hu},
+                category = ${data.category},
+                difficulty = ${data.difficulty || null},
+                source_name = ${data.source_name || null},
+                source_url = ${data.source_url || null},
+                is_active = ${
+                  data.is_active !== undefined ? data.is_active : true
+                },
+                updated_at = NOW()
+              WHERE id = ${questionId}
+            `;
+
+            console.log("✅ Question updated, now updating answers...");
+
+            // Update answers - delete old ones and create new ones
+            await sql`DELETE FROM answers WHERE question_id = ${questionId}`;
+
+            console.log(
+              "✅ Old answers deleted, inserting",
+              data.answers?.length,
+              "new answers..."
+            );
+
+            for (const answer of data.answers) {
+              await sql`
+                INSERT INTO answers (
+                  question_id,
+                  answer_en,
+                  answer_hu,
+                  order_index,
+                  is_alternative
+                ) VALUES (
+                  ${questionId},
+                  ${answer.answer_en},
+                  ${answer.answer_hu},
+                  ${answer.order_index},
+                  ${answer.is_alternative || false}
+                )
+              `;
+            }
+
+            console.log("✅ Answers inserted, building changes log...");
+
+            // Build changes object for logging
+            const changes: any = {};
+            if (existingQuestion.question_en !== data.question_en) {
+              changes.question_en = {
+                from: existingQuestion.question_en,
+                to: data.question_en,
+              };
+            }
+            if (existingQuestion.question_hu !== data.question_hu) {
+              changes.question_hu = {
+                from: existingQuestion.question_hu,
+                to: data.question_hu,
+              };
+            }
+            if (existingQuestion.category !== data.category) {
+              changes.category = {
+                from: existingQuestion.category,
+                to: data.category,
+              };
+            }
+            if (existingQuestion.difficulty !== data.difficulty) {
+              changes.difficulty = {
+                from: existingQuestion.difficulty,
+                to: data.difficulty,
+              };
+            }
+            if (existingQuestion.is_active !== data.is_active) {
+              changes.is_active = {
+                from: existingQuestion.is_active,
+                to: data.is_active,
+              };
+            }
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id,
+                action_type,
+                entity_type,
+                entity_id,
+                details
+              ) VALUES (
+                ${sessionData.id},
+                'update',
+                'question',
+                ${questionId.toString()},
+                ${JSON.stringify(changes)}
+              )
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true }));
+            return;
+          } catch (error) {
+            console.error("❌ Error updating question:", error);
             console.error(
-              "Error details:",
-              error instanceof Error ? error.message : String(error)
+              "Error stack:",
+              error instanceof Error ? error.stack : "No stack"
             );
             console.error(
-              "Stack trace:",
-              error instanceof Error ? error.stack : "No stack trace"
+              "Error message:",
+              error instanceof Error ? error.message : String(error)
             );
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
@@ -1409,6 +1920,177 @@ function apiRoutesPlugin(): PluginOption {
                 message: error instanceof Error ? error.message : String(error),
               })
             );
+            return;
+          }
+        }
+
+        // Handle DELETE /api/admin/questions/:id - Delete question
+        if (
+          req.method === "DELETE" &&
+          req.url?.match(/^\/api\/admin\/questions\/\d+$/)
+        ) {
+          try {
+            const questionId = parseInt(req.url.split("/")[4]);
+
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Get question info for logging
+            const [question] = await sql`
+              SELECT question_en, question_hu, category
+              FROM questions
+              WHERE id = ${questionId}
+            `;
+
+            if (!question) {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Question not found" }));
+              return;
+            }
+
+            // Delete question (answers will be cascade deleted)
+            await sql`DELETE FROM questions WHERE id = ${questionId}`;
+
+            // Log activity
+            await sql`
+              INSERT INTO admin_activity_log (
+                user_id,
+                action_type,
+                entity_type,
+                entity_id,
+                details
+              ) VALUES (
+                ${sessionData.id},
+                'delete',
+                'question',
+                ${questionId.toString()},
+                ${JSON.stringify({
+                  question_en: question.question_en,
+                  question_hu: question.question_hu,
+                  category: question.category,
+                })}
+              )
+            `;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true }));
+            return;
+          } catch (error) {
+            console.error("Error deleting question:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
+        // Handle POST /api/questions/:id/track - Track question statistics
+        if (
+          req.method === "POST" &&
+          req.url?.match(/^\/api\/questions\/\d+\/track/)
+        ) {
+          try {
+            const questionId = parseInt(req.url.split("/")[3]);
+
+            // Parse request body
+            let body = "";
+            for await (const chunk of req) {
+              body += chunk.toString();
+            }
+            const data = JSON.parse(body);
+
+            if (!process.env.POSTGRES_POSTGRES_URL) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Database not configured" }));
+              return;
+            }
+
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL);
+
+            // Validate the action type
+            if (!["played", "completed"].includes(data.action)) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Invalid action type" }));
+              return;
+            }
+
+            // Update the appropriate counter
+            if (data.action === "played") {
+              await sql`
+                UPDATE questions
+                SET times_played = times_played + 1
+                WHERE id = ${questionId}
+              `;
+            } else if (data.action === "completed") {
+              await sql`
+                UPDATE questions
+                SET times_completed = times_completed + 1
+                WHERE id = ${questionId}
+              `;
+            }
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ success: true }));
+            return;
+          } catch (error) {
+            console.error("Error tracking question stats:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
             return;
           }
         }
@@ -1486,7 +2168,7 @@ function apiRoutesPlugin(): PluginOption {
             res.end(
               JSON.stringify({
                 success: true,
-                questionSets,
+                sets: questionSets,
                 count: questionSets.length,
                 isAuthenticated,
               })

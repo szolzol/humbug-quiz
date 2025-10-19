@@ -85,6 +85,51 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   const [selectedAnswers, setSelectedAnswers] = useState<Set<number>>(() =>
     getStoredAnswers(question.id)
   );
+  const [hasTrackedPlay, setHasTrackedPlay] = useState(false);
+  const [hasTrackedCompletion, setHasTrackedCompletion] = useState(false);
+
+  // Track when card is flipped (played)
+  useEffect(() => {
+    if (isFlipped && !hasTrackedPlay) {
+      // Track that the question was played (card flipped to see answers)
+      fetch(`/api/questions/${question.id}/track`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "played" }),
+      }).catch((error) => {
+        console.error("Failed to track play:", error);
+      });
+      setHasTrackedPlay(true);
+    }
+  }, [isFlipped, question.id, hasTrackedPlay]);
+
+  // Track when all answers are marked (completed)
+  useEffect(() => {
+    if (
+      selectedAnswers.size === question.answers.length &&
+      question.answers.length > 0 &&
+      !hasTrackedCompletion
+    ) {
+      // Track that all answers were found
+      fetch(`/api/questions/${question.id}/track`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "completed" }),
+      }).catch((error) => {
+        console.error("Failed to track completion:", error);
+      });
+      setHasTrackedCompletion(true);
+    }
+  }, [
+    selectedAnswers.size,
+    question.answers.length,
+    question.id,
+    hasTrackedCompletion,
+  ]);
 
   // Persist flip state to localStorage
   useEffect(() => {

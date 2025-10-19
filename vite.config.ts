@@ -1035,6 +1035,182 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // Handle /api/admin/activity - Get activity log with pagination and filters
+        if (
+          req.method === "GET" &&
+          (req.url === "/api/admin/activity" ||
+            req.url?.startsWith("/api/admin/activity?"))
+        ) {
+          try {
+            // Parse cookies
+            const cookies =
+              req.headers.cookie?.split(";").reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split("=");
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, string>) || {};
+
+            const token = cookies.auth_token;
+
+            if (!token) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Unauthorized" }));
+              return;
+            }
+
+            // Decode session token
+            const sessionData = JSON.parse(
+              Buffer.from(token, "base64").toString()
+            );
+
+            // Check expiration
+            if (sessionData.exp < Date.now()) {
+              res.statusCode = 401;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Session expired" }));
+              return;
+            }
+
+            // Verify admin permissions from database
+            const sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+            const [adminUser] = await sql`
+              SELECT id, role, is_active
+              FROM users
+              WHERE id = ${sessionData.id}
+              LIMIT 1
+            `;
+
+            if (
+              !adminUser ||
+              !adminUser.is_active ||
+              (adminUser.role !== "admin" && adminUser.role !== "creator")
+            ) {
+              res.statusCode = 403;
+              res.setHeader("Content-Type", "application/json");
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
+              return;
+            }
+
+            // Parse query parameters
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const page = parseInt(url.searchParams.get("page") || "1");
+            const limit = parseInt(url.searchParams.get("limit") || "50");
+            const actionType = url.searchParams.get("action_type") || "all";
+            const entityType = url.searchParams.get("entity_type") || "all";
+            const adminUserId = url.searchParams.get("admin_user") || "all";
+            const startDate = url.searchParams.get("start_date");
+            const endDate = url.searchParams.get("end_date");
+
+            const offset = (page - 1) * limit;
+
+            // Build WHERE clause for filters
+            let whereClause = "";
+            const conditions: string[] = [];
+
+            if (actionType !== "all") {
+              conditions.push(`aal.action_type = '${actionType}'`);
+            }
+
+            if (entityType !== "all") {
+              conditions.push(`aal.entity_type = '${entityType}'`);
+            }
+
+            if (adminUserId !== "all") {
+              conditions.push(`aal.user_id = '${adminUserId}'`);
+            }
+
+            if (startDate) {
+              conditions.push(`aal.created_at >= '${startDate}'`);
+            }
+
+            if (endDate) {
+              conditions.push(`aal.created_at <= '${endDate}'`);
+            }
+
+            if (conditions.length > 0) {
+              whereClause = `WHERE ${conditions.join(" AND ")}`;
+            }
+
+            // Get total count
+            const countQuery = `
+              SELECT COUNT(*) as total
+              FROM admin_activity_log aal
+              ${whereClause}
+            `;
+
+            const countResult = await sql.unsafe(countQuery);
+            const total = parseInt((countResult as any)[0].total);
+
+            // Get activity logs with admin user info
+            const logsQuery = `
+              SELECT 
+                aal.id,
+                aal.user_id,
+                aal.action_type,
+                aal.entity_type,
+                aal.entity_id,
+                aal.details,
+                aal.ip_address,
+                aal.user_agent,
+                aal.created_at,
+                u.name as admin_name,
+                u.email as admin_email,
+                u.picture as admin_picture
+              FROM admin_activity_log aal
+              LEFT JOIN users u ON aal.user_id = u.id
+              ${whereClause}
+              ORDER BY aal.created_at DESC
+              LIMIT ${limit} OFFSET ${offset}
+            `;
+
+            const logs = (await sql.unsafe(logsQuery)) as unknown as any[];
+
+            // Calculate pagination
+            const totalPages = Math.ceil(total / limit);
+            const hasNext = page < totalPages;
+            const hasPrev = page > 1;
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                logs: logs.map((log: any) => ({
+                  id: log.id,
+                  userId: log.user_id,
+                  actionType: log.action_type,
+                  entityType: log.entity_type,
+                  entityId: log.entity_id,
+                  details: log.details,
+                  ipAddress: log.ip_address,
+                  userAgent: log.user_agent,
+                  createdAt: log.created_at,
+                  adminName: log.admin_name,
+                  adminEmail: log.admin_email,
+                  adminPicture: log.admin_picture,
+                })),
+                pagination: {
+                  page,
+                  limit,
+                  total,
+                  totalPages,
+                  hasNext,
+                  hasPrev,
+                },
+              })
+            );
+            return;
+          } catch (error) {
+            console.error("❌ Error fetching activity logs:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Internal server error" }));
+            return;
+          }
+        }
+
         // Handle /api/question-sets (with or without query string)
         if (req.url?.startsWith("/api/question-sets")) {
           try {

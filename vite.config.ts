@@ -495,7 +495,9 @@ function apiRoutesPlugin(): PluginOption {
             ) {
               res.statusCode = 403;
               res.setHeader("Content-Type", "application/json");
-              res.end(JSON.stringify({ error: "Forbidden: Admin access required" }));
+              res.end(
+                JSON.stringify({ error: "Forbidden: Admin access required" })
+              );
               return;
             }
 

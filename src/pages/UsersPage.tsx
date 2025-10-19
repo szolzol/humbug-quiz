@@ -22,7 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Search, Filter, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -230,16 +235,14 @@ export function UsersPage() {
                           variant="outline"
                           className={`font-normal uppercase text-xs ${
                             ROLE_COLORS[user.role]
-                          }`}
-                        >
+                          }`}>
                           {user.role}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant={user.is_active ? "default" : "secondary"}
-                          className="font-normal"
-                        >
+                          className="font-normal">
                           {user.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
@@ -268,8 +271,11 @@ export function UsersPage() {
               <div className="flex items-center justify-between mt-6">
                 <div className="text-sm text-muted-foreground">
                   Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-                  {pagination.total} users
+                  {Math.min(
+                    pagination.page * pagination.limit,
+                    pagination.total
+                  )}{" "}
+                  of {pagination.total} users
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -277,9 +283,11 @@ export function UsersPage() {
                     size="sm"
                     disabled={pagination.page === 1}
                     onClick={() =>
-                      setPagination({ ...pagination, page: pagination.page - 1 })
-                    }
-                  >
+                      setPagination({
+                        ...pagination,
+                        page: pagination.page - 1,
+                      })
+                    }>
                     <ChevronLeft size={16} className="mr-1" />
                     Previous
                   </Button>
@@ -288,9 +296,11 @@ export function UsersPage() {
                     size="sm"
                     disabled={pagination.page === pagination.totalPages}
                     onClick={() =>
-                      setPagination({ ...pagination, page: pagination.page + 1 })
-                    }
-                  >
+                      setPagination({
+                        ...pagination,
+                        page: pagination.page + 1,
+                      })
+                    }>
                     Next
                     <ChevronRight size={16} className="ml-1" />
                   </Button>
@@ -303,4 +313,3 @@ export function UsersPage() {
     </div>
   );
 }
-

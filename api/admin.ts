@@ -219,15 +219,15 @@ async function handleUsers(
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
-    return getUsersList(req, res);
+    return await getUsersList(req, res);
   }
 
   if (req.method === "PUT" && id) {
-    return updateUser(req, res, id, admin);
+    return await updateUser(req, res, id, admin);
   }
 
   if (req.method === "DELETE" && id) {
-    return deleteUser(req, res, id, admin);
+    return await deleteUser(req, res, id, admin);
   }
 
   return res.status(400).json({ error: "Invalid operation" });
@@ -435,15 +435,15 @@ async function handleQuestions(
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
-    return getQuestionsList(req, res);
+    return await getQuestionsList(req, res);
   }
 
   if (req.method === "PUT" && id) {
-    return updateQuestion(req, res, id);
+    return await updateQuestion(req, res, id);
   }
 
   if (req.method === "DELETE" && id) {
-    return deleteQuestion(req, res, id);
+    return await deleteQuestion(req, res, id);
   }
 
   return res.status(400).json({ error: "Invalid operation" });
@@ -709,15 +709,15 @@ async function handlePacks(
   const id = req.query.id as string;
 
   if (req.method === "GET" && !id) {
-    return getPacksList(req, res);
+    return await getPacksList(req, res);
   }
 
   if (req.method === "PUT" && id) {
-    return updatePack(req, res, id);
+    return await updatePack(req, res, id);
   }
 
   if (req.method === "DELETE" && id) {
-    return deletePack(req, res, id);
+    return await deletePack(req, res, id);
   }
 
   return res.status(400).json({ error: "Invalid operation" });

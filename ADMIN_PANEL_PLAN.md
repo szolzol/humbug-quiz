@@ -1,11 +1,13 @@
 # Admin Panel - Complete Implementation Plan
 
 ## Overview
+
 A comprehensive admin dashboard for managing users, questions, question packs, and monitoring system activity.
 
 ---
 
 ## Phase 1: Foundation ✅ (COMPLETED)
+
 - ✅ Role-based authentication (admin/creator roles)
 - ✅ Session token enhancements with role field
 - ✅ Admin auth check endpoint
@@ -17,6 +19,7 @@ A comprehensive admin dashboard for managing users, questions, question packs, a
 ## Phase 2: Routing & Layout (IN PROGRESS)
 
 ### 2.1 Setup React Router
+
 - Install `react-router-dom`
 - Configure routes in `main.tsx`:
   - `/` - Main quiz app
@@ -28,7 +31,9 @@ A comprehensive admin dashboard for managing users, questions, question packs, a
   - `/admin/settings` - System settings
 
 ### 2.2 Admin Layout Component
+
 Create `src/components/admin/AdminLayout.tsx`:
+
 - **Sidebar Navigation**
   - Dashboard (overview)
   - Users (list/edit)
@@ -37,8 +42,8 @@ Create `src/components/admin/AdminLayout.tsx`:
   - Activity Log (view)
   - Settings
   - Back to Quiz (exit admin)
-  
 - **Top Bar**
+
   - Current admin user name & role badge
   - Logout button
   - Search bar (global search)
@@ -55,7 +60,9 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 3.1 User List Page (`/admin/users`)
 
 **Features:**
+
 - Table view with columns:
+
   - Avatar/Photo
   - Name
   - Email
@@ -66,12 +73,14 @@ Create `src/components/admin/AdminLayout.tsx`:
   - Actions (Edit, Promote/Demote)
 
 - **Filters & Search:**
+
   - Search by name/email
   - Filter by role (all/free/premium/admin/creator)
   - Filter by status (active/inactive)
   - Sort by: name, email, joined date, last login
 
 - **Pagination:**
+
   - 25/50/100 users per page
   - Total count display
 
@@ -83,6 +92,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 3.2 User Edit Dialog
 
 **Fields:**
+
 - Name (editable)
 - Email (read-only, from Google)
 - Role dropdown:
@@ -94,6 +104,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 - Display created_at, last_login (read-only)
 
 **Actions:**
+
 - Save Changes → logs "update" activity
 - Deactivate Account → logs "update" activity
 - View Activity History → shows all logs for this user
@@ -126,8 +137,10 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 4.1 Question List Page (`/admin/questions`)
 
 **Features:**
+
 - Table/Card view toggle
 - Columns:
+
   - Question ID
   - Question text (truncated, click to expand)
   - Category
@@ -137,6 +150,7 @@ Create `src/components/admin/AdminLayout.tsx`:
   - Actions (Edit, Delete, Duplicate)
 
 - **Filters:**
+
   - Search question text
   - Filter by pack
   - Filter by category
@@ -151,6 +165,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 **Two-column layout:**
 
 **Left Column - Question Details:**
+
 - Question text (textarea)
 - Category dropdown (existing categories + add new)
 - Pack assignment (free/premium/advanced)
@@ -160,20 +175,24 @@ Create `src/components/admin/AdminLayout.tsx`:
   - Alt text field
 
 **Right Column - Answers:**
+
 - 4 answer inputs (A, B, C, D)
 - Correct answer selector (radio buttons)
 - Explanation text (optional, textarea)
 
 **Multi-language Support:**
+
 - Language tabs (EN / HU)
 - Switch between languages to edit both versions
 - "Copy from EN" button for HU tab
 
 **Preview Panel:**
+
 - Shows how question will appear in quiz
 - Toggle between EN/HU preview
 
 **Actions:**
+
 - Save Question → logs "create" or "update"
 - Save & Add Another
 - Cancel (with unsaved changes warning)
@@ -182,12 +201,14 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 4.3 Question Import/Export
 
 **Import:**
+
 - Upload JSON file (same format as current questions)
 - Bulk import with validation
 - Preview before import
 - Error handling (duplicate IDs, invalid format)
 
 **Export:**
+
 - Export all questions
 - Export by pack
 - Export by category
@@ -230,6 +251,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 5.1 Pack List Page (`/admin/packs`)
 
 **View:**
+
 - Card layout showing each pack:
   - Pack name & description
   - Total questions count
@@ -238,17 +260,20 @@ Create `src/components/admin/AdminLayout.tsx`:
   - Actions (Edit, View Questions, Delete)
 
 **Existing Packs:**
+
 - Free Pack
-- Premium Pack  
+- Premium Pack
 - Advanced Pack (if exists)
 
 **Create New Pack:**
+
 - Button to add custom packs
 - Example: "History Pack", "Science Pack", "Expert Pack"
 
 ### 5.2 Pack Editor
 
 **Fields:**
+
 - Pack ID (slug, e.g., "history-pack")
 - Display Name (EN/HU)
 - Description (EN/HU)
@@ -260,12 +285,14 @@ Create `src/components/admin/AdminLayout.tsx`:
 - Color theme (for UI customization)
 
 **Question Assignment:**
+
 - Checkbox list of all questions
 - Filter/search to find questions
 - Bulk select by category
 - Drag & drop to reorder questions
 
 **Preview:**
+
 - Shows pack card as users will see it
 - Question count
 - Sample questions
@@ -299,6 +326,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 6.1 Activity Log Page (`/admin/activity`)
 
 **Features:**
+
 - Timeline view of all admin actions
 - Each entry shows:
   - Timestamp (relative: "5 minutes ago" + absolute)
@@ -310,6 +338,7 @@ Create `src/components/admin/AdminLayout.tsx`:
   - User agent (browser/device)
 
 **Filters:**
+
 - Date range picker (today/week/month/custom)
 - Filter by admin user
 - Filter by action type (create/update/delete/etc)
@@ -317,6 +346,7 @@ Create `src/components/admin/AdminLayout.tsx`:
 - Search by entity ID or details
 
 **Export:**
+
 - Export log as CSV for auditing
 - Logs this export action too!
 
@@ -334,28 +364,33 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 7.1 Admin Dashboard (`/admin`)
 
 **Statistics Cards:**
+
 - Total Users (with breakdown by role)
 - Total Questions (by pack)
 - Active Users (last 7 days)
 - Recent Sign-ups (this month)
 
 **Charts:**
+
 - User growth over time (line chart)
 - Questions by category (pie chart)
 - User role distribution (donut chart)
 - Activity heatmap (by day/hour)
 
 **Recent Activity Widget:**
+
 - Last 10 admin actions
 - "View All" link to activity log
 
 **Quick Actions:**
+
 - Add New Question
 - Add New User (manual creation)
 - View Reports
 - Export Data
 
 **System Health:**
+
 - Database status
 - API status
 - Last backup date
@@ -368,22 +403,26 @@ Create `src/components/admin/AdminLayout.tsx`:
 ### 8.1 Settings Page (`/admin/settings`)
 
 **Categories Management:**
+
 - Add/edit/delete question categories
 - Reorder categories
 - Set category icons
 
 **System Settings:**
+
 - Quiz time limits
 - Points per question
 - Passing score threshold
 - Max questions per session
 
 **Email Templates (future):**
+
 - Welcome email
 - Premium upgrade confirmation
 - Password reset (if adding email auth)
 
 **Backup & Export:**
+
 - Full database export
 - Scheduled backups
 - Restore from backup
@@ -450,6 +489,7 @@ ALTER TABLE questions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
 ## UI Component Library
 
 Use existing Shadcn/ui components:
+
 - ✅ Table - for user/question lists
 - ✅ Dialog - for edit modals
 - ✅ Select - for dropdowns
@@ -461,6 +501,7 @@ Use existing Shadcn/ui components:
 - ✅ Toast/Sonner - for success/error messages
 
 Additional needs:
+
 - Date Range Picker (react-day-picker)
 - Rich Text Editor (for descriptions/explanations)
 - Image Upload (react-dropzone or similar)
@@ -471,17 +512,20 @@ Additional needs:
 ## Security Considerations
 
 ### Access Control:
+
 - All `/api/admin/*` endpoints require admin/creator role
 - Double-check role on sensitive actions (promote to admin)
 - Log all admin actions
 - Rate limiting on admin endpoints
 
 ### Audit Trail:
+
 - Log who changed what, when, from where
 - Cannot delete activity logs (append-only)
 - Regular backups of activity log
 
 ### Input Validation:
+
 - Sanitize all user inputs
 - Validate question format before save
 - Prevent XSS in question text/answers
@@ -489,36 +533,39 @@ Additional needs:
 
 ### Permissions Matrix:
 
-| Action | Free | Premium | Admin | Creator |
-|--------|------|---------|-------|---------|
-| View own data | ✅ | ✅ | ✅ | ✅ |
-| Take quizzes | ✅ | ✅ | ✅ | ✅ |
-| Access premium packs | ❌ | ✅ | ✅ | ✅ |
-| View admin panel | ❌ | ❌ | ✅ | ✅ |
-| Manage users | ❌ | ❌ | ✅ | ✅ |
-| Promote to admin | ❌ | ❌ | ❌ | ✅ (creator only) |
-| Manage questions | ❌ | ❌ | ✅ | ✅ |
-| Manage packs | ❌ | ❌ | ✅ | ✅ |
-| View activity log | ❌ | ❌ | ✅ | ✅ |
-| System settings | ❌ | ❌ | ❌ | ✅ (creator only) |
+| Action               | Free | Premium | Admin | Creator           |
+| -------------------- | ---- | ------- | ----- | ----------------- |
+| View own data        | ✅   | ✅      | ✅    | ✅                |
+| Take quizzes         | ✅   | ✅      | ✅    | ✅                |
+| Access premium packs | ❌   | ✅      | ✅    | ✅                |
+| View admin panel     | ❌   | ❌      | ✅    | ✅                |
+| Manage users         | ❌   | ❌      | ✅    | ✅                |
+| Promote to admin     | ❌   | ❌      | ❌    | ✅ (creator only) |
+| Manage questions     | ❌   | ❌      | ✅    | ✅                |
+| Manage packs         | ❌   | ❌      | ✅    | ✅                |
+| View activity log    | ❌   | ❌      | ✅    | ✅                |
+| System settings      | ❌   | ❌      | ❌    | ✅ (creator only) |
 
 ---
 
 ## Development Phases
 
 ### **Phase 2: Routing & Layout** (Next, ~2 hours)
+
 - Install react-router-dom
 - Create AdminLayout with sidebar
 - Setup protected routes
 - Basic navigation
 
 ### **Phase 3: User Management** (~4 hours)
+
 - User list page
 - User edit dialog
 - Role promotion/demotion
 - Backend endpoints
 
 ### **Phase 4: Question Management** (~6 hours)
+
 - Question list page
 - Question editor (add/edit)
 - Multi-language support
@@ -526,23 +573,27 @@ Additional needs:
 - Import/export
 
 ### **Phase 5: Pack Management** (~3 hours)
+
 - Pack list page
 - Pack editor
 - Question assignment
 - Database schema for packs
 
 ### **Phase 6: Activity Log Viewer** (~2 hours)
+
 - Activity log page
 - Filters & search
 - Export functionality
 
 ### **Phase 7: Dashboard** (~3 hours)
+
 - Statistics widgets
 - Charts
 - Quick actions
 - Recent activity
 
 ### **Phase 8: Settings** (~2 hours)
+
 - Category management
 - System settings
 - Backup/export

@@ -123,8 +123,7 @@ export function AdminLayout() {
                       isActive
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    }`}
-                  >
+                    }`}>
                     {item.icon}
                     <span>{item.label}</span>
                   </div>
@@ -149,8 +148,7 @@ export function AdminLayout() {
                 <div className="flex items-center gap-1">
                   <Badge
                     variant="secondary"
-                    className="text-xs font-normal uppercase"
-                  >
+                    className="text-xs font-normal uppercase">
                     {role}
                   </Badge>
                 </div>
@@ -162,8 +160,7 @@ export function AdminLayout() {
                 variant="outline"
                 size="sm"
                 className="w-full justify-start"
-                onClick={() => navigate("/")}
-              >
+                onClick={() => navigate("/")}>
                 <ArrowLeft className="mr-2" size={16} />
                 Exit Admin
               </Button>
@@ -171,8 +168,7 @@ export function AdminLayout() {
                 variant="outline"
                 size="sm"
                 className="w-full justify-start text-destructive hover:text-destructive"
-                onClick={logout}
-              >
+                onClick={logout}>
                 <LogOut className="mr-2" size={16} />
                 Logout
               </Button>

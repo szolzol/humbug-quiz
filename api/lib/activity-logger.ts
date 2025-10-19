@@ -10,7 +10,14 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export interface ActivityLogEntry {
   userId: string; // Google user ID (TEXT)
-  actionType: "create" | "update" | "delete" | "view" | "export" | "login" | "logout";
+  actionType:
+    | "create"
+    | "update"
+    | "delete"
+    | "view"
+    | "export"
+    | "login"
+    | "logout";
   entityType?: "user" | "question" | "pack" | "settings" | string;
   entityId?: string | number;
   details?: Record<string, any>;
@@ -74,7 +81,10 @@ export async function logActivityFromRequest(
   req: IncomingMessage,
   userId: string,
   actionType: ActivityLogEntry["actionType"],
-  options?: Omit<ActivityLogEntry, "userId" | "actionType" | "ipAddress" | "userAgent">
+  options?: Omit<
+    ActivityLogEntry,
+    "userId" | "actionType" | "ipAddress" | "userAgent"
+  >
 ): Promise<void> {
   await logActivity({
     userId,

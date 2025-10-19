@@ -136,25 +136,37 @@ async function requireAdmin(
 }
 
 /**
- * Admin Activity Log Endpoint
- * GET /api/admin/activity - List activity log with pagination and filters
+ * Admin Pack Detail Endpoint
+ * PUT /api/admin/packs/[id] - Update a specific pack
+ * DELETE /api/admin/packs/[id] - Delete a specific pack
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify admin access
   const admin = await requireAdmin(req, res);
-  if (!admin) return; // Response already sent by requireAdmin
+  if (!admin) return;
 
-  if (req.method === "GET") {
-    return handleGetActivity(req, res, admin);
+  const packId = req.query.id as string;
+
+  if (!packId) {
+    return res.status(400).json({ error: "Pack ID is required" });
+  }
+
+  if (req.method === "PUT") {
+    return handleUpdatePack(req, res, packId, admin);
+  }
+
+  if (req.method === "DELETE") {
+    return handleDeletePack(req, res, packId, admin);
   }
 
   res.status(405).json({ error: "Method not allowed" });
 }
 
-async function handleGetActivity(
+async function handleUpdatePack(
   req: VercelRequest,
   res: VercelResponse,
-  admin: any
+  packId: string,
+  admin: AdminUser
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -165,93 +177,137 @@ async function handleGetActivity(
   });
 
   try {
-    // Parse query parameters
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const action = req.query.action as string;
-    const entityType = req.query.entity_type as string;
-    const userId = req.query.user_id as string;
+    const {
+      name,
+      slug,
+      description,
+      category,
+      difficulty,
+      is_active,
+      is_premium,
+    } = req.body;
 
-    const offset = (page - 1) * limit;
-
-    // Build where clauses
-    const whereClauses: string[] = [];
+    // Build update query dynamically
+    const updates: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
 
-    if (action && action !== "all") {
-      whereClauses.push(`action = $${paramIndex}`);
-      params.push(action);
+    if (name !== undefined) {
+      updates.push(`name = $${paramIndex}`);
+      params.push(name);
       paramIndex++;
     }
 
-    if (entityType && entityType !== "all") {
-      whereClauses.push(`entity_type = $${paramIndex}`);
-      params.push(entityType);
+    if (slug !== undefined) {
+      updates.push(`slug = $${paramIndex}`);
+      params.push(slug);
       paramIndex++;
     }
 
-    if (userId) {
-      whereClauses.push(`user_id = $${paramIndex}`);
-      params.push(userId);
+    if (description !== undefined) {
+      updates.push(`description = $${paramIndex}`);
+      params.push(description);
       paramIndex++;
     }
 
-    const whereClause =
-      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    if (category !== undefined) {
+      updates.push(`category = $${paramIndex}`);
+      params.push(category);
+      paramIndex++;
+    }
 
-    // Get total count
-    const countQuery = `
-      SELECT COUNT(*) as count
-      FROM admin_activity_log
-      ${whereClause}
+    if (difficulty !== undefined) {
+      updates.push(`difficulty = $${paramIndex}`);
+      params.push(difficulty);
+      paramIndex++;
+    }
+
+    if (is_active !== undefined) {
+      updates.push(`is_active = $${paramIndex}`);
+      params.push(is_active);
+      paramIndex++;
+    }
+
+    if (is_premium !== undefined) {
+      updates.push(`is_premium = $${paramIndex}`);
+      params.push(is_premium);
+      paramIndex++;
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: "No fields to update" });
+    }
+
+    updates.push(`updated_at = NOW()`);
+
+    params.push(packId); // For WHERE clause
+    const packIdParam = paramIndex;
+
+    const query = `
+      UPDATE question_sets
+      SET ${updates.join(", ")}
+      WHERE id = $${packIdParam}
+      RETURNING *
     `;
 
-    const countResult = await pool.query(countQuery, params);
-    const total = parseInt(countResult.rows[0].count);
+    const result = await pool.query(query, params);
 
-    // Get activity logs
-    const logsQuery = `
-      SELECT 
-        aal.id,
-        aal.user_id,
-        u.email AS user_email,
-        u.name AS user_name,
-        aal.action,
-        aal.entity_type,
-        aal.entity_id,
-        aal.details,
-        aal.ip_address,
-        aal.created_at
-      FROM admin_activity_log aal
-      LEFT JOIN users u ON aal.user_id = u.id
-      ${whereClause}
-      ORDER BY aal.created_at DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-    const logsResult = await pool.query(logsQuery, [...params, limit, offset]);
-    const logs = logsResult.rows;
-
-    // Calculate pagination metadata
-    const totalPages = Math.ceil(total / limit);
-    const hasNext = page < totalPages;
-    const hasPrev = page > 1;
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Pack not found" });
+    }
 
     res.status(200).json({
-      logs,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext,
-        hasPrev,
-      },
+      success: true,
+      pack: result.rows[0],
     });
   } catch (error) {
-    console.error("❌ Error fetching activity log:", error);
-    res.status(500).json({ error: "Failed to fetch activity log" });
+    console.error("Error updating pack:", error);
+    res.status(500).json({
+      error: "Failed to update pack",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    await pool.end();
+  }
+}
+
+async function handleDeletePack(
+  req: VercelRequest,
+  res: VercelResponse,
+  packId: string,
+  admin: AdminUser
+) {
+  if (!process.env.POSTGRES_POSTGRES_URL) {
+    return res.status(500).json({ error: "Database not configured" });
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    const query = `
+      DELETE FROM question_sets
+      WHERE id = $1
+      RETURNING id, name
+    `;
+
+    const result = await pool.query(query, [packId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Pack not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Pack "${result.rows[0].name}" deleted successfully`,
+    });
+  } catch (error) {
+    console.error("Error deleting pack:", error);
+    res.status(500).json({
+      error: "Failed to delete pack",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
   } finally {
     await pool.end();
   }

@@ -461,15 +461,23 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
     const params: any[] = [];
     let paramIndex = 1;
 
+    console.log("📊 Query params:", {
+      category,
+      setId,
+      isActive,
+      search,
+      sort,
+    });
+
     if (category && category !== "all") {
       whereClauses.push(`category = $${paramIndex}`);
       params.push(category);
       paramIndex++;
     }
 
-    if (setId && setId !== "all") {
+    if (setId && setId !== "all" && setId !== "") {
       whereClauses.push(`set_id = $${paramIndex}`);
-      params.push(setId);
+      params.push(parseInt(setId)); // Convert to integer for database
       paramIndex++;
     }
 

@@ -121,6 +121,14 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            {user.role &&
+              (user.role === "admin" || user.role === "creator") && (
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                    👑 {user.role}
+                  </span>
+                </div>
+              )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

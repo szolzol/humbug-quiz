@@ -284,7 +284,12 @@ function apiRoutesPlugin(): PluginOption {
                 return;
               }
 
-              console.log("✅ User session valid:", dbUser.email, "Role:", dbUser.role);
+              console.log(
+                "✅ User session valid:",
+                dbUser.email,
+                "Role:",
+                dbUser.role
+              );
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(
@@ -303,7 +308,10 @@ function apiRoutesPlugin(): PluginOption {
             } catch (dbError) {
               console.error("❌ Database error during session check:", dbError);
               // Fallback to token data if DB fails
-              console.log("✅ User session valid (fallback):", sessionData.email);
+              console.log(
+                "✅ User session valid (fallback):",
+                sessionData.email
+              );
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.end(

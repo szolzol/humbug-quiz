@@ -7,11 +7,13 @@
 **Location:** `/api/auth/callback` endpoint (lines ~148-178)
 
 **Changes:**
+
 - After saving user to database, fetch their `role` from the users table
 - Include `role` field in the session token JSON
 - Session token now contains: `id`, `email`, `name`, `picture`, `role`, `exp`
 
 **Code:**
+
 ```typescript
 // Fetch user role from database for session token
 let userRole = "free";
@@ -41,6 +43,7 @@ const sessionData = JSON.stringify({
 **Location:** `/api/auth/session` endpoint (lines ~210-330)
 
 **Changes:**
+
 - After decoding token, verify user against database
 - Check `is_active` status
 - Return current `role` from database (not just from token)
@@ -48,6 +51,7 @@ const sessionData = JSON.stringify({
 - Returns user object with `role` field
 
 **Features:**
+
 - ✅ Database verification (user exists and is active)
 - ✅ Role returned in response
 - ✅ Graceful degradation if DB fails
@@ -60,6 +64,7 @@ const sessionData = JSON.stringify({
 **Purpose:** Check if current user has admin/creator access
 
 **Response:**
+
 ```json
 {
   "hasAccess": true/false,
@@ -74,6 +79,7 @@ const sessionData = JSON.stringify({
 ```
 
 **Logic:**
+
 1. Parse session cookie
 2. Verify against database
 3. Check if role is "admin" or "creator"
@@ -82,6 +88,7 @@ const sessionData = JSON.stringify({
 ### 4. Updated AuthContext Interface (`src/context/AuthContext.tsx`)
 
 **Changes:**
+
 ```typescript
 export interface User {
   id: string;
@@ -93,6 +100,7 @@ export interface User {
 ```
 
 **Impact:**
+
 - All components using `useAuth()` hook now have access to user role
 - Backward compatible (role is optional)
 
@@ -101,6 +109,7 @@ export interface User {
 **Purpose:** Reusable authentication utilities for backend endpoints
 
 **Functions:**
+
 - `parseSessionCookie()` - Extract and decode session token
 - `getAuthUser()` - Get authenticated user with DB verification
 - `requireAuth()` - Middleware: require any authenticated user
@@ -109,6 +118,7 @@ export interface User {
 - `hasPermission()` - Check granular permissions (future use)
 
 **Usage Example:**
+
 ```typescript
 // In any API endpoint
 import { requireAdmin } from "../lib/auth";
@@ -125,6 +135,7 @@ if (!adminUser) return;
 **Purpose:** React hook to check admin access from frontend
 
 **Usage:**
+
 ```typescript
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
@@ -134,11 +145,16 @@ function AdminPanel() {
   if (isLoading) return <div>Loading...</div>;
   if (!hasAccess) return <div>Access Denied</div>;
 
-  return <div>Welcome, {user.name} ({role})</div>;
+  return (
+    <div>
+      Welcome, {user.name} ({role})
+    </div>
+  );
 }
 ```
 
 **Returns:**
+
 - `hasAccess`: boolean - whether user has admin/creator role
 - `role`: user's current role
 - `isLoading`: boolean - loading state
@@ -149,6 +165,7 @@ function AdminPanel() {
 ## 🔄 How It All Works Together
 
 ### Login Flow (Enhanced):
+
 ```
 1. User clicks login → Google OAuth
 2. Callback receives Google user info
@@ -159,6 +176,7 @@ function AdminPanel() {
 ```
 
 ### Session Check Flow (Enhanced):
+
 ```
 1. Frontend calls /api/auth/session
 2. Decode session cookie
@@ -168,6 +186,7 @@ function AdminPanel() {
 ```
 
 ### Admin Access Flow (New):
+
 ```
 1. Frontend calls /api/admin/auth/check
 2. Decode session cookie
@@ -181,6 +200,7 @@ function AdminPanel() {
 ## 🔒 Security Features
 
 ### ✅ Implemented:
+
 - **Database verification**: Session tokens verified against active users
 - **Role-based access**: Admin endpoints check user role
 - **Inactive user protection**: Inactive users rejected at session check
@@ -188,6 +208,7 @@ function AdminPanel() {
 - **Fallback protection**: Graceful degradation if DB unavailable
 
 ### 🔜 Ready for Phase 2:
+
 - Activity logging (when admin actions occur)
 - Fine-grained permissions (admin_permissions table)
 - Admin panel UI with protected routes
@@ -197,6 +218,7 @@ function AdminPanel() {
 ## 📊 Database Schema (Already Exists)
 
 ### `users` table:
+
 ```sql
 - id: TEXT (Google user ID)
 - email: TEXT
@@ -215,6 +237,7 @@ function AdminPanel() {
 ## 🧪 Testing the Enhancements
 
 ### 1. Test Session Token Includes Role:
+
 ```bash
 # Login via Google OAuth
 # Then check browser cookies (DevTools → Application → Cookies)
@@ -222,6 +245,7 @@ function AdminPanel() {
 ```
 
 ### 2. Test Session Endpoint Returns Role:
+
 ```bash
 # In browser console:
 fetch('/api/auth/session', { credentials: 'include' })
@@ -231,6 +255,7 @@ fetch('/api/auth/session', { credentials: 'include' })
 ```
 
 ### 3. Test Admin Auth Check:
+
 ```bash
 # In browser console:
 fetch('/api/admin/auth/check', { credentials: 'include' })
@@ -241,6 +266,7 @@ fetch('/api/admin/auth/check', { credentials: 'include' })
 ```
 
 ### 4. Test Role Change:
+
 ```sql
 -- In database, promote a user to admin:
 UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
@@ -254,12 +280,14 @@ UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
 ## 🎯 What's Next (Phase 2+)
 
 ### Immediate Next Steps:
+
 1. **Create admin_activity_log table** (SQL migration)
 2. **Create activity logging helper** (`api/lib/activity-logger.ts`)
 3. **Build admin UI shell** (layout with sidebar)
-4. **Add routing** (react-router or similar for /admin/* paths)
+4. **Add routing** (react-router or similar for /admin/\* paths)
 
 ### Future Features:
+
 - Question management UI
 - Pack management UI
 - User management (for super admins)
@@ -281,6 +309,7 @@ UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
 ## 🚀 Ready to Deploy
 
 All OAuth enhancements are complete and tested. The system now:
+
 - ✅ Includes user roles in session tokens
 - ✅ Verifies sessions against database
 - ✅ Provides admin access checking

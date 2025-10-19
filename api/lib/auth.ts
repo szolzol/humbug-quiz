@@ -23,14 +23,11 @@ export function parseSessionCookie(
   if (!cookieHeader) return null;
 
   // Extract auth_token cookie
-  const cookies = cookieHeader.split(";").reduce(
-    (acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = value;
-      return acc;
-    },
-    {} as Record<string, string>
-  );
+  const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
+    const [key, value] = cookie.trim().split("=");
+    acc[key] = value;
+    return acc;
+  }, {} as Record<string, string>);
 
   const token = cookies.auth_token;
   if (!token) return null;

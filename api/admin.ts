@@ -164,7 +164,7 @@ async function logActivity(
     });
 
     const result = await pool.query(
-      `INSERT INTO activity_logs (user_id, action_type, entity_type, entity_id, details, ip_address, user_agent)
+      `INSERT INTO admin_activity_log (user_id, action_type, entity_type, entity_id, details, ip_address, user_agent)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
       [
         userId,
@@ -1290,7 +1290,7 @@ async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
     const whereClause =
       whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
-    const countQuery = `SELECT COUNT(*) as count FROM activity_logs al ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as count FROM admin_activity_log al ${whereClause}`;
     console.log("Activity count query:", countQuery, "params:", params);
     const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
@@ -1302,7 +1302,7 @@ async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
              u.name as admin_name,
              u.email as admin_email,
              u.picture as admin_picture
-      FROM activity_logs al
+      FROM admin_activity_log al
       LEFT JOIN users u ON al.user_id = u.id
       ${whereClause}
       ORDER BY al.created_at DESC

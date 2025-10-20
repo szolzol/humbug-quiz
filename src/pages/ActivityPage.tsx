@@ -12,6 +12,12 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,9 +31,8 @@ import {
   FileEdit,
   Trash2,
   UserPlus,
-  Package,
-  Activity,
-  Calendar,
+  Activity as ActivityIcon,
+  Filter,
 } from "lucide-react";
 
 interface ActivityLog {
@@ -121,7 +126,7 @@ export function ActivityPage() {
       case "delete":
         return <Trash2 className="h-4 w-4" />;
       default:
-        return <Activity className="h-4 w-4" />;
+        return <ActivityIcon className="h-4 w-4" />;
     }
   };
 
@@ -211,203 +216,210 @@ export function ActivityPage() {
 
   return (
     <div className="p-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Activity Log</h1>
-        <p className="text-muted-foreground">
-          Monitor all administrative actions across the platform
-        </p>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg border p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
           <div>
-            <label className="text-sm font-medium mb-2 block">
-              Action Type
-            </label>
-            <Select
-              value={actionTypeFilter}
-              onValueChange={setActionTypeFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All actions" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All actions</SelectItem>
-                <SelectItem value="create">Create</SelectItem>
-                <SelectItem value="update">Update</SelectItem>
-                <SelectItem value="delete">Delete</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Entity Type
-            </label>
-            <Select
-              value={entityTypeFilter}
-              onValueChange={setEntityTypeFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All entities" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All entities</SelectItem>
-                <SelectItem value="user">Users</SelectItem>
-                <SelectItem value="question">Questions</SelectItem>
-                <SelectItem value="pack">Packs</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Start Date</label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">End Date</label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-end">
-            <Button
-              variant="outline"
-              onClick={handleResetFilters}
-              className="w-full">
-              Reset Filters
-            </Button>
+            <h1 className="text-3xl font-bold mb-2">Activity Log</h1>
+            <p className="text-muted-foreground">
+              Monitor all administrative actions across the platform
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Activity Table */}
-      <div className="bg-white rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Admin</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Entity</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  Loading activity logs...
-                </TableCell>
-              </TableRow>
-            ) : logs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  <div className="flex flex-col items-center gap-2">
-                    <Calendar className="h-8 w-8 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      No activity logs found
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              logs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={log.adminPicture}
-                          alt={log.adminName}
-                        />
-                        <AvatarFallback>
-                          {log.adminName
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium text-sm">
-                          {log.adminName}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {log.adminEmail}
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getActionBadge(log.actionType)}</TableCell>
-                  <TableCell>{getEntityBadge(log.entityType)}</TableCell>
-                  <TableCell>
-                    <div className="max-w-md">
-                      <p className="text-sm">{getActionDescription(log)}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Entity ID: {log.entityId}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {formatDistanceToNow(new Date(log.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(log.createdAt).toLocaleString()}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        {!isLoading && logs.length > 0 && (
-          <div className="border-t p-4 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
-              of {pagination.total} logs
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter size={20} />
+            Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-5">
+            <div>
+              <Select
+                value={actionTypeFilter}
+                onValueChange={setActionTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All actions" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All actions</SelectItem>
+                  <SelectItem value="create">Create</SelectItem>
+                  <SelectItem value="update">Update</SelectItem>
+                  <SelectItem value="delete">Delete</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div>
+              <Select
+                value={entityTypeFilter}
+                onValueChange={setEntityTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All entities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All entities</SelectItem>
+                  <SelectItem value="user">Users</SelectItem>
+                  <SelectItem value="question">Questions</SelectItem>
+                  <SelectItem value="pack">Packs</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="Start date"
+              />
+            </div>
+
+            <div>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="End date"
+              />
+            </div>
+
+            <div>
               <Button
                 variant="outline"
-                size="sm"
-                onClick={() =>
-                  setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
-                }
-                disabled={!pagination.hasPrev}>
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-              <div className="text-sm">
-                Page {pagination.page} of {pagination.totalPages}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-                }
-                disabled={!pagination.hasNext}>
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
+                onClick={handleResetFilters}
+                className="w-full">
+                Reset Filters
               </Button>
             </div>
           </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
+
+      {/* Activity Table */}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Admin</TableHead>
+                <TableHead>Action</TableHead>
+                <TableHead>Entity</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      <span className="text-muted-foreground">
+                        Loading activity logs...
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : logs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <div className="text-muted-foreground">
+                      No activity logs found
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                logs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage
+                            src={log.adminPicture}
+                            alt={log.adminName}
+                          />
+                          <AvatarFallback>
+                            {log.adminName?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium text-sm">
+                            {log.adminName}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {log.adminEmail}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getActionBadge(log.actionType)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {log.entityType}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="max-w-md">
+                      <div className="text-sm break-words whitespace-normal">
+                        {getActionDescription(log)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {formatDistanceToNow(new Date(log.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      {!isLoading && logs.length > 0 && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+            {pagination.total} results
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
+              disabled={!pagination.hasPrev}>
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
+              disabled={!pagination.hasNext}>
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

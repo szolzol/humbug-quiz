@@ -270,6 +270,8 @@ function App() {
       answers: Array<{ answer_en: string; answer_hu: string }>;
       source_name?: string;
       source_url?: string;
+      thumbs_up_count?: number;
+      thumbs_down_count?: number;
     }>
   >([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
@@ -329,6 +331,8 @@ function App() {
       ),
       sourceName: q.source_name,
       sourceUrl: q.source_url,
+      thumbs_up_count: q.thumbs_up_count,
+      thumbs_down_count: q.thumbs_down_count,
     }));
   }, [apiQuestions, currentLang]);
 

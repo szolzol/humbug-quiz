@@ -85,6 +85,9 @@ export async function GET(request: Request) {
         q.source_name,
         q.source_url,
         q.order_index,
+        q.thumbs_up_count,
+        q.thumbs_down_count,
+        q.feedback_score,
         json_agg(
           json_build_object(
             'id', a.id,
@@ -97,7 +100,8 @@ export async function GET(request: Request) {
       LEFT JOIN answers a ON a.question_id = q.id
       WHERE q.set_id = ${questionSet.id} AND q.is_active = true
       GROUP BY q.id, q.question_en, q.question_hu, q.category, 
-               q.difficulty, q.source_name, q.source_url, q.order_index
+               q.difficulty, q.source_name, q.source_url, q.order_index,
+               q.thumbs_up_count, q.thumbs_down_count, q.feedback_score
       ORDER BY q.order_index ASC
     `;
 

@@ -13,6 +13,8 @@ interface QuizQuestion {
   category: string;
   sourceUrl?: string;
   sourceName?: string;
+  thumbs_up_count?: number;
+  thumbs_down_count?: number;
 }
 
 interface QuestionCardProps {
@@ -100,6 +102,14 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   });
   const [isAnimatingCompletion, setIsAnimatingCompletion] = useState(false);
 
+  // Load feedback counts from question data (available to all users)
+  useEffect(() => {
+    setFeedbackCounts({
+      thumbsUp: question.thumbs_up_count || 0,
+      thumbsDown: question.thumbs_down_count || 0,
+    });
+  }, [question.thumbs_up_count, question.thumbs_down_count]);
+
   // Load user's progress and completion status on mount
   useEffect(() => {
     const loadUserProgress = async () => {
@@ -173,12 +183,28 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     });
   };
 
-  // RESET button: Clear all marked answers
+  // RESET button: Clear all marked answers AND completion status
   const handleReset = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedAnswers(new Set());
     setStoredAnswers(question.id, new Set());
+    setIsCompleted(false); // Reset completion status
     setHasTrackedCompletion(false); // Allow tracking completion again
+
+    // Call API to reset progress in database
+    if (isAuthenticated) {
+      fetch("/api/user-actions?action=reset-progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ questionId: question.id }),
+        credentials: "include",
+      }).catch((error) => {
+        console.error("Failed to reset progress:", error);
+      });
+    }
+
     toast.success(t("questions.resetSuccess"));
   };
 
@@ -504,63 +530,69 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                 </button>
               </div>
 
-              {/* Right side: Thumbs Up/Down (only show if authenticated) */}
-              {isAuthenticated && (
-                <div className="flex gap-1.5">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+              {/* Right side: Thumbs Up/Down (visible to all, clickable only if authenticated) */}
+              <div className="flex gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isAuthenticated) {
                       handleFeedback(1);
-                    }}
-                    className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
-                      userVote === 1
-                        ? "bg-green-500/30 text-green-700 border border-green-500/50"
-                        : "bg-muted hover:bg-muted/70 text-card-foreground"
-                    }`}>
-                    <svg
-                      className="w-3 h-3"
-                      fill={userVote === 1 ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                      />
-                    </svg>
-                    <span className="text-xs font-medium">
-                      {feedbackCounts.thumbsUp}
-                    </span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    } else {
+                      toast.error(t("questions.loginRequired"));
+                    }
+                  }}
+                  className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
+                    userVote === 1
+                      ? "bg-green-500/30 text-green-700 border border-green-500/50"
+                      : "bg-muted hover:bg-muted/70 text-card-foreground"
+                  }`}>
+                  <svg
+                    className="w-3 h-3"
+                    fill={userVote === 1 ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                    />
+                  </svg>
+                  <span className="text-xs font-medium">
+                    {feedbackCounts.thumbsUp}
+                  </span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isAuthenticated) {
                       handleFeedback(-1);
-                    }}
-                    className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
-                      userVote === -1
-                        ? "bg-red-500/30 text-red-700 border border-red-500/50"
-                        : "bg-muted hover:bg-muted/70 text-card-foreground"
-                    }`}>
-                    <svg
-                      className="w-3 h-3 rotate-180"
-                      fill={userVote === -1 ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                      />
-                    </svg>
-                    <span className="text-xs font-medium">
-                      {feedbackCounts.thumbsDown}
-                    </span>
-                  </button>
-                </div>
-              )}
+                    } else {
+                      toast.error(t("questions.loginRequired"));
+                    }
+                  }}
+                  className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
+                    userVote === -1
+                      ? "bg-red-500/30 text-red-700 border border-red-500/50"
+                      : "bg-muted hover:bg-muted/70 text-card-foreground"
+                  }`}>
+                  <svg
+                    className="w-3 h-3 rotate-180"
+                    fill={userVote === -1 ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                    />
+                  </svg>
+                  <span className="text-xs font-medium">
+                    {feedbackCounts.thumbsDown}
+                  </span>
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -677,6 +677,9 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
       timesPlayed: q.times_played || 0,
       timesCompleted: q.times_completed || 0,
       answerCount: parseInt(q.answer_count) || 0,
+      thumbsUpCount: q.thumbs_up_count || 0,
+      thumbsDownCount: q.thumbs_down_count || 0,
+      feedbackScore: q.feedback_score || 0,
       metadata: q.metadata,
     }));
 
@@ -1427,6 +1430,34 @@ async function getDashboardStats(req: VercelRequest, res: VercelResponse) {
     `);
     const solvedChange = parseInt(solvedWeekResult.rows[0].total);
 
+    // Get total thumbs up
+    const thumbsUpResult = await pool.query(`
+      SELECT COALESCE(SUM(thumbs_up_count), 0) as total FROM questions WHERE is_active = true
+    `);
+    const totalThumbsUp = parseInt(thumbsUpResult.rows[0].total);
+
+    // Get thumbs up in the last 7 days
+    const thumbsUpWeekResult = await pool.query(`
+      SELECT COALESCE(SUM(thumbs_up_count), 0) as total 
+      FROM questions 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const thumbsUpChange = parseInt(thumbsUpWeekResult.rows[0].total);
+
+    // Get total thumbs down
+    const thumbsDownResult = await pool.query(`
+      SELECT COALESCE(SUM(thumbs_down_count), 0) as total FROM questions WHERE is_active = true
+    `);
+    const totalThumbsDown = parseInt(thumbsDownResult.rows[0].total);
+
+    // Get thumbs down in the last 7 days
+    const thumbsDownWeekResult = await pool.query(`
+      SELECT COALESCE(SUM(thumbs_down_count), 0) as total 
+      FROM questions 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const thumbsDownChange = parseInt(thumbsDownWeekResult.rows[0].total);
+
     // Generate chart data: 30 days of user count and play count
     const chartResult = await pool.query(`
       WITH dates AS (
@@ -1452,12 +1483,16 @@ async function getDashboardStats(req: VercelRequest, res: VercelResponse) {
         totalPacks,
         totalPlays,
         totalSolved,
+        totalThumbsUp,
+        totalThumbsDown,
         recentActivities,
         usersChange,
         questionsChange,
         packsChange,
         playsChange,
         solvedChange,
+        thumbsUpChange,
+        thumbsDownChange,
       },
       chartData,
     });

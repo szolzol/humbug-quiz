@@ -18,6 +18,8 @@ import {
   TrendingUp,
   Play,
   CheckCircle,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import {
   LineChart,
@@ -36,12 +38,16 @@ interface DashboardStats {
   totalPacks: number;
   totalPlays: number;
   totalSolved: number;
+  totalThumbsUp: number;
+  totalThumbsDown: number;
   recentActivities: number;
   usersChange: number;
   questionsChange: number;
   packsChange: number;
   playsChange: number;
   solvedChange: number;
+  thumbsUpChange: number;
+  thumbsDownChange: number;
 }
 
 interface ChartDataPoint {
@@ -57,12 +63,16 @@ export function AdminDashboard() {
     totalPacks: 0,
     totalPlays: 0,
     totalSolved: 0,
+    totalThumbsUp: 0,
+    totalThumbsDown: 0,
     recentActivities: 0,
     usersChange: 0,
     questionsChange: 0,
     packsChange: 0,
     playsChange: 0,
     solvedChange: 0,
+    thumbsUpChange: 0,
+    thumbsDownChange: 0,
   });
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +108,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -192,6 +202,56 @@ export function AdminDashboard() {
                 <p className="text-xs text-muted-foreground mt-1">
                   Admin actions
                 </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Thumbs Up</CardTitle>
+            <ThumbsUp className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="h-8 w-16 animate-pulse bg-muted rounded" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.totalThumbsUp.toLocaleString()}
+                </div>
+                {stats.thumbsUpChange !== 0 && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                    <TrendingUp className="h-3 w-3" />
+                    {stats.thumbsUpChange > 0 ? "+" : ""}
+                    {stats.thumbsUpChange} this week
+                  </p>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Thumbs Down</CardTitle>
+            <ThumbsDown className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="h-8 w-16 animate-pulse bg-muted rounded" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-red-600">
+                  {stats.totalThumbsDown.toLocaleString()}
+                </div>
+                {stats.thumbsDownChange !== 0 && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                    <TrendingUp className="h-3 w-3" />
+                    {stats.thumbsDownChange > 0 ? "+" : ""}
+                    {stats.thumbsDownChange} this week
+                  </p>
+                )}
               </>
             )}
           </CardContent>

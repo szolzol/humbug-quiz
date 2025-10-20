@@ -52,6 +52,9 @@ interface Question {
   timesPlayed: number;
   timesCompleted: number;
   answerCount: number;
+  thumbsUpCount?: number;
+  thumbsDownCount?: number;
+  feedbackScore?: number;
 }
 
 interface Pagination {
@@ -376,6 +379,14 @@ export function QuestionsPage() {
                           Completed:
                         </span>{" "}
                         {question.timesCompleted}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-600">
+                          👍 {question.thumbsUpCount || 0}
+                        </span>
+                        <span className="text-red-600">
+                          👎 {question.thumbsDownCount || 0}
+                        </span>
                       </div>
                     </div>
                   </TableCell>

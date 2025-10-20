@@ -62,7 +62,16 @@
         "flipCard": "Játékmester vagy? Nyomj a válaszokért!",
         "totalAnswers": "Összesen {{count}} lehetséges válasz",
         "correctAnswers": "Helyes válaszok",
-        "clickToMark": "Kattints a válaszokra a jelöléshez"
+        "clickToMark": "Kattints a válaszokra a jelöléshez",
+        "reset": "ÚJRA",
+        "finished": "KÉSZ",
+        "resetSuccess": "Válaszok törölve!",
+        "markedCompleted": "Befejezettnek jelölve!",
+        "loginRequired": "Ehhez be kell jelentkezni",
+        "errorCompleted": "Hiba történt a jelölésnél",
+        "likedQuestion": "Kérdés tetszett!",
+        "dislikedQuestion": "Kérdés nem tetszett!",
+        "errorFeedback": "Hiba történt a visszajelzésnél"
     },
     "questionPacks": {
         "menu": "Kérdéscsomagok menü",

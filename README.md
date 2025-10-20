@@ -796,14 +796,18 @@ humbug-quiz/
 
 ### Available Scripts
 
-| Command                 | Description                           |
-| ----------------------- | ------------------------------------- |
-| `npm run dev`           | Start Vite dev server with hot reload |
-| `npm run dev -- --host` | Expose dev server on local network    |
-| `npm run build`         | Build production bundle to `dist/`    |
-| `npm run preview`       | Preview production build locally      |
-| `npm run lint`          | Run ESLint for code quality checks    |
-| `npm run type-check`    | Run TypeScript compiler checks        |
+| Command                 | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| `npm run dev`           | Start Vite dev server (frontend only, no APIs) |
+| `npm run dev:full`      | Start Vercel dev (frontend + API functions) ⭐ |
+| `npm run dev -- --host` | Expose dev server on local network             |
+| `npm run build`         | Build production bundle to `dist/`             |
+| `npm run preview`       | Preview production build locally               |
+| `npm run lint`          | Run ESLint for code quality checks             |
+| `npm run type-check`    | Run TypeScript compiler checks                 |
+| `npm run migrate`       | Run database migration scripts                 |
+
+> ⚠️ **Important**: Use `npm run dev:full` when working with question packs, authentication, or any API features. The regular `npm run dev` only runs the Vite frontend server and will **not** load question packs.
 
 ### Development Workflow
 

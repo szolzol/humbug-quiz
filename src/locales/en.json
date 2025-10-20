@@ -62,7 +62,16 @@
         "flipCard": "Game master? Click for the answers!",
         "totalAnswers": "Total of {{count}} possible answers",
         "correctAnswers": "Correct Answers",
-        "clickToMark": "Click on answers to mark them"
+        "clickToMark": "Click on answers to mark them",
+        "reset": "RESET",
+        "finished": "FINISHED",
+        "resetSuccess": "Answers cleared!",
+        "markedCompleted": "Marked as finished!",
+        "loginRequired": "Please log in to use this feature",
+        "errorCompleted": "Failed to mark as completed",
+        "likedQuestion": "Question liked!",
+        "dislikedQuestion": "Question disliked!",
+        "errorFeedback": "Failed to submit feedback"
     },
     "questionPacks": {
         "menu": "Question packs menu",

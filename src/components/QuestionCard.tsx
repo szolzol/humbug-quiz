@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowsClockwise, ArrowUpRight } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface QuizQuestion {
   id: string;
@@ -78,6 +80,7 @@ const setStoredAnswers = (questionId: string, answers: Set<number>) => {
 
 export function QuestionCard({ question, index }: QuestionCardProps) {
   const { t } = useTranslation();
+  const { isAuthenticated, user } = useAuth();
 
   const [isFlipped, setIsFlipped] = useState(() =>
     getStoredFlipState(question.id)
@@ -87,6 +90,14 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   );
   const [hasTrackedPlay, setHasTrackedPlay] = useState(false);
   const [hasTrackedCompletion, setHasTrackedCompletion] = useState(false);
+
+  // New state for feedback and completion
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [userVote, setUserVote] = useState<1 | -1 | null>(null);
+  const [feedbackCounts, setFeedbackCounts] = useState({
+    thumbsUp: 0,
+    thumbsDown: 0,
+  });
 
   // Track when card is flipped (played)
   useEffect(() => {
@@ -152,6 +163,86 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
       }
       return newSet;
     });
+  };
+
+  // RESET button: Clear all marked answers
+  const handleReset = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAnswers(new Set());
+    setStoredAnswers(question.id, new Set());
+    setHasTrackedCompletion(false); // Allow tracking completion again
+    toast.success(t("questions.resetSuccess"));
+  };
+
+  // FINISHED button: Mark question as completed
+  const handleMarkCompleted = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error(t("questions.loginRequired"));
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user-actions?action=mark-completed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ questionId: question.id }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setIsCompleted(true);
+        toast.success(t("questions.markedCompleted"));
+      } else {
+        throw new Error("Failed to mark as completed");
+      }
+    } catch (error) {
+      console.error("Error marking completed:", error);
+      toast.error(t("questions.errorCompleted"));
+    }
+  };
+
+  // Thumbs up/down feedback
+  const handleFeedback = async (vote: 1 | -1) => {
+    if (!isAuthenticated) {
+      toast.error(t("questions.loginRequired"));
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user-actions?action=feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ questionId: question.id, vote }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserVote(vote);
+        if (data.feedback) {
+          setFeedbackCounts({
+            thumbsUp: data.feedback.thumbs_up_count || 0,
+            thumbsDown: data.feedback.thumbs_down_count || 0,
+          });
+        }
+        toast.success(
+          vote === 1
+            ? t("questions.likedQuestion")
+            : t("questions.dislikedQuestion")
+        );
+      } else {
+        throw new Error("Failed to submit feedback");
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast.error(t("questions.errorFeedback"));
+    }
   };
 
   // Determine number of columns based on answer count
@@ -312,6 +403,116 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             </div>
             <div className="mt-2 text-muted-foreground text-[10px] md:text-xs text-center leading-tight">
               {t("questions.clickToMark")}
+            </div>
+
+            {/* Action buttons: RESET, FINISHED, Thumbs Up/Down */}
+            <div className="mt-3 pt-3 border-t border-border flex justify-between items-center gap-2">
+              {/* Left side: RESET and FINISHED */}
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReset(e);
+                  }}
+                  className="px-3 py-2 text-xs md:text-sm font-medium bg-muted hover:bg-muted/70 text-card-foreground rounded transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  <span>{t("questions.reset")}</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMarkCompleted(e);
+                  }}
+                  disabled={isCompleted}
+                  className={`px-3 py-2 text-xs md:text-sm font-medium rounded transition-colors flex items-center gap-1.5 cursor-pointer ${
+                    isCompleted
+                      ? "bg-green-500/30 text-green-700 cursor-not-allowed"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  }`}>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>{t("questions.finished")}</span>
+                </button>
+              </div>
+
+              {/* Right side: Thumbs Up/Down (only show if authenticated) */}
+              {isAuthenticated && (
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFeedback(1);
+                    }}
+                    className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
+                      userVote === 1
+                        ? "bg-green-500/30 text-green-700 border border-green-500/50"
+                        : "bg-muted hover:bg-muted/70 text-card-foreground"
+                    }`}>
+                    <svg
+                      className="w-3 h-3"
+                      fill={userVote === 1 ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                      />
+                    </svg>
+                    <span className="text-xs font-medium">
+                      {feedbackCounts.thumbsUp}
+                    </span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFeedback(-1);
+                    }}
+                    className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
+                      userVote === -1
+                        ? "bg-red-500/30 text-red-700 border border-red-500/50"
+                        : "bg-muted hover:bg-muted/70 text-card-foreground"
+                    }`}>
+                    <svg
+                      className="w-3 h-3 rotate-180"
+                      fill={userVote === -1 ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                      />
+                    </svg>
+                    <span className="text-xs font-medium">
+                      {feedbackCounts.thumbsDown}
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

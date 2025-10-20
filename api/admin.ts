@@ -238,6 +238,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return handlePacks(req, res, admin);
       case "activity":
         return handleActivity(req, res, admin);
+      case "dashboard-stats":
+        return handleDashboardStats(req, res, admin);
       default:
         return res.status(400).json({ error: `Unknown resource: ${resource}` });
     }
@@ -1343,6 +1345,148 @@ async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error("Error fetching activity logs:", error);
     res.status(500).json({ error: "Failed to fetch activity logs" });
+  } finally {
+    await pool.end();
+  }
+}
+
+async function handleDashboardStats(
+  req: VercelRequest,
+  res: VercelResponse,
+  admin: AdminUser
+) {
+  if (req.method === "GET") {
+    return await getDashboardStats(req, res);
+  }
+
+  return res.status(400).json({ error: "Invalid operation" });
+}
+
+async function getDashboardStats(req: VercelRequest, res: VercelResponse) {
+  if (!process.env.POSTGRES_POSTGRES_URL) {
+    return res.status(500).json({ error: "Database not configured" });
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    // Get total users
+    const usersResult = await pool.query(`
+      SELECT COUNT(*) as total FROM users
+    `);
+    const totalUsers = parseInt(usersResult.rows[0].total);
+
+    // Get users created in the last 7 days
+    const usersWeekResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM users 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const usersChange = parseInt(usersWeekResult.rows[0].total);
+
+    // Get total questions
+    const questionsResult = await pool.query(`
+      SELECT COUNT(*) as total FROM questions WHERE is_active = true
+    `);
+    const totalQuestions = parseInt(questionsResult.rows[0].total);
+
+    // Get questions created in the last 7 days
+    const questionsWeekResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM questions 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const questionsChange = parseInt(questionsWeekResult.rows[0].total);
+
+    // Get total packs
+    const packsResult = await pool.query(`
+      SELECT COUNT(*) as total FROM question_sets WHERE is_active = true
+    `);
+    const totalPacks = parseInt(packsResult.rows[0].total);
+
+    // Get packs created in the last 7 days
+    const packsWeekResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM question_sets 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const packsChange = parseInt(packsWeekResult.rows[0].total);
+
+    // Get activity count in last 24 hours
+    const activityResult = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM admin_activity_log 
+      WHERE created_at >= NOW() - INTERVAL '24 hours'
+    `);
+    const recentActivities = parseInt(activityResult.rows[0].total);
+
+    // Get total plays
+    const playsResult = await pool.query(`
+      SELECT COALESCE(SUM(times_played), 0) as total FROM questions WHERE is_active = true
+    `);
+    const totalPlays = parseInt(playsResult.rows[0].total);
+
+    // Get plays in the last 7 days (sum of times_played for questions created this week)
+    const playsWeekResult = await pool.query(`
+      SELECT COALESCE(SUM(times_played), 0) as total 
+      FROM questions 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const playsChange = parseInt(playsWeekResult.rows[0].total);
+
+    // Get total solved
+    const solvedResult = await pool.query(`
+      SELECT COALESCE(SUM(times_completed), 0) as total FROM questions WHERE is_active = true
+    `);
+    const totalSolved = parseInt(solvedResult.rows[0].total);
+
+    // Get solved in the last 7 days
+    const solvedWeekResult = await pool.query(`
+      SELECT COALESCE(SUM(times_completed), 0) as total 
+      FROM questions 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+    const solvedChange = parseInt(solvedWeekResult.rows[0].total);
+
+    // Generate chart data: 30 days of user count and play count
+    const chartResult = await pool.query(`
+      WITH dates AS (
+        SELECT generate_series(
+          CURRENT_DATE - INTERVAL '29 days',
+          CURRENT_DATE,
+          '1 day'::interval
+        )::date AS date
+      )
+      SELECT 
+        d.date::text,
+        (SELECT COUNT(*) FROM users WHERE created_at::date <= d.date) as users,
+        COALESCE((SELECT SUM(times_played) FROM questions WHERE created_at::date = d.date), 0) as plays
+      FROM dates d
+      ORDER BY d.date
+    `);
+    const chartData = chartResult.rows;
+
+    res.status(200).json({
+      stats: {
+        totalUsers,
+        totalQuestions,
+        totalPacks,
+        totalPlays,
+        totalSolved,
+        recentActivities,
+        usersChange,
+        questionsChange,
+        packsChange,
+        playsChange,
+        solvedChange,
+      },
+      chartData,
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    res.status(500).json({ error: "Failed to fetch dashboard stats" });
   } finally {
     await pool.end();
   }

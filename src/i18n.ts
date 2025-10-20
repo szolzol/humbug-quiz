@@ -12,14 +12,15 @@ i18n
       hu: { translation: hu },
       en: { translation: en },
     },
-    fallbackLng: "hu",
-    lng: localStorage.getItem("language") || "hu",
+    fallbackLng: "en", // Default to English for non-Hungarian browsers
+    supportedLngs: ["hu", "en"],
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ["localStorage", "navigator"],
+      order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
+      lookupLocalStorage: "language",
     },
   });
 

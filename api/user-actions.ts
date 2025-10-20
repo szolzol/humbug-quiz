@@ -298,7 +298,10 @@ async function handleMarkCompleted(
     // Increment times_completed counter ONLY if not already completed by this user
     if (!alreadyCompleted) {
       await pool.query(
-        `UPDATE questions SET times_completed = times_completed + 1 WHERE id = $1`,
+        `UPDATE questions 
+         SET times_completed = times_completed + 1, 
+             updated_at = NOW() 
+         WHERE id = $1`,
         [questionId]
       );
     }
@@ -360,7 +363,10 @@ async function handleTrackPlay(
     // Increment times_played counter ONLY if first time played by this user
     if (!alreadyPlayed) {
       await pool.query(
-        `UPDATE questions SET times_played = times_played + 1 WHERE id = $1`,
+        `UPDATE questions 
+         SET times_played = times_played + 1, 
+             updated_at = NOW() 
+         WHERE id = $1`,
         [questionId]
       );
     }

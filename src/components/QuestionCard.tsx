@@ -110,29 +110,48 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     });
   }, [question.thumbs_up_count, question.thumbs_down_count]);
 
-  // Load user's progress and completion status on mount
+  // Load completion status from localStorage (for unauthenticated) or database (for authenticated)
   useEffect(() => {
-    const loadUserProgress = async () => {
-      if (!isAuthenticated || !user) return;
-
-      try {
-        const response = await fetch(
-          `/api/user-actions?action=progress&questionId=${question.id}`,
-          { credentials: "include" }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.isCompleted) {
+    const loadCompletionStatus = async () => {
+      // First, check localStorage (works for everyone)
+      if (hasFunctionalConsent()) {
+        try {
+          const stored = localStorage.getItem(`completed_${question.id}`);
+          if (stored === "true") {
             setIsCompleted(true);
           }
+
+          // Load vote from localStorage
+          const storedVote = localStorage.getItem(`vote_${question.id}`);
+          if (storedVote) {
+            setUserVote(parseInt(storedVote) as 1 | -1);
+          }
+        } catch (error) {
+          // Ignore localStorage errors
         }
-      } catch (error) {
-        console.error("Error loading progress:", error);
+      }
+
+      // If authenticated, also check database (takes precedence)
+      if (isAuthenticated && user) {
+        try {
+          const response = await fetch(
+            `/api/user-actions?action=progress&questionId=${question.id}`,
+            { credentials: "include" }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.isCompleted) {
+              setIsCompleted(true);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading progress:", error);
+        }
       }
     };
 
-    loadUserProgress();
+    loadCompletionStatus();
   }, [isAuthenticated, user, question.id]);
 
   // Track when card is flipped (played) - ONLY ONCE PER USER
@@ -212,11 +231,6 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   const handleMarkCompleted = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!isAuthenticated) {
-      toast.error(t("questions.loginRequired"));
-      return;
-    }
-
     if (isCompleted || isAnimatingCompletion) {
       return; // Already completed or animating
     }
@@ -243,28 +257,43 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
       // Wait a moment to show all answers marked
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Call API to mark as completed (increments times_completed ONCE per user)
-      const response = await fetch("/api/user-actions?action=mark-completed", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ questionId: question.id }),
-        credentials: "include",
-      });
+      // Mark as completed locally
+      setIsCompleted(true);
+      setHasTrackedCompletion(true);
 
-      if (response.ok) {
-        setIsCompleted(true);
-        setHasTrackedCompletion(true);
-
-        // Flip back to question side after 1 second
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsFlipped(false);
-
-        toast.success(t("questions.markedCompleted"));
-      } else {
-        throw new Error("Failed to mark as completed");
+      // Save to localStorage
+      if (hasFunctionalConsent()) {
+        try {
+          localStorage.setItem(`completed_${question.id}`, "true");
+        } catch (error) {
+          // Ignore localStorage errors
+        }
       }
+
+      // If authenticated, also call API to track in database
+      if (isAuthenticated) {
+        const response = await fetch(
+          "/api/user-actions?action=mark-completed",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ questionId: question.id }),
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          console.error("Failed to sync completion to database");
+        }
+      }
+
+      // Flip back to question side after 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsFlipped(false);
+
+      toast.success(t("questions.markedCompleted"));
     } catch (error) {
       console.error("Error marking completed:", error);
       toast.error(t("questions.errorCompleted"));
@@ -275,41 +304,55 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
   // Thumbs up/down feedback
   const handleFeedback = async (vote: 1 | -1) => {
-    if (!isAuthenticated) {
-      toast.error(t("questions.loginRequired"));
-      return;
-    }
-
     try {
-      const response = await fetch("/api/user-actions?action=feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ questionId: question.id, vote }),
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserVote(vote);
-        if (data.feedback) {
-          setFeedbackCounts({
-            thumbsUp: data.feedback.thumbs_up_count || 0,
-            thumbsDown: data.feedback.thumbs_down_count || 0,
-          });
+      // Store vote locally first
+      setUserVote(vote);
+      if (hasFunctionalConsent()) {
+        try {
+          localStorage.setItem(`vote_${question.id}`, String(vote));
+        } catch (error) {
+          // Ignore localStorage errors
         }
-        toast.success(
-          vote === 1
-            ? t("questions.likedQuestion")
-            : t("questions.dislikedQuestion")
-        );
-      } else {
-        throw new Error("Failed to submit feedback");
       }
+
+      // If authenticated, sync to database
+      if (isAuthenticated) {
+        const response = await fetch("/api/user-actions?action=feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ questionId: question.id, vote }),
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.feedback) {
+            setFeedbackCounts({
+              thumbsUp: data.feedback.thumbs_up_count || 0,
+              thumbsDown: data.feedback.thumbs_down_count || 0,
+            });
+          }
+        } else {
+          throw new Error("Failed to submit feedback");
+        }
+      } else {
+        // For unauthenticated users, just show a message
+        toast.info(t("questions.feedbackSaved"));
+      }
+
+      toast.success(
+        vote === 1
+          ? t("questions.likedQuestion")
+          : t("questions.dislikedQuestion")
+      );
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      toast.error(t("questions.errorFeedback"));
+      // Don't show error to unauthenticated users since local save worked
+      if (isAuthenticated) {
+        toast.error(t("questions.errorFeedback"));
+      }
     }
   };
 
@@ -530,16 +573,12 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                 </button>
               </div>
 
-              {/* Right side: Thumbs Up/Down (visible to all, clickable only if authenticated) */}
+              {/* Right side: Thumbs Up/Down (visible and clickable for everyone) */}
               <div className="flex gap-1.5">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (isAuthenticated) {
-                      handleFeedback(1);
-                    } else {
-                      toast.error(t("questions.loginRequired"));
-                    }
+                    handleFeedback(1);
                   }}
                   className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
                     userVote === 1
@@ -565,11 +604,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (isAuthenticated) {
-                      handleFeedback(-1);
-                    } else {
-                      toast.error(t("questions.loginRequired"));
-                    }
+                    handleFeedback(-1);
                   }}
                   className={`px-2 py-2 text-xs rounded transition-all flex items-center gap-1 cursor-pointer ${
                     userVote === -1

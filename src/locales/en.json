@@ -65,6 +65,7 @@
         "clickToMark": "Click on answers to mark them",
         "reset": "RESET",
         "finished": "FINISHED",
+        "completing": "Completing...",
         "resetSuccess": "Answers cleared!",
         "markedCompleted": "Marked as finished!",
         "loginRequired": "Please log in to use this feature",

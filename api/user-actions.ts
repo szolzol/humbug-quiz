@@ -65,6 +65,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await handleResetProgress(req, res, user);
       case "mark-completed":
         return await handleMarkCompleted(req, res, user);
+      case "track-play":
+        return await handleTrackPlay(req, res, user);
       default:
         return res.status(400).json({ error: "Invalid action" });
     }
@@ -250,7 +252,7 @@ async function handleResetProgress(
 }
 
 /**
- * Mark question as completed
+ * Mark question as completed (ONCE PER USER)
  * POST /api/user-actions?action=mark-completed
  * Body: { questionId: number }
  */
@@ -274,6 +276,16 @@ async function handleMarkCompleted(
   });
 
   try {
+    // Check if user already completed this question
+    const existingResult = await pool.query(
+      `SELECT is_completed FROM user_question_progress 
+       WHERE user_id = $1 AND question_id = $2`,
+      [user.userId, questionId]
+    );
+
+    const alreadyCompleted =
+      existingResult.rows.length > 0 && existingResult.rows[0].is_completed;
+
     // Mark question as completed
     await pool.query(
       `INSERT INTO user_question_progress (user_id, question_id, is_completed, completed_at, last_viewed_at)
@@ -283,16 +295,82 @@ async function handleMarkCompleted(
       [user.userId, questionId]
     );
 
-    // Increment times_completed counter
-    await pool.query(
-      `UPDATE questions SET times_completed = times_completed + 1 WHERE id = $1`,
-      [questionId]
-    );
+    // Increment times_completed counter ONLY if not already completed by this user
+    if (!alreadyCompleted) {
+      await pool.query(
+        `UPDATE questions SET times_completed = times_completed + 1 WHERE id = $1`,
+        [questionId]
+      );
+    }
 
-    return res.status(200).json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, wasAlreadyCompleted: alreadyCompleted });
   } catch (error) {
     console.error("Mark completed error:", error);
     return res.status(500).json({ error: "Failed to mark as completed" });
+  } finally {
+    await pool.end();
+  }
+}
+
+/**
+ * Track question play (ONCE PER USER)
+ * POST /api/user-actions?action=track-play
+ * Body: { questionId: number }
+ */
+async function handleTrackPlay(
+  req: VercelRequest,
+  res: VercelResponse,
+  user: { userId: string }
+) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { questionId } = req.body;
+
+  if (!questionId) {
+    return res.status(400).json({ error: "questionId required" });
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    // Check if user already has progress record (played before)
+    const existingResult = await pool.query(
+      `SELECT id FROM user_question_progress 
+       WHERE user_id = $1 AND question_id = $2`,
+      [user.userId, questionId]
+    );
+
+    const alreadyPlayed = existingResult.rows.length > 0;
+
+    // Create or update progress record
+    await pool.query(
+      `INSERT INTO user_question_progress (user_id, question_id, last_viewed_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (user_id, question_id)
+       DO UPDATE SET last_viewed_at = NOW()`,
+      [user.userId, questionId]
+    );
+
+    // Increment times_played counter ONLY if first time played by this user
+    if (!alreadyPlayed) {
+      await pool.query(
+        `UPDATE questions SET times_played = times_played + 1 WHERE id = $1`,
+        [questionId]
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, wasAlreadyPlayed: alreadyPlayed });
+  } catch (error) {
+    console.error("Track play error:", error);
+    return res.status(500).json({ error: "Failed to track play" });
   } finally {
     await pool.end();
   }

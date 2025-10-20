@@ -65,6 +65,7 @@
         "clickToMark": "Kattints a válaszokra a jelöléshez",
         "reset": "ÚJRA",
         "finished": "KÉSZ",
+        "completing": "Befejezés...",
         "resetSuccess": "Válaszok törölve!",
         "markedCompleted": "Befejezettnek jelölve!",
         "loginRequired": "Ehhez be kell jelentkezni",

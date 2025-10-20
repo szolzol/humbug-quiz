@@ -98,49 +98,57 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     thumbsUp: 0,
     thumbsDown: 0,
   });
+  const [isAnimatingCompletion, setIsAnimatingCompletion] = useState(false);
 
-  // Track when card is flipped (played)
+  // Load user's progress and completion status on mount
+  useEffect(() => {
+    const loadUserProgress = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const response = await fetch(
+          `/api/user-actions?action=progress&questionId=${question.id}`,
+          { credentials: "include" }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isCompleted) {
+            setIsCompleted(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading progress:", error);
+      }
+    };
+
+    loadUserProgress();
+  }, [isAuthenticated, user, question.id]);
+
+  // Track when card is flipped (played) - ONLY ONCE PER USER
   useEffect(() => {
     if (isFlipped && !hasTrackedPlay) {
       // Track that the question was played (card flipped to see answers)
-      fetch(`/api/questions/${question.id}/track`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: "played" }),
-      }).catch((error) => {
-        console.error("Failed to track play:", error);
-      });
-      setHasTrackedPlay(true);
+      const trackPlay = async () => {
+        try {
+          // This increments times_played in the database (once per user)
+          await fetch(`/api/user-actions?action=track-play`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ questionId: question.id }),
+            credentials: "include",
+          });
+          setHasTrackedPlay(true);
+        } catch (error) {
+          console.error("Failed to track play:", error);
+        }
+      };
+
+      trackPlay();
     }
   }, [isFlipped, question.id, hasTrackedPlay]);
-
-  // Track when all answers are marked (completed)
-  useEffect(() => {
-    if (
-      selectedAnswers.size === question.answers.length &&
-      question.answers.length > 0 &&
-      !hasTrackedCompletion
-    ) {
-      // Track that all answers were found
-      fetch(`/api/questions/${question.id}/track`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: "completed" }),
-      }).catch((error) => {
-        console.error("Failed to track completion:", error);
-      });
-      setHasTrackedCompletion(true);
-    }
-  }, [
-    selectedAnswers.size,
-    question.answers.length,
-    question.id,
-    hasTrackedCompletion,
-  ]);
 
   // Persist flip state to localStorage
   useEffect(() => {
@@ -174,7 +182,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     toast.success(t("questions.resetSuccess"));
   };
 
-  // FINISHED button: Mark question as completed
+  // FINISHED button: Mark question as completed with animation
   const handleMarkCompleted = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -183,7 +191,33 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
       return;
     }
 
+    if (isCompleted || isAnimatingCompletion) {
+      return; // Already completed or animating
+    }
+
     try {
+      // Start animation: mark all answers one by one
+      setIsAnimatingCompletion(true);
+
+      const totalAnswers = question.answers.length;
+      const delayBetweenAnswers = 3000 / totalAnswers; // Spread over 3 seconds
+
+      // Animate marking each answer
+      for (let i = 0; i < totalAnswers; i++) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, delayBetweenAnswers)
+        );
+        setSelectedAnswers((prev) => {
+          const newSet = new Set(prev);
+          newSet.add(i);
+          return newSet;
+        });
+      }
+
+      // Wait a moment to show all answers marked
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Call API to mark as completed (increments times_completed ONCE per user)
       const response = await fetch("/api/user-actions?action=mark-completed", {
         method: "POST",
         headers: {
@@ -195,6 +229,12 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
       if (response.ok) {
         setIsCompleted(true);
+        setHasTrackedCompletion(true);
+
+        // Flip back to question side after 1 second
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setIsFlipped(false);
+
         toast.success(t("questions.markedCompleted"));
       } else {
         throw new Error("Failed to mark as completed");
@@ -202,6 +242,8 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
     } catch (error) {
       console.error("Error marking completed:", error);
       toast.error(t("questions.errorCompleted"));
+    } finally {
+      setIsAnimatingCompletion(false);
     }
   };
 
@@ -434,11 +476,13 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                     e.stopPropagation();
                     handleMarkCompleted(e);
                   }}
-                  disabled={isCompleted}
-                  className={`px-3 py-2 text-xs md:text-sm font-medium rounded transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  disabled={isCompleted || isAnimatingCompletion}
+                  className={`px-3 py-2 text-xs md:text-sm font-medium rounded transition-colors flex items-center gap-1.5 ${
                     isCompleted
                       ? "bg-green-500/30 text-green-700 cursor-not-allowed"
-                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                      : isAnimatingCompletion
+                      ? "bg-primary/70 text-primary-foreground cursor-wait animate-pulse"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
                   }`}>
                   <svg
                     className="w-4 h-4"
@@ -452,7 +496,11 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>{t("questions.finished")}</span>
+                  <span>
+                    {isAnimatingCompletion
+                      ? t("questions.completing")
+                      : t("questions.finished")}
+                  </span>
                 </button>
               </div>
 

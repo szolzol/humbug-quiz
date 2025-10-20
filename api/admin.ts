@@ -134,6 +134,49 @@ async function requireAdmin(
 }
 
 /**
+ * Log Activity
+ * Records admin actions to activity_logs table for audit trail
+ */
+async function logActivity(
+  userId: string,
+  actionType: "create" | "update" | "delete",
+  entityType: "user" | "question" | "pack" | "answer",
+  entityId: string,
+  details: any = {},
+  req?: VercelRequest
+) {
+  if (!process.env.POSTGRES_POSTGRES_URL) {
+    console.error("Cannot log activity: Database not configured");
+    return;
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_POSTGRES_URL,
+  });
+
+  try {
+    await pool.query(
+      `INSERT INTO activity_logs (user_id, action_type, entity_type, entity_id, details, ip_address, user_agent)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        userId,
+        actionType,
+        entityType,
+        entityId,
+        JSON.stringify(details),
+        req?.headers["x-forwarded-for"] || req?.headers["x-real-ip"] || null,
+        req?.headers["user-agent"] || null,
+      ]
+    );
+  } catch (error) {
+    console.error("Failed to log activity:", error);
+    // Don't throw - activity logging failure shouldn't break operations
+  } finally {
+    await pool.end();
+  }
+}
+
+/**
  * Unified Admin API Endpoint
  * Handles all admin operations via resource and id parameters
  *
@@ -384,6 +427,16 @@ async function updateUser(
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Log activity
+    await logActivity(
+      admin.id,
+      "update",
+      "user",
+      userId,
+      { role, is_active },
+      req
+    );
+
     res.status(200).json({ success: true, user: result.rows[0] });
   } catch (error) {
     console.error("Error updating user:", error);
@@ -421,9 +474,21 @@ async function deleteUser(
       return res.status(404).json({ error: "User not found" });
     }
 
+    const deletedUser = result.rows[0];
+
+    // Log activity
+    await logActivity(
+      admin.id,
+      "delete",
+      "user",
+      userId,
+      { email: deletedUser.email },
+      req
+    );
+
     res
       .status(200)
-      .json({ success: true, message: `User ${result.rows[0].email} deleted` });
+      .json({ success: true, message: `User ${deletedUser.email} deleted` });
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Failed to delete user" });
@@ -444,11 +509,11 @@ async function handleQuestions(
   }
 
   if (req.method === "PUT" && id) {
-    return await updateQuestion(req, res, id);
+    return await updateQuestion(req, res, id, admin);
   }
 
   if (req.method === "DELETE" && id) {
-    return await deleteQuestion(req, res, id);
+    return await deleteQuestion(req, res, id, admin);
   }
 
   return res.status(400).json({ error: "Invalid operation" });
@@ -639,7 +704,8 @@ async function getQuestionsList(req: VercelRequest, res: VercelResponse) {
 async function updateQuestion(
   req: VercelRequest,
   res: VercelResponse,
-  questionId: string
+  questionId: string,
+  admin: AdminUser
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -769,6 +835,16 @@ async function updateQuestion(
       }
     }
 
+    // Log activity
+    await logActivity(
+      admin.id,
+      "update",
+      "question",
+      questionId,
+      { question_en, question_hu, answersCount: answers?.length || 0 },
+      req
+    );
+
     res
       .status(200)
       .json({ success: true, message: "Question updated successfully" });
@@ -783,7 +859,8 @@ async function updateQuestion(
 async function deleteQuestion(
   req: VercelRequest,
   res: VercelResponse,
-  questionId: string
+  questionId: string,
+  admin: AdminUser
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -802,6 +879,9 @@ async function deleteQuestion(
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Question not found" });
     }
+
+    // Log activity
+    await logActivity(admin.id, "delete", "question", questionId, {}, req);
 
     res.status(200).json({ success: true, message: "Question deleted" });
   } catch (error) {
@@ -824,11 +904,11 @@ async function handlePacks(
   }
 
   if (req.method === "PUT" && id) {
-    return await updatePack(req, res, id);
+    return await updatePack(req, res, id, admin);
   }
 
   if (req.method === "DELETE" && id) {
-    return await deletePack(req, res, id);
+    return await deletePack(req, res, id, admin);
   }
 
   return res.status(400).json({ error: "Invalid operation" });
@@ -952,7 +1032,8 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
 async function updatePack(
   req: VercelRequest,
   res: VercelResponse,
-  packId: string
+  packId: string,
+  admin: AdminUser
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -1056,6 +1137,16 @@ async function updatePack(
       return res.status(404).json({ error: "Pack not found" });
     }
 
+    // Log activity
+    await logActivity(
+      admin.id,
+      "update",
+      "pack",
+      packId,
+      { name_en, name_hu, pack_type, access_level },
+      req
+    );
+
     res.status(200).json({ success: true, pack: result.rows[0] });
   } catch (error) {
     console.error("Error updating pack:", error);
@@ -1068,7 +1159,8 @@ async function updatePack(
 async function deletePack(
   req: VercelRequest,
   res: VercelResponse,
-  packId: string
+  packId: string,
+  admin: AdminUser
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
     return res.status(500).json({ error: "Database not configured" });
@@ -1088,9 +1180,21 @@ async function deletePack(
       return res.status(404).json({ error: "Pack not found" });
     }
 
+    const deletedPack = result.rows[0];
+
+    // Log activity
+    await logActivity(
+      admin.id,
+      "delete",
+      "pack",
+      packId,
+      { name_en: deletedPack.name_en },
+      req
+    );
+
     res.status(200).json({
       success: true,
-      message: `Pack "${result.rows[0].name_en}" deleted`,
+      message: `Pack "${deletedPack.name_en}" deleted`,
     });
   } catch (error) {
     console.error("Error deleting pack:", error);

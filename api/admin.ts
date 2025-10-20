@@ -964,22 +964,31 @@ async function updatePack(
 
   try {
     const {
-      name,
+      name_en,
+      name_hu,
       slug,
-      description,
-      category,
-      difficulty,
+      description_en,
+      description_hu,
+      pack_type,
+      access_level,
       is_active,
-      is_premium,
+      is_published,
+      display_order,
     } = req.body;
 
     const updates: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
 
-    if (name !== undefined) {
+    if (name_en !== undefined) {
       updates.push(`name_en = $${paramIndex}`);
-      params.push(name);
+      params.push(name_en);
+      paramIndex++;
+    }
+
+    if (name_hu !== undefined) {
+      updates.push(`name_hu = $${paramIndex}`);
+      params.push(name_hu);
       paramIndex++;
     }
 
@@ -989,21 +998,27 @@ async function updatePack(
       paramIndex++;
     }
 
-    if (description !== undefined) {
+    if (description_en !== undefined) {
       updates.push(`description_en = $${paramIndex}`);
-      params.push(description);
+      params.push(description_en);
       paramIndex++;
     }
 
-    if (category !== undefined) {
-      updates.push(`category = $${paramIndex}`);
-      params.push(category);
+    if (description_hu !== undefined) {
+      updates.push(`description_hu = $${paramIndex}`);
+      params.push(description_hu);
       paramIndex++;
     }
 
-    if (difficulty !== undefined) {
-      updates.push(`difficulty = $${paramIndex}`);
-      params.push(difficulty);
+    if (pack_type !== undefined) {
+      updates.push(`pack_type = $${paramIndex}`);
+      params.push(pack_type);
+      paramIndex++;
+    }
+
+    if (access_level !== undefined) {
+      updates.push(`access_level = $${paramIndex}`);
+      params.push(access_level);
       paramIndex++;
     }
 
@@ -1013,9 +1028,15 @@ async function updatePack(
       paramIndex++;
     }
 
-    if (is_premium !== undefined) {
-      updates.push(`is_premium = $${paramIndex}`);
-      params.push(is_premium);
+    if (is_published !== undefined) {
+      updates.push(`is_published = $${paramIndex}`);
+      params.push(is_published);
+      paramIndex++;
+    }
+
+    if (display_order !== undefined) {
+      updates.push(`display_order = $${paramIndex}`);
+      params.push(display_order);
       paramIndex++;
     }
 

@@ -174,6 +174,17 @@ export function QuestionEditDialog({
   ) => {
     const newAnswers = [...answers];
     newAnswers[index] = { ...newAnswers[index], [field]: value };
+
+    // If is_alternative is turned OFF, copy English to Hungarian
+    if (field === "is_alternative" && value === false) {
+      newAnswers[index].answer_hu = newAnswers[index].answer_en;
+    }
+
+    // If not alternative and editing English, auto-copy to Hungarian
+    if (field === "answer_en" && !newAnswers[index].is_alternative) {
+      newAnswers[index].answer_hu = value as string;
+    }
+
     setAnswers(newAnswers);
   };
 
@@ -431,6 +442,16 @@ export function QuestionEditDialog({
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {/* Column Headers */}
+                  <div className="grid grid-cols-2 gap-2 px-10 mb-2">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">
+                      🇬🇧 English Answer
+                    </Label>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">
+                      🇭🇺 Hungarian Answer
+                    </Label>
+                  </div>
+
                   {answers.map((answer, index) => (
                     <div
                       key={index}
@@ -476,8 +497,14 @@ export function QuestionEditDialog({
                                 e.target.value
                               )
                             }
-                            placeholder="Hungarian answer"
+                            placeholder="Hungarian answer (auto-copied if switch OFF)"
                             className="text-sm"
+                            disabled={!answer.is_alternative}
+                            title={
+                              !answer.is_alternative
+                                ? "Enable 'Different spelling' switch to edit separately"
+                                : "Edit Hungarian translation"
+                            }
                           />
                         </div>
                       </div>
@@ -489,8 +516,9 @@ export function QuestionEditDialog({
                             handleAnswerChange(index, "is_alternative", checked)
                           }
                         />
-                        <Label className="text-xs text-muted-foreground">
-                          Alternative spelling/version
+                        <Label className="text-xs text-muted-foreground cursor-pointer select-none">
+                          Different spelling in Hungarian (OFF = identical,
+                          auto-copied from English)
                         </Label>
                       </div>
                     </div>

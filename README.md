@@ -41,6 +41,7 @@
 - 🃏 **Complete Question Database** - 28 quiz questions across 6 diverse categories
 - 📦 **Multiple Quiz Packs** - FREE (4), International (18), Hungarian (6) question packs
 - 🔐 **Google OAuth Authentication** - Secure login for premium content access
+- 👑 **Admin Panel** - Comprehensive content management system
 - 🎨 **Game Show Aesthetics** - "Who Wants to be a Millionaire" inspired design
 - 🌐 **Bilingual Support** - Full Hungarian/English localization
 - 📱 **Fully Responsive** - Mobile-first design that works on all devices
@@ -148,11 +149,7 @@ The game continues until only one player remains "alive" - requiring both knowle
 - **Full bilingual support** (Hungarian 🇭🇺 / English 🇬🇧)
 - **Language switcher** in hero section header
 - **Persistent language preference** stored in localStorage
-- **Complete translations** for:
-  - All UI text and navigation
-  - Game rules and instructions
-  - 22+ questions with all answers
-  - Category names and labels
+- **Complete translations**
 - **Localized formatting**: Number formats, dates, etc.
 - **Automatic language detection** based on browser preferences
 
@@ -217,15 +214,194 @@ The game continues until only one player remains "alive" - requiring both knowle
 
 - **Neon PostgreSQL**: Serverless PostgreSQL database
   - `@neondatabase/serverless` (0.10.6): Serverless-optimized database client
-  - Stores user data, question packs, and authentication sessions
-- **Vercel Serverless Functions**: API endpoints in `api/` folder
-  - Google OAuth authentication flow
-  - Question pack management
-  - Session validation
+  - Stores users, questions, question sets, and admin activity logs
+  - Connection pooling for optimal performance
+- **Vercel Serverless Functions**: Unified API architecture
+  - `/api/admin.ts`: Unified admin endpoint (7/12 functions used)
+  - `/api/auth/*`: OAuth authentication flow (4 endpoints)
+  - `/api/questions/[slug].ts`: Question pack data
+  - `/api/question-sets.ts`: Pack listing
 - **JWT Authentication**: Secure token-based authentication
   - `jsonwebtoken` (9.0.2): JWT token creation and validation
   - `cookie` (1.0.2): HTTP-only cookie management
   - 7-day session expiration
+  - Role-based access control (user, admin)
+
+---
+
+## 👑 Admin Panel
+
+### Overview
+
+The HUMBUG! admin panel is a comprehensive content management system built with a serverless-first architecture. It provides complete control over users, questions, question packs, and system monitoring.
+
+### Key Features
+
+#### 📊 Dashboard
+
+- **Real-time Statistics**:
+  - Total users with weekly growth
+  - Total questions with weekly additions
+  - Total plays with weekly trends
+  - Total solved questions
+  - Recent activity count (24h)
+- **Growth Analytics**:
+  - 30-day line chart showing user growth (yellow line)
+  - 30-day play count trends (green line)
+  - Interactive tooltips with formatted dates
+  - Responsive chart design
+
+#### 👥 User Management
+
+- **User List**: Paginated table with search and role filtering
+- **User Editing**: Update name, email, role (user/admin), active status
+- **User Deletion**: Soft delete with confirmation dialog
+- **Activity Tracking**: All user management actions logged
+
+#### 🃏 Question Management
+
+- **Question CRUD**: Create, read, update, delete questions
+- **Answer Management**: Multiple answers per question with correct/alternative flags
+- **Category System**: Organize questions by category
+- **Pack Assignment**: Link questions to specific question sets
+- **Difficulty Levels**: Easy, Medium, Hard classification
+- **Search & Filter**: Find questions by text, category, pack, status
+- **Bulk Operations**: Multi-select for batch actions
+
+#### 📦 Pack Management
+
+- **Pack CRUD**: Full question pack lifecycle management
+- **Pack Types**: FREE, PREMIUM, EXCLUSIVE
+- **Access Levels**: PUBLIC, REGISTERED, ADMIN
+- **Metadata**: Name, description, slug, icon
+- **Question Assignment**: Link/unlink questions to packs
+- **Pack Analytics**: Question count, play statistics
+
+#### 📜 Activity Log
+
+- **Comprehensive Logging**: All admin actions tracked
+- **Action Types**: CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+- **Entity Types**: user, question, pack, auth
+- **Filter System**: By action type, entity type, admin, date range
+- **Pagination**: Efficient browsing of activity history
+- **User Attribution**: Admin name, email, profile picture
+- **Timestamp Display**: Relative time (e.g., "2 hours ago")
+- **Details View**: JSON data for each action
+
+### Architecture
+
+#### Unified Admin API (`/api/admin.ts`)
+
+The admin panel uses a **single serverless function** to handle all operations, avoiding Vercel's 12-function limit:
+
+```typescript
+// Endpoint structure: /api/admin?resource={resource}&action={action}
+
+Resources:
+- users: User management (list, create, update, delete)
+- questions: Question management (list, create, update, delete)
+- answers: Answer management (list by question)
+- packs: Question pack management (list, create, update, delete)
+- activity: Activity log (list, filter, search)
+- dashboard-stats: Dashboard statistics and analytics
+
+Actions (REST-style):
+- GET: List/retrieve resources
+- POST: Create new resources
+- PUT: Update existing resources
+- DELETE: Remove resources
+```
+
+**Benefits:**
+
+- ✅ Only 1 of 12 Vercel function slots used for admin
+- ✅ Consistent error handling and logging
+- ✅ Shared authentication middleware
+- ✅ Unified activity logging system
+- ✅ Easy to maintain and extend
+
+#### Activity Logging System
+
+All admin actions are automatically logged to `admin_activity_log` table:
+
+```typescript
+// Automatic logging on every admin action
+await logActivity(
+  admin.id,           // Who performed the action
+  "UPDATE",           // What type of action (CREATE/UPDATE/DELETE)
+  "question",         // What entity was affected
+  questionId,         // Which specific entity
+  {
+    changes: {...},   // What changed
+    previous: {...}   // What it was before
+  },
+  req                 // Request context (IP, user agent)
+);
+```
+
+**Logged data:**
+
+- Admin user ID, name, email, picture
+- Action type (CREATE, UPDATE, DELETE, LOGIN, LOGOUT)
+- Entity type (user, question, pack, auth)
+- Entity ID (specific record affected)
+- Detailed changes (JSON)
+- IP address and user agent
+- Timestamp (automatic)
+
+#### Database Schema
+
+**Core Tables:**
+
+- `users`: User accounts (id, name, email, picture, role, is_active)
+- `questions`: Question bank (id, question_en, question_hu, category, difficulty)
+- `answers`: Question answers (id, question_id, answer_en, answer_hu, is_correct)
+- `question_sets`: Question packs (id, name, slug, type, access_level)
+- `admin_activity_log`: Activity tracking (id, user_id, action_type, entity_type, details)
+
+**Relationships:**
+
+- Questions → Question Sets (many-to-one via set_id)
+- Questions → Answers (one-to-many)
+- Admin Activity → Users (many-to-one via user_id)
+
+### UI/UX Design
+
+#### Layout
+
+- **Horizontal Navigation Bar** (desktop):
+  - Dashboard, Users, Questions, Packs, Activity tabs
+  - Slim user profile section (avatar, name, logout)
+  - Responsive hover states and active indicators
+- **Collapsible Sidebar** (mobile/tablet):
+  - Toggle button for space efficiency
+  - Full-width navigation items
+  - User profile at bottom
+
+#### Components
+
+- **Stat Cards**: TrendingUp indicators for weekly changes
+- **Data Tables**: Sortable, paginated, searchable
+- **Edit Dialogs**: Modal forms with validation
+- **Confirmation Dialogs**: Destructive action protection
+- **Toast Notifications**: Success/error feedback
+- **Loading States**: Skeleton loaders and spinners
+
+#### Accessibility
+
+- Keyboard navigation support
+- ARIA labels and roles
+- Focus management in dialogs
+- Screen reader friendly
+
+### Security
+
+- **Role-Based Access Control**: Only users with `role='admin'` can access
+- **Session Validation**: JWT token verified on every request
+- **CSRF Protection**: SameSite cookies
+- **XSS Prevention**: Input sanitization
+- **SQL Injection Prevention**: Parameterized queries
+- **Audit Trail**: All actions logged with attribution
 
 ---
 
@@ -395,6 +571,7 @@ For local development, the project includes a custom Vite plugin (`apiRoutesPlug
 ```
 humbug-quiz/
 ├── api/                             # Vercel serverless functions
+│   ├── admin.ts                     # Unified admin API (users, questions, packs, activity)
 │   └── auth/
 │       ├── google.ts                # OAuth initiation endpoint
 │       ├── callback.ts              # OAuth callback handler
@@ -406,6 +583,10 @@ humbug-quiz/
 │
 ├── database/                        # Database scripts & migrations
 │   ├── schema.sql                   # Complete database schema
+│   ├── migrations/                  # Migration scripts
+│   │   ├── add-activity-logs.sql    # Add admin activity logging
+│   │   ├── cleanup-activity-tables.sql # Remove old activity tables
+│   │   └── consolidate-activity-logs.sql # Consolidate to admin_activity_log
 │   ├── reorganize-packs.js          # Question pack reorganization script
 │   ├── rename-to-quiz.js            # Pack renaming to "Quiz Pack" terminology
 │   ├── execute-cleanup.js           # Duplicate question cleanup (48→28)
@@ -418,6 +599,7 @@ humbug-quiz/
 │   ├── migrate-two-packs.js         # Migration script for question packs
 │   ├── fix-first-question.js        # Data fix scripts
 │   ├── check-first-question.js      # Database verification
+│   ├── verify-activity-table.sql    # Activity table verification
 │   ├── README.md                    # Database documentation
 │   ├── SCHEMA_DOCUMENTATION.md      # Schema reference
 │   ├── STEP_BY_STEP_GUIDE.md        # Setup guide
@@ -455,11 +637,23 @@ humbug-quiz/
 │   │   ├── PrivacyPolicy.tsx        # Privacy policy modal
 │   │   ├── QuestionCard.tsx         # Flip card component
 │   │   ├── QuestionPackSelector.tsx # Question pack switcher
+│   │   ├── admin/                   # Admin panel components
+│   │   │   ├── AdminLayout.tsx      # Admin panel layout wrapper
+│   │   │   ├── PackEditDialog.tsx   # Pack create/edit modal
+│   │   │   ├── QuestionEditDialog.tsx # Question create/edit modal
+│   │   │   └── UserEditDialog.tsx   # User edit modal
 │   │   └── ui/                      # Radix UI components
 │   │       ├── button.tsx
 │   │       ├── card.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── separator.tsx
+│   │       ├── table.tsx            # Data table component
+│   │       ├── dialog.tsx           # Modal dialogs
+│   │       ├── select.tsx           # Dropdown selects
+│   │       ├── input.tsx            # Form inputs
+│   │       ├── textarea.tsx         # Text areas
+│   │       ├── badge.tsx            # Status badges
+│   │       ├── alert-dialog.tsx     # Confirmation dialogs
 │   │       └── ... (30+ components)
 │   │
 │   ├── context/                     # React context providers
@@ -475,6 +669,13 @@ humbug-quiz/
 │   ├── locales/                     # Internationalization
 │   │   ├── en.json                  # English translations
 │   │   └── hu.json                  # Hungarian translations
+│   │
+│   ├── pages/                       # Admin panel pages
+│   │   ├── AdminDashboard.tsx       # Dashboard with stats & charts
+│   │   ├── UsersPage.tsx            # User management page
+│   │   ├── QuestionsPage.tsx        # Question management page
+│   │   ├── PacksPage.tsx            # Pack management page
+│   │   └── ActivityPage.tsx         # Activity log page
 │   │
 │   ├── styles/                      # CSS files
 │   │   └── theme.css                # Custom theme variables
@@ -496,6 +697,9 @@ humbug-quiz/
 │
 ├── .env.example                     # Environment variables template
 ├── .env.local                       # Local environment variables (git-ignored)
+├── .github/
+│   └── instructions/
+│       └── agents.md.instructions.md # AI agent development guidelines
 ├── components.json                  # shadcn/ui configuration
 ├── index.html                       # HTML entry point
 ├── LICENSE                          # MIT License

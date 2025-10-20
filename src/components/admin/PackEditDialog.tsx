@@ -225,7 +225,6 @@ export function PackEditDialog({
       onPackUpdated();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error saving pack:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to save pack"
       );

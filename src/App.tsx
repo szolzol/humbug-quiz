@@ -241,38 +241,11 @@ function App() {
     // Add classes to document for CSS fallbacks
     if (!supportsOklch) {
       document.documentElement.classList.add("no-oklch");
-      console.warn(
-        "⚠️ Browser Compatibility: Your browser does not support OKLCH color space. Using RGB fallbacks."
-      );
     }
 
     if (!supportsBackdropFilter) {
       document.documentElement.classList.add("no-backdrop-filter");
-      console.warn(
-        "⚠️ Browser Compatibility: Your browser does not support backdrop-filter. Visual effects may be limited."
-      );
     }
-
-    if (!supports3D) {
-      console.warn(
-        "⚠️ Browser Compatibility: Your browser has limited 3D transform support. Card flip animations may not work properly."
-      );
-    }
-
-    if (isLowEndDevice) {
-      console.info(
-        "ℹ️ Performance: Low-end device detected. Some animations may be disabled for better performance."
-      );
-    }
-
-    // Log comprehensive browser support info
-    const browserInfo = {
-      oklch: supportsOklch,
-      backdropFilter: supportsBackdropFilter,
-      transform3D: supports3D,
-      hardwareCores: navigator.hardwareConcurrency || "unknown",
-      userAgent: navigator.userAgent,
-    };
 
     // Show user-friendly notification for critical missing features
     if (!supportsOklch || !supportsBackdropFilter) {
@@ -282,10 +255,6 @@ function App() {
 
       // Only show warning once per session
       if (!sessionStorage.getItem("compatibility-warning-shown")) {
-        setTimeout(() => {
-          // You can replace this with a proper toast notification component
-          console.warn("📢 " + message);
-        }, 2000);
         sessionStorage.setItem("compatibility-warning-shown", "true");
       }
     }
@@ -328,7 +297,6 @@ function App() {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`❌ API Error Response:`, errorText);
           throw new Error(
             `Failed to fetch questions: ${response.status} ${errorText}`
           );
@@ -338,7 +306,6 @@ function App() {
         const newQuestions = [...(data.questions || [])];
         setApiQuestions(newQuestions);
       } catch (error) {
-        console.error("Error fetching questions:", error);
         // No fallback - questions must come from database
         setApiQuestions([]);
       } finally {

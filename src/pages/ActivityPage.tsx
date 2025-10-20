@@ -103,11 +103,10 @@ export function ActivityPage() {
       }
 
       const data = await response.json();
-      console.log("📊 Activity logs data:", data);
       setLogs(data.logs);
       setPagination(data.pagination);
     } catch (error) {
-      console.error("Error fetching activity logs:", error);
+      // Error fetching activity logs
     } finally {
       setIsLoading(false);
     }

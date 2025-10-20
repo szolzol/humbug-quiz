@@ -144,7 +144,6 @@ export function QuestionEditDialog({
       const data = await response.json();
       setAnswers(data.answers || []);
     } catch (error) {
-      console.error("Error loading answers:", error);
       toast.error("Failed to load answers");
       setAnswers([]);
     } finally {
@@ -228,8 +227,6 @@ export function QuestionEditDialog({
         })),
       };
 
-      console.log("📤 Saving question payload:", payload);
-
       const url = question
         ? `/api/admin?resource=questions&id=${question.id}`
         : `/api/admin?resource=questions`;
@@ -245,7 +242,6 @@ export function QuestionEditDialog({
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("❌ Server error response:", error);
         throw new Error(
           error.message || error.error || "Failed to save question"
         );
@@ -259,7 +255,6 @@ export function QuestionEditDialog({
       onQuestionUpdated();
       onOpenChange(false);
     } catch (error: any) {
-      console.error("Error saving question:", error);
       toast.error(error.message || "Failed to save question");
     } finally {
       setIsSaving(false);
@@ -288,7 +283,6 @@ export function QuestionEditDialog({
       onOpenChange(false);
       setShowDeleteConfirm(false);
     } catch (error: any) {
-      console.error("Error deleting question:", error);
       toast.error(error.message || "Failed to delete question");
     } finally {
       setIsDeleting(false);

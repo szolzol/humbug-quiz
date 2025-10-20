@@ -54,7 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       }
     } catch (error) {
-      console.error("Session check failed:", error);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -106,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       setUser(null);
     } catch (error) {
-      console.error("Logout failed:", error);
+      // Logout failed
     }
   };
 

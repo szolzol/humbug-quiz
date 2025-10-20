@@ -105,11 +105,10 @@ export function QuestionsPage() {
         const response = await fetch("/api/question-sets");
         if (response.ok) {
           const data = await response.json();
-          console.log("📦 Question sets data:", data);
           setQuestionSets(data.questionSets || []);
         }
       } catch (error) {
-        console.error("Failed to fetch question sets:", error);
+        // Failed to fetch question sets
       }
     };
     fetchQuestionSets();

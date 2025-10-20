@@ -146,7 +146,6 @@ async function logActivity(
   req?: VercelRequest
 ) {
   if (!process.env.POSTGRES_POSTGRES_URL) {
-    console.error("Cannot log activity: Database not configured");
     return;
   }
 
@@ -155,14 +154,6 @@ async function logActivity(
   });
 
   try {
-    console.log("Logging activity:", {
-      userId,
-      actionType,
-      entityType,
-      entityId,
-      details,
-    });
-
     const result = await pool.query(
       `INSERT INTO admin_activity_log (user_id, action_type, entity_type, entity_id, details, ip_address, user_agent)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
@@ -176,17 +167,7 @@ async function logActivity(
         req?.headers["user-agent"] || null,
       ]
     );
-
-    console.log("Activity logged successfully, ID:", result.rows[0]?.id);
   } catch (error) {
-    console.error("Failed to log activity:", error);
-    console.error("Error details:", {
-      message: error instanceof Error ? error.message : "Unknown error",
-      userId,
-      actionType,
-      entityType,
-      entityId,
-    });
     // Don't throw - activity logging failure shouldn't break operations
   } finally {
     await pool.end();
@@ -1293,10 +1274,8 @@ async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
       whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     const countQuery = `SELECT COUNT(*) as count FROM admin_activity_log al ${whereClause}`;
-    console.log("Activity count query:", countQuery, "params:", params);
     const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    console.log("Total activity logs found:", total);
 
     params.push(limit, offset);
     const dataQuery = `
@@ -1311,9 +1290,7 @@ async function getActivityLogs(req: VercelRequest, res: VercelResponse) {
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
 
-    console.log("Activity data query:", dataQuery);
     const dataResult = await pool.query(dataQuery, params);
-    console.log("Activity logs returned:", dataResult.rows.length);
 
     // Transform to match frontend interface
     const logs = dataResult.rows.map((log) => ({

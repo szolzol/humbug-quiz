@@ -111,7 +111,6 @@ export function UserEditDialog({
       onUserUpdated();
       onOpenChange(false);
     } catch (error: any) {
-      console.error("Error updating user:", error);
       toast.error(error.message || "Failed to update user");
     } finally {
       setIsSaving(false);
@@ -135,7 +134,6 @@ export function UserEditDialog({
       onOpenChange(false);
       setShowDeleteConfirm(false);
     } catch (error: any) {
-      console.error("Error deleting user:", error);
       toast.error(error.message || "Failed to delete user");
     } finally {
       setIsDeleting(false);

@@ -6,38 +6,44 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { Pool } from "@neondatabase/serverless";
 import { neon } from "@neondatabase/serverless";
+import jwt from "jsonwebtoken";
+import { parse } from "cookie";
 
-// Helper to get authenticated user from cookie
+// Helper to get authenticated user from JWT cookie
 function getUserFromCookie(
   req: VercelRequest
 ): { userId: string; email: string } | null {
-  const cookieHeader = req.headers.cookie;
-  if (!cookieHeader) return null;
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    console.error("JWT_SECRET not configured");
+    return null;
+  }
 
-  const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
-    const [key, value] = cookie.trim().split("=");
-    acc[key] = value;
-    return acc;
-  }, {} as Record<string, string>);
-
+  // Parse cookies from request
+  const cookies = parse(req.headers.cookie || "");
   const token = cookies.auth_token;
-  if (!token) return null;
+
+  if (!token) {
+    console.log("No auth_token cookie found");
+    return null;
+  }
 
   try {
-    const sessionData = JSON.parse(
-      Buffer.from(token, "base64").toString("utf-8")
-    );
-
-    // Check expiration
-    if (sessionData.exp && Date.now() > sessionData.exp) {
-      return null;
-    }
+    // Verify and decode JWT token
+    const decoded = jwt.verify(token, jwtSecret) as {
+      userId: string;
+      email: string;
+      name: string;
+      picture: string;
+      role?: string;
+    };
 
     return {
-      userId: sessionData.id,
-      email: sessionData.email,
+      userId: decoded.userId,
+      email: decoded.email,
     };
   } catch (error) {
+    console.error("JWT verification failed:", error);
     return null;
   }
 }

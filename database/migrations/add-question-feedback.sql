@@ -1,8 +1,28 @@
 -- ============================================================================
--- Add Question Feedback & Progress Tracking System
+-- Add Question Feedback & Progress Tracking System + Player Profile
 -- ============================================================================
--- Purpose: Track user feedback (thumbs up/down), completion status, and answer progress
--- Date: 2025-01-20
+-- Purpose: Track user feedback (thumbs up/down), completion status, answer progress,
+--          and player profile data (nickname)
+-- Date: 2025-01-20 (Updated: 2025-10-21)
+-- ============================================================================
+
+-- ============================================================================
+-- Player Profile Enhancement
+-- ============================================================================
+-- Add nickname column to users table for player profiles
+-- ============================================================================
+
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS nickname VARCHAR(50);
+
+-- Add index for nickname lookups (optional, for future features)
+CREATE INDEX IF NOT EXISTS idx_users_nickname ON users(nickname);
+
+-- Comment explaining the column
+COMMENT ON COLUMN users.nickname IS 'Player chosen display name (3-50 chars, alphanumeric + spaces/underscores)';
+
+-- ============================================================================
+-- Question Feedback System
 -- ============================================================================
 
 -- Add feedback columns to questions table

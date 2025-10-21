@@ -13,6 +13,7 @@ import { QuestionsPage } from "./pages/QuestionsPage.tsx";
 import { PacksPage } from "./pages/PacksPage.tsx";
 import { ActivityPage } from "./pages/ActivityPage.tsx";
 import { SettingsPage } from "./pages/SettingsPage.tsx";
+import PlayerProfile from "./components/PlayerProfile.tsx";
 import "./i18n";
 
 import "./main.css";
@@ -27,6 +28,9 @@ createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Profile Route */}
+          <Route path="/profile" element={<PlayerProfile />} />
+
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />

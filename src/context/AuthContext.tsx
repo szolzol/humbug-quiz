@@ -8,6 +8,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  nickname?: string;
   picture: string;
   role?: "free" | "premium" | "admin" | "creator";
 }

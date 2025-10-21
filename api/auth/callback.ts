@@ -72,6 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Save or update user in database and fetch role
     let userRole = "free"; // Default role
+    let userNickname: string | undefined = undefined;
 
     if (process.env.POSTGRES_POSTGRES_URL) {
       try {
@@ -90,26 +91,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             updated_at = NOW()
         `;
 
-        // Fetch user role from database
+        // Fetch user role and nickname from database
         const [dbUser] = await sql`
-          SELECT role FROM users WHERE id = ${id} LIMIT 1
+          SELECT role, nickname FROM users WHERE id = ${id} LIMIT 1
         `;
 
         if (dbUser?.role) {
           userRole = dbUser.role;
         }
+
+        // Store nickname if exists
+        userNickname = dbUser?.nickname || undefined;
       } catch (dbError) {
         console.error("❌ Database error during OAuth:", dbError);
         // Continue with default role if DB fails
       }
     }
 
-    // Create JWT token with user info AND role
+    // Create JWT token with user info, role, AND nickname
     const token = jwt.sign(
       {
         userId: id,
         email,
         name,
+        nickname: userNickname,
         picture,
         role: userRole, // Include role from database
       },

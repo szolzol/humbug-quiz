@@ -27,17 +27,19 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       userId: string;
       email: string;
       name: string;
+      nickname?: string;
       picture: string;
       role?: string; // Role might not exist in old tokens
     };
 
-    // Return user info with role
+    // Return user info with role and nickname
     res.status(200).json({
       authenticated: true,
       user: {
         id: decoded.userId,
         email: decoded.email,
         name: decoded.name,
+        nickname: decoded.nickname,
         picture: decoded.picture,
         role: decoded.role || "free", // Default to 'free' if not present
       },

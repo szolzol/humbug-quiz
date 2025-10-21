@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Crown } from "lucide-react";
+import { Crown, User } from "lucide-react";
 
 /**
  * LoginButton Component
@@ -140,18 +140,26 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {/* Profile link for all users */}
+        <DropdownMenuItem
+          onClick={() => navigate("/profile")}
+          className="cursor-pointer">
+          <User className="mr-2 h-4 w-4" />
+          {t("profile.viewProfile") || "View Profile"}
+        </DropdownMenuItem>
         {/* Admin Panel link for admin/creator users */}
         {user.role && (user.role === "admin" || user.role === "creator") && (
           <>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => navigate("/admin")}
               className="cursor-pointer">
               <Crown className="mr-2 h-4 w-4 text-yellow-500" />
               Admin Panel
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
           </>
         )}
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={logout}
           className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">

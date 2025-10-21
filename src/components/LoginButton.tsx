@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Crown, User } from "lucide-react";
+import { Crown, User, Trophy } from "lucide-react";
 
 /**
  * LoginButton Component
@@ -124,19 +124,26 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
-            {/* Show admin badge for admin/creator users only */}
-            {user.role &&
-              (user.role === "admin" || user.role === "creator") && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate("/admin");
-                  }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/30 hover:border-yellow-500/50 transition-colors cursor-pointer mt-1">
-                  <Crown size={12} />
-                  {user.role}
-                </button>
-              )}
+            {/* Show role badge for ALL users */}
+            {user.role && (
+              <div className="mt-2">
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                    user.role === "admin" || user.role === "creator"
+                      ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                      : user.role === "premium"
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                  }`}>
+                  {(user.role === "admin" || user.role === "creator") && (
+                    <Crown size={12} />
+                  )}
+                  {user.role === "premium" && <Trophy size={12} />}
+                  {user.role === "free" && <User size={12} />}
+                  {user.role.toUpperCase()}
+                </span>
+              </div>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

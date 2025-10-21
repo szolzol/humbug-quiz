@@ -182,6 +182,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    // DELETE - Delete user account
+    if (req.method === "DELETE") {
+      // Delete user account (cascades will handle related data)
+      await pool.query(`DELETE FROM users WHERE id = $1`, [user.userId]);
+
+      await pool.end();
+
+      // Clear the auth cookie
+      res.setHeader(
+        "Set-Cookie",
+        "auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax"
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Account deleted successfully",
+      });
+    }
+
     await pool.end();
     return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {

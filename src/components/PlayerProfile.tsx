@@ -15,6 +15,17 @@ import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { Alert, AlertDescription } from "./ui/alert";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import {
   User,
   Crown,
   Trophy,
@@ -25,6 +36,8 @@ import {
   Loader2,
   ChevronLeft,
   Save,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ProfileData {
@@ -132,6 +145,28 @@ export default function PlayerProfile() {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch("/api/profile", {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete account");
+      }
+
+      // Account deleted successfully, logout and redirect
+      window.location.href = "/api/auth/logout";
+    } catch (err: any) {
+      console.error("Error deleting account:", err);
+      setError(
+        err.message || t("profile.errorDeleting") || "Failed to delete account"
+      );
     }
   };
 
@@ -409,6 +444,83 @@ export default function PlayerProfile() {
                 {new Date(profile.createdAt).toLocaleDateString(currentLang)}
               </span>
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone - Account Deletion */}
+        <Card className="border-red-500/50">
+          <CardHeader>
+            <CardTitle className="text-xl text-red-600 dark:text-red-400 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              {t("profile.dangerZone") || "Danger Zone"}
+            </CardTitle>
+            <CardDescription>
+              {t("profile.dangerZoneDesc") ||
+                "Permanent actions that cannot be undone"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  {t("profile.deleteAccount") || "Delete My Account"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+                    <AlertTriangle className="w-5 h-5" />
+                    {t("profile.deleteAccountTitle") ||
+                      "Delete Account Permanently?"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="space-y-3 pt-2">
+                    <p>
+                      {t("profile.deleteAccountWarning") ||
+                        "This action cannot be undone. This will permanently delete your account and remove all your data from our servers."}
+                    </p>
+                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg p-3 space-y-2">
+                      <p className="font-semibold text-sm text-red-800 dark:text-red-300">
+                        {t("profile.deleteWillRemove") ||
+                          "The following will be permanently deleted:"}
+                      </p>
+                      <ul className="text-sm text-red-700 dark:text-red-400 space-y-1 list-disc list-inside">
+                        <li>
+                          {t("profile.deleteItem1") ||
+                            "Your profile and nickname"}
+                        </li>
+                        <li>
+                          {t("profile.deleteItem2") ||
+                            "All progress and completion data"}
+                        </li>
+                        <li>
+                          {t("profile.deleteItem3") ||
+                            "All feedback you've given"}
+                        </li>
+                        <li>
+                          {t("profile.deleteItem4") ||
+                            "Your account credentials"}
+                        </li>
+                      </ul>
+                    </div>
+                    <p className="text-sm font-medium">
+                      {t("profile.deleteConfirmQuestion") ||
+                        "Are you absolutely sure you want to delete your account?"}
+                    </p>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {t("profile.cancel") || "Cancel"}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+                    {t("profile.confirmDelete") || "Yes, Delete My Account"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </div>

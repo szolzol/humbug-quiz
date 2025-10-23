@@ -20,6 +20,7 @@ interface QuizQuestion {
 interface QuestionCardProps {
   question: QuizQuestion;
   index: number;
+  packSlug?: string;
 }
 
 // Helper functions for localStorage (no longer language-specific)
@@ -80,9 +81,12 @@ const setStoredAnswers = (questionId: string, answers: Set<number>) => {
   }
 };
 
-export function QuestionCard({ question, index }: QuestionCardProps) {
+export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
+
+  // Check if this is the Horror Tagen pack
+  const isHorrorPack = packSlug === "horror-tagen-special";
 
   const [isFlipped, setIsFlipped] = useState(() =>
     getStoredFlipState(question.id)
@@ -387,23 +391,43 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
         {/* Front of card */}
         <Card
-          className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-2 border-accent shadow-xl overflow-hidden"
+          className={`absolute inset-0 w-full h-full backface-hidden border-2 shadow-xl overflow-hidden ${
+            isHorrorPack
+              ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50"
+              : "bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-accent"
+          }`}
           style={{ pointerEvents: isFlipped ? "none" : "auto" }}>
+          {/* Premium shimmer for Horror pack */}
+          {isHorrorPack && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
+            </div>
+          )}
+
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
-              className="text-primary-foreground/[0.07] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
+              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${
+                isHorrorPack
+                  ? "text-purple-500/[0.07]"
+                  : "text-primary-foreground/[0.07]"
+              }`}
               style={{
                 transform: "rotate(-45deg)",
                 fontFamily: "Space Grotesk, sans-serif",
               }}>
-              HUMBUG!
+              {isHorrorPack ? "HORROR! 👻" : "HUMBUG!"}
             </div>
           </div>
 
           <CardContent className="flex flex-col justify-between h-full p-4 md:p-6 relative z-10">
             {/* Top section with flip instruction and arrow - aligned with button */}
-            <div className="flex items-center justify-end pr-14 md:pr-16 text-primary-foreground/80 text-xs sm:text-sm md:text-base">
+            <div
+              className={`flex items-center justify-end pr-14 md:pr-16 text-xs sm:text-sm md:text-base ${
+                isHorrorPack
+                  ? "text-purple-200/80"
+                  : "text-primary-foreground/80"
+              }`}>
               <div className="flex items-center gap-1.5 max-w-full">
                 <span className="font-medium text-right break-words md:whitespace-nowrap">
                   {t("questions.flipCard")}
@@ -430,23 +454,41 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
             {/* Center section with question */}
             <div className="flex-1 flex flex-col justify-center items-center text-center">
-              <div className="text-primary-foreground/80 !text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide">
+              <div
+                className={`!text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide ${
+                  isHorrorPack
+                    ? "text-purple-300/90"
+                    : "text-primary-foreground/80"
+                }`}>
                 {question.category}
               </div>
-              <h3 className="text-primary-foreground font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4">
+              <h3
+                className={`font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4 ${
+                  isHorrorPack ? "text-purple-100" : "text-primary-foreground"
+                }`}>
                 {question.question}
               </h3>
             </div>
 
             {/* Bottom section with answer count and source */}
             <div className="text-center space-y-1">
-              <div className="text-primary-foreground/80 text-base md:text-base font-medium">
+              <div
+                className={`text-base md:text-base font-medium ${
+                  isHorrorPack
+                    ? "text-purple-200/80"
+                    : "text-primary-foreground/80"
+                }`}>
                 {t("questions.totalAnswers", {
                   count: question.answers.length,
                 })}
               </div>
               {question.sourceUrl && (
-                <div className="text-primary-foreground/60 text-sm">
+                <div
+                  className={`text-sm ${
+                    isHorrorPack
+                      ? "text-purple-300/60"
+                      : "text-primary-foreground/60"
+                  }`}>
                   <span>Source: </span>
                   <a
                     href={question.sourceUrl}
@@ -464,24 +506,42 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
 
         {/* Back of card */}
         <Card
-          className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-card border-2 border-border shadow-xl overflow-hidden"
+          className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 border-2 shadow-xl overflow-hidden ${
+            isHorrorPack
+              ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50"
+              : "bg-card border-border"
+          }`}
           style={{ pointerEvents: isFlipped ? "auto" : "none" }}>
+          {/* Premium shimmer for Horror pack */}
+          {isHorrorPack && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
+            </div>
+          )}
+
           {/* Diagonal HUMBUG! Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
-              className="text-card-foreground/[0.05] font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none"
+              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${
+                isHorrorPack
+                  ? "text-purple-500/[0.05]"
+                  : "text-card-foreground/[0.05]"
+              }`}
               style={{
                 transform: "rotate(-45deg)",
                 fontFamily: "Space Grotesk, sans-serif",
               }}>
-              HUMBUG!
+              {isHorrorPack ? "HORROR! 👻" : "HUMBUG!"}
             </div>
           </div>
 
           <CardContent
             className="flex flex-col h-full p-3 md:p-4 relative z-10"
             onClick={(e) => e.stopPropagation()}>
-            <div className="text-card-foreground/80 !text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center">
+            <div
+              className={`!text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center ${
+                isHorrorPack ? "text-purple-200/90" : "text-card-foreground/80"
+              }`}>
               {t("questions.correctAnswers")}
               <span className="ml-2 text-xs md:text-sm font-normal">
                 ({selectedAnswers.size} / {question.answers.length})
@@ -502,22 +562,37 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
                   key={answerIndex}
                   className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 w-full ${
                     selectedAnswers.has(answerIndex)
-                      ? "bg-green-500/30 border border-green-500/50"
+                      ? isHorrorPack
+                        ? "bg-purple-500/30 border border-purple-400/50"
+                        : "bg-green-500/30 border border-green-500/50"
+                      : isHorrorPack
+                      ? "bg-purple-950/50 hover:bg-purple-900/50 border border-purple-500/20"
                       : "bg-muted hover:bg-muted/80"
                   }`}
                   onClick={(e) => handleAnswerClick(e, answerIndex)}>
-                  <span className="text-card-foreground font-medium">
+                  <span
+                    className={`font-medium ${
+                      isHorrorPack ? "text-purple-100" : "text-card-foreground"
+                    }`}>
                     {answer}
                   </span>
                 </button>
               ))}
             </div>
-            <div className="mt-2 text-muted-foreground text-[10px] md:text-xs text-center leading-tight">
+            <div
+              className={`mt-2 text-[10px] md:text-xs text-center leading-tight ${
+                isHorrorPack ? "text-purple-300/70" : "text-muted-foreground"
+              }`}>
               {t("questions.clickToMark")}
             </div>
 
             {/* Action buttons: RESET, FINISHED, Thumbs Up/Down */}
-            <div className="mt-3 pt-3 border-t border-border flex justify-between items-center gap-2">
+            <div
+              className={`mt-3 pt-3 flex justify-between items-center gap-2 ${
+                isHorrorPack
+                  ? "border-t border-purple-500/30"
+                  : "border-t border-border"
+              }`}>
               {/* Left side: RESET and FINISHED */}
               <div className="flex gap-2">
                 <button

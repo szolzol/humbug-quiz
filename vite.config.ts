@@ -2787,7 +2787,7 @@ function apiRoutesPlugin(): PluginOption {
             res.end(
               JSON.stringify({
                 success: true,
-                sets: questionSets,
+                questionSets: questionSets,
                 count: questionSets.length,
                 isAuthenticated,
               })

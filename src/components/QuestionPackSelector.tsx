@@ -25,6 +25,7 @@ interface QuestionPack {
   description_hu: string;
   question_count: number;
   is_active: boolean;
+  access_level: "free" | "premium" | "admin_only";
 }
 
 interface QuestionPackSelectorProps {
@@ -133,40 +134,100 @@ export function QuestionPackSelector({
         <div className="space-y-4">
           {packs
             .filter((pack) => pack.is_active)
-            .map((pack) => (
-              <div
-                key={pack.slug}
-                className={`
+            .map((pack) => {
+              const isPremium = pack.access_level === "premium";
+              const isHorrorPack = pack.slug === "horror-tagen-special";
+
+              return (
+                <div
+                  key={pack.slug}
+                  className={`
                 relative flex items-start space-x-3 rounded-lg border p-4 
-                transition-colors hover:bg-accent cursor-pointer
+                transition-all duration-300 cursor-pointer
+                ${
+                  isHorrorPack
+                    ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50 hover:border-purple-400/70 hover:shadow-lg hover:shadow-purple-500/20"
+                    : isPremium
+                    ? "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border-amber-300 dark:border-amber-700/50 hover:shadow-md hover:shadow-amber-500/10"
+                    : "hover:bg-accent"
+                }
                 ${
                   currentPack === pack.slug
-                    ? "border-primary bg-primary/5"
+                    ? isHorrorPack
+                      ? "border-purple-400 shadow-lg shadow-purple-500/30"
+                      : "border-primary bg-primary/5"
                     : "border-border"
                 }
               `}
-                onClick={() => handlePackSelect(pack.slug)}>
-                <RadioGroupItem
-                  value={pack.slug}
-                  id={pack.slug}
-                  className="mt-1"
-                />
-                <div className="flex-1 space-y-1">
-                  <Label
-                    htmlFor={pack.slug}
-                    className="flex items-center gap-2 font-semibold cursor-pointer">
-                    {getPackName(pack)}
-                    <Badge variant="secondary" className="text-xs">
-                      {pack.question_count}{" "}
-                      {t("questionPacks.questions", "questions")}
-                    </Badge>
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {getPackDescription(pack)}
-                  </p>
+                  onClick={() => handlePackSelect(pack.slug)}>
+                  {/* Premium shimmer effect for Horror pack */}
+                  {isHorrorPack && (
+                    <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
+                    </div>
+                  )}
+
+                  <RadioGroupItem
+                    value={pack.slug}
+                    id={pack.slug}
+                    className={`mt-1 ${
+                      isHorrorPack
+                        ? "border-purple-400 text-purple-400"
+                        : isPremium
+                        ? "border-amber-500 text-amber-500"
+                        : ""
+                    }`}
+                  />
+                  <div className="flex-1 space-y-1">
+                    <Label
+                      htmlFor={pack.slug}
+                      className={`flex items-center gap-2 font-semibold cursor-pointer ${
+                        isHorrorPack
+                          ? "text-purple-100"
+                          : isPremium
+                          ? "text-amber-900 dark:text-amber-100"
+                          : ""
+                      }`}>
+                      {getPackName(pack)}
+                      {isHorrorPack && <span className="text-lg">👻</span>}
+                      <Badge
+                        variant="secondary"
+                        className={`text-xs ${
+                          isHorrorPack
+                            ? "bg-purple-900/50 text-purple-200 border-purple-500/30"
+                            : isPremium
+                            ? "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"
+                            : ""
+                        }`}>
+                        {pack.question_count}{" "}
+                        {t("questionPacks.questions", "questions")}
+                      </Badge>
+                      {isPremium && (
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${
+                            isHorrorPack
+                              ? "bg-gradient-to-r from-purple-500 to-amber-500 text-white border-none"
+                              : "bg-amber-500 text-white border-amber-500"
+                          }`}>
+                          ✨ Premium
+                        </Badge>
+                      )}
+                    </Label>
+                    <p
+                      className={`text-sm ${
+                        isHorrorPack
+                          ? "text-purple-300"
+                          : isPremium
+                          ? "text-amber-700 dark:text-amber-300"
+                          : "text-muted-foreground"
+                      }`}>
+                      {getPackDescription(pack)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </RadioGroup>
     );

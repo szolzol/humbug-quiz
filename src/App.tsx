@@ -719,6 +719,7 @@ function App() {
                     key={`${selectedPack}-${question.id}`}
                     question={question}
                     index={index}
+                    packSlug={selectedPack}
                   />
                 ))
               )}

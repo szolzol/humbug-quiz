@@ -109,6 +109,15 @@ const defaultTheme = {
       "2xl": "var(--radius-2xl)",
       full: "var(--radius-full)",
     },
+    keyframes: {
+      shimmer: {
+        "0%": { transform: "translateX(-100%)" },
+        "100%": { transform: "translateX(100%)" },
+      },
+    },
+    animation: {
+      shimmer: "shimmer 3s infinite",
+    },
   },
   spacing: {
     px: "var(--size-px)",

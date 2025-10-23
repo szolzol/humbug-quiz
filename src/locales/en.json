@@ -123,7 +123,12 @@
         "signInWithGoogle": "Sign in with Google",
         "signOut": "Sign Out",
         "welcome": "Welcome",
-        "viewProfile": "View Profile"
+        "viewProfile": "View Profile",
+        "ctaTitle": "Unlock Premium Features",
+        "ctaDescription": "Sign in with your Google account to access exclusive content and save your progress",
+        "benefit1": "Access premium question packs",
+        "benefit2": "Save your game progress",
+        "benefit3": "Personalized experience"
     },
     "profile": {
         "title": "Player Profile",

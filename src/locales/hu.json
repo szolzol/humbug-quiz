@@ -128,7 +128,10 @@
         "unlockCards": "Jelentkezz be a kérdécsomagok feloldásához",
         "cardCount": "{{visible}}/{{total}} kérdés elérhető",
         "ctaTitle": "Még egy kört mindenkinek...",
-        "ctaDescription": "Fedezd fel az összes feladványt belépés után!"
+        "ctaDescription": "Fedezd fel az összes feladványt belépés után!",
+        "benefit1": "Prémium kérdéscsomagok elérése",
+        "benefit2": "Játékállás mentése",
+        "benefit3": "Személyre szabott élmény"
     },
     "profile": {
         "title": "Játékos Profil",

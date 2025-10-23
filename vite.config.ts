@@ -2894,6 +2894,85 @@ function apiRoutesPlugin(): PluginOption {
           }
         }
 
+        // Handle /api/rooms (Multiplayer game rooms)
+        if (req.url?.startsWith("/api/rooms")) {
+          try {
+            // Import the rooms handler dynamically
+            const roomsHandler = await import("./api/rooms.ts");
+
+            // Create Vercel-compatible request/response objects
+            const vercelReq: any = {
+              method: req.method,
+              headers: req.headers,
+              query: {},
+              body: null,
+              socket: req.socket,
+            };
+
+            // Parse query string
+            if (req.url.includes("?")) {
+              const urlParams = new URLSearchParams(req.url.split("?")[1]);
+              urlParams.forEach((value, key) => {
+                vercelReq.query[key] = value;
+              });
+            }
+
+            // Parse body for POST requests
+            if (req.method === "POST") {
+              let body = "";
+              for await (const chunk of req) {
+                body += chunk;
+              }
+              if (body) {
+                try {
+                  vercelReq.body = JSON.parse(body);
+                } catch {
+                  vercelReq.body = body;
+                }
+              }
+            }
+
+            const vercelRes: any = {
+              statusCode: 200,
+              headers: {},
+              setHeader(name: string, value: string | number) {
+                this.headers[name] = value;
+                res.setHeader(name, value);
+                return this;
+              },
+              status(code: number) {
+                this.statusCode = code;
+                res.statusCode = code;
+                return this;
+              },
+              json(data: any) {
+                this.setHeader("Content-Type", "application/json");
+                res.end(JSON.stringify(data));
+                return this;
+              },
+              end(data?: any) {
+                res.end(data);
+                return this;
+              },
+            };
+
+            // Call the handler
+            await roomsHandler.default(vercelReq, vercelRes);
+            return;
+          } catch (error) {
+            console.error("Multiplayer API Error:", error);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                success: false,
+                error: "Failed to process multiplayer request",
+              })
+            );
+            return;
+          }
+        }
+
         next();
       });
     },

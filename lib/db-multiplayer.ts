@@ -3,21 +3,24 @@
  * Uses Neon serverless with pooled connections (PgBouncer)
  */
 
-import { neon } from "@neondatabase/serverless";
+import { Pool, neon } from "@neondatabase/serverless";
 
 // Use pooled connection string for serverless environments
-const DATABASE_URL = process.env.DATABASE_URL;
+// Note: Using POSTGRES_POSTGRES_URL to match existing project convention
+const DATABASE_URL =
+  process.env.DATABASE_URL || process.env.POSTGRES_POSTGRES_URL;
 
 if (!DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+  throw new Error(
+    "DATABASE_URL or POSTGRES_POSTGRES_URL environment variable is required"
+  );
 }
 
-// Ensure we're using pooled connection (pgbouncer=true)
-const pooledUrl = DATABASE_URL.includes("?")
-  ? `${DATABASE_URL}&pgbouncer=true`
-  : `${DATABASE_URL}?pgbouncer=true`;
+// Use Pool for parameterized queries (not template literals)
+const pool = new Pool({ connectionString: DATABASE_URL });
 
-export const sql = neon(pooledUrl);
+// Keep sql for simple template literal queries if needed
+export const sql = neon(DATABASE_URL);
 
 /**
  * Query helper with error handling and logging
@@ -28,7 +31,7 @@ export async function query<T = any>(
 ): Promise<T[]> {
   try {
     const startTime = Date.now();
-    const result = await sql(sqlQuery, params);
+    const result = await pool.query(sqlQuery, params);
     const duration = Date.now() - startTime;
 
     // Log slow queries (>500ms)
@@ -39,7 +42,7 @@ export async function query<T = any>(
       );
     }
 
-    return result as T[];
+    return result.rows as T[];
   } catch (error) {
     console.error("[DB] Query error:", error);
     console.error("[DB] Query:", sqlQuery);
@@ -53,15 +56,20 @@ export async function query<T = any>(
  * Note: Simplified for serverless - uses single connection per transaction
  */
 export async function transaction<T>(
-  callback: (tx: typeof sql) => Promise<T>
+  callback: (client: any) => Promise<T>
 ): Promise<T> {
+  const client = await pool.connect();
   try {
-    // In serverless, we rely on Neon's transaction handling
-    // BEGIN/COMMIT happens automatically per request
-    return await callback(sql);
+    await client.query("BEGIN");
+    const result = await callback(client);
+    await client.query("COMMIT");
+    return result;
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("[DB] Transaction error:", error);
     throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -83,8 +91,8 @@ export async function execute(
   sqlQuery: string,
   params: any[] = []
 ): Promise<number> {
-  const result = await sql(sqlQuery, params);
-  return result.length;
+  const result = await pool.query(sqlQuery, params);
+  return result.rowCount || 0;
 }
 
 /**
@@ -170,6 +178,14 @@ export interface GameSession {
   total_questions: number;
   started_at: Date;
   last_updated: Date;
+  last_answer_at: Date | null;
+  humbug_deadline: Date | null;
+  last_humbug_event: any | null; // JSONB - last HUMBUG challenge result
+  // For queries that include question data
+  question_en?: string;
+  question_hu?: string;
+  answers_en?: string[];
+  answers_hu?: string[];
 }
 
 export interface PlayerAnswer {
@@ -182,6 +198,9 @@ export interface PlayerAnswer {
   points_earned: number;
   submitted_at: Date;
   round_number: number;
+  revealed: boolean;
+  humbug_called_by: number | null;
+  answerer_nickname?: string; // Added via JOIN in queries
 }
 
 /**
@@ -218,7 +237,14 @@ export async function isRoomJoinable(code: string): Promise<{
     return { joinable: false, reason: "Game already started", roomId: room.id };
   }
 
-  if (new Date(room.expires_at) < new Date()) {
+  // Compare with UTC timestamps to avoid timezone issues
+  const now = new Date();
+  const expiresAt = new Date(room.expires_at);
+
+  if (expiresAt < now) {
+    console.log(
+      `[DB] Room ${code} expired: expires=${expiresAt.toISOString()}, now=${now.toISOString()}`
+    );
     return { joinable: false, reason: "Room expired", roomId: room.id };
   }
 

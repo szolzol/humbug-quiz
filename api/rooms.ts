@@ -12,6 +12,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import cookie from "cookie";
+import jwt from "jsonwebtoken";
 import { randomBytes } from "crypto";
 import {
   query as dbQuery,
@@ -22,6 +23,8 @@ import {
   touchRoom,
   GameRoom,
   RoomPlayer,
+  GameSession,
+  PlayerAnswer,
 } from "../lib/db-multiplayer";
 
 // Standardized response format
@@ -72,10 +75,202 @@ function getOrCreateSession(req: VercelRequest, res: VercelResponse): string {
   return sessionId;
 }
 
+// User info from JWT token
+interface AuthenticatedUser {
+  userId: string;
+  email: string;
+  name: string;
+  nickname?: string;
+  picture: string;
+  role: "free" | "premium" | "admin" | "creator";
+}
+
+/**
+ * Get authenticated user from JWT cookie
+ * Returns null if not authenticated or token invalid
+ */
+function getAuthenticatedUser(req: VercelRequest): AuthenticatedUser | null {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) return null;
+
+  const cookies = cookie.parse(req.headers.cookie || "");
+  const token = cookies.auth_token;
+
+  if (!token) return null;
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret) as any;
+    return {
+      userId: decoded.userId,
+      email: decoded.email,
+      name: decoded.name,
+      nickname: decoded.nickname,
+      picture: decoded.picture,
+      role: decoded.role || "free",
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Get available question sets for user based on their role
+ */
+async function getAvailableQuestionSets(
+  role: "free" | "premium" | "admin" | "creator"
+): Promise<number[]> {
+  // Admin and creators see all sets
+  if (role === "admin" || role === "creator") {
+    const sets = await dbQuery<{ id: number }>(
+      `SELECT id FROM question_sets WHERE is_active = true ORDER BY display_order`
+    );
+    return sets.map((s) => s.id);
+  }
+
+  // Premium users see free + premium sets
+  if (role === "premium") {
+    const sets = await dbQuery<{ id: number }>(
+      `SELECT id FROM question_sets 
+       WHERE is_active = true 
+       AND access_level IN ('free', 'premium')
+       ORDER BY display_order`
+    );
+    return sets.map((s) => s.id);
+  }
+
+  // Free users only see free sets
+  const sets = await dbQuery<{ id: number }>(
+    `SELECT id FROM question_sets 
+     WHERE is_active = true 
+     AND access_level = 'free'
+     ORDER BY display_order`
+  );
+  return sets.map((s) => s.id);
+}
+
+/**
+ * Fuzzy answer matching with tolerance for typos and formatting
+ * Returns true if user answer is "close enough" to any correct answer
+ */
+function fuzzyMatchAnswer(
+  userAnswer: string,
+  correctAnswers: string[]
+): boolean {
+  // Normalize function: lowercase, remove extra whitespace, remove common prefixes/suffixes
+  const normalize = (str: string): string => {
+    return (
+      str
+        .toLowerCase()
+        .trim()
+        // Remove common articles and prefixes
+        .replace(/^(the|a|an|le|la|les|el|il|un|una)\s+/i, "")
+        // Remove common suffixes (FC, CF, etc for football clubs)
+        .replace(
+          /\s+(fc|cf|afc|bfc|cfc|united|city|town|rovers|athletic|albion|wanderers)$/i,
+          ""
+        )
+        // Remove special characters but keep alphanumeric and spaces
+        .replace(/[^\w\s]/g, " ")
+        // Normalize multiple spaces
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+  };
+
+  // Extract key words (ignore very short words)
+  const extractKeyWords = (str: string): string[] => {
+    return str
+      .split(/\s+/)
+      .filter((word) => word.length > 2) // Ignore 1-2 char words like "FC", "CF"
+      .map((w) => w.toLowerCase());
+  };
+
+  const normalizedUser = normalize(userAnswer);
+  const userWords = extractKeyWords(normalizedUser);
+
+  // Check each correct answer
+  for (const correct of correctAnswers) {
+    const normalizedCorrect = normalize(correct);
+
+    // Exact match after normalization
+    if (normalizedUser === normalizedCorrect) {
+      return true;
+    }
+
+    const correctWords = extractKeyWords(normalizedCorrect);
+
+    // Calculate word overlap percentage
+    if (correctWords.length === 0) continue;
+
+    const matchingWords = userWords.filter((word) =>
+      correctWords.some((cWord) => {
+        // Exact word match
+        if (word === cWord) return true;
+
+        // Allow 1 character difference for short words (typo tolerance)
+        if (word.length >= 3 && cWord.length >= 3) {
+          return levenshteinDistance(word, cWord) <= 1;
+        }
+
+        return false;
+      })
+    );
+
+    const overlapRatio = matchingWords.length / correctWords.length;
+
+    // Accept if:
+    // - All significant words match (100%)
+    // - Or at least 75% of words match for multi-word answers
+    if (
+      overlapRatio === 1.0 ||
+      (correctWords.length >= 2 && overlapRatio >= 0.75)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Levenshtein distance - minimum edits to transform one string to another
+ * Used for typo tolerance
+ */
+function levenshteinDistance(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j] + 1 // deletion
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 // Simple in-memory rate limiting (per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 60; // 60 requests per minute per IP
+const RATE_LIMIT_MAX = 120; // 120 requests per minute per IP (for polling)
 
 function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
@@ -117,6 +312,11 @@ const AnswerSchema = z.object({
 
 const NextQuestionSchema = z.object({
   roomId: z.string().uuid(),
+});
+
+const HumbugSchema = z.object({
+  roomId: z.string().uuid(),
+  answerId: z.number().int().positive(),
 });
 
 const StateSchema = z.object({
@@ -191,12 +391,18 @@ export default async function handler(
       case "next":
         return await handleNext(req, res, sessionId);
 
+      case "humbug":
+        return await handleHumbug(req, res, sessionId);
+
+      case "available-sets":
+        return await handleAvailableSets(req, res);
+
       default:
         return respond(
           res,
           false,
           undefined,
-          `Invalid action: ${action}. Supported: create, join, leave, start, state, answer, next`,
+          `Invalid action: ${action}. Supported: create, join, leave, start, state, answer, next, humbug, available-sets`,
           400
         );
     }
@@ -212,7 +418,46 @@ export default async function handler(
   }
 }
 
-// Action handlers (stubs - to be implemented)
+// Action handlers
+
+/**
+ * Get available question sets for current user based on their role
+ */
+async function handleAvailableSets(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<void> {
+  if (req.method !== "GET") {
+    return respond(res, false, undefined, "Method not allowed", 405);
+  }
+
+  try {
+    const authUser = getAuthenticatedUser(req);
+    const userRole = authUser?.role || "free";
+
+    // Get available set IDs
+    const availableSetIds = await getAvailableQuestionSets(userRole);
+
+    // Get full set details
+    const sets = await dbQuery<any>(
+      `SELECT id, slug, name_en, name_hu, description_en, description_hu, 
+              access_level, question_count, cover_image_url, icon_url
+       FROM question_sets 
+       WHERE id = ANY($1::int[]) AND is_active = true
+       ORDER BY display_order`,
+      [availableSetIds]
+    );
+
+    respond(res, true, {
+      userRole,
+      authenticated: !!authUser,
+      sets,
+    });
+  } catch (error: any) {
+    console.error("[Rooms] Available sets error:", error);
+    respond(res, false, undefined, error.message, 500);
+  }
+}
 
 async function handleCreate(
   req: VercelRequest,
@@ -229,12 +474,15 @@ async function handleCreate(
     // Generate unique room code
     const code = await generateUniqueRoomCode();
 
+    // Set expiration to 4 hours from now (UTC)
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+
     // Create room
     const room = await queryOne<GameRoom>(
-      `INSERT INTO game_rooms (code, host_session_id, max_players, question_set_id, state, state_version)
-       VALUES ($1, $2, $3, $4, 'lobby', 0)
+      `INSERT INTO game_rooms (code, host_session_id, max_players, question_set_id, state, state_version, expires_at)
+       VALUES ($1, $2, $3, $4, 'lobby', 0, $5)
        RETURNING *`,
-      [code, sessionId, body.maxPlayers, body.questionSetId || null]
+      [code, sessionId, body.maxPlayers, body.questionSetId || null, expiresAt]
     );
 
     if (!room) {
@@ -270,6 +518,12 @@ async function handleJoin(
   const body = JoinRoomSchema.parse(req.body);
 
   try {
+    // Get authenticated user (if logged in)
+    const authUser = getAuthenticatedUser(req);
+
+    // Use profile nickname if authenticated, otherwise use provided nickname
+    const nickname = authUser?.nickname || body.nickname;
+
     // Check if room is joinable
     const joinCheck = await isRoomJoinable(body.code);
 
@@ -286,22 +540,25 @@ async function handleJoin(
     );
 
     if (existingPlayer) {
-      // Update nickname if changed
+      // Update nickname if changed (from profile or manual)
       await execute(
         `UPDATE room_players 
          SET nickname = $1, last_seen = NOW()
          WHERE id = $2`,
-        [body.nickname, existingPlayer.id]
+        [nickname, existingPlayer.id]
       );
 
       console.log(
-        `[Rooms] Player ${existingPlayer.id} rejoined room ${body.code}`
+        `[Rooms] Player ${existingPlayer.id} (${nickname}) rejoined room ${body.code}`
       );
 
       return respond(res, true, {
         roomId,
         playerId: existingPlayer.id,
+        isHost: existingPlayer.is_host,
+        nickname,
         rejoined: true,
+        authenticated: !!authUser,
       });
     }
 
@@ -322,7 +579,7 @@ async function handleJoin(
       `INSERT INTO room_players (room_id, session_id, nickname, is_host)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [roomId, sessionId, body.nickname, isHost]
+      [roomId, sessionId, nickname, isHost]
     );
 
     if (!player) {
@@ -333,14 +590,16 @@ async function handleJoin(
     await touchRoom(roomId);
 
     console.log(
-      `[Rooms] Player ${player.id} (${body.nickname}) joined room ${body.code}`
+      `[Rooms] Player ${player.id} (${nickname}) joined room ${body.code}`
     );
 
     respond(res, true, {
       roomId,
       playerId: player.id,
       isHost,
-      nickname: player.nickname,
+      nickname,
+      authenticated: !!authUser,
+      userRole: authUser?.role,
     });
   } catch (error: any) {
     console.error("[Rooms] Join error:", error);
@@ -459,24 +718,65 @@ async function handleStart(
       );
     }
 
-    // Get random questions from the set
-    const questionSetId = body.questionSetId || room.question_set_id || 1;
-    const totalQuestions = 10; // MVP: fixed 10 questions per game
+    // Get authenticated user to check question set access
+    const authUser = getAuthenticatedUser(req);
+    const userRole = authUser?.role || "free";
+
+    // Get available question sets for user's role
+    const availableSets = await getAvailableQuestionSets(userRole);
+
+    if (availableSets.length === 0) {
+      return respond(res, false, undefined, "No question sets available", 400);
+    }
+
+    // Determine which question set to use
+    let questionSetId = body.questionSetId;
+
+    // If no set specified, use first available (usually Free Pack)
+    if (!questionSetId) {
+      questionSetId = availableSets[0];
+    }
+
+    // Verify user has access to requested set
+    if (!availableSets.includes(questionSetId)) {
+      return respond(
+        res,
+        false,
+        undefined,
+        `You don't have access to this question set. Available sets: ${availableSets.join(
+          ", "
+        )}`,
+        403
+      );
+    }
+
+    // Get question set info for total questions
+    const questionSet = await queryOne<{ id: number; question_count: number }>(
+      `SELECT id, question_count FROM question_sets WHERE id = $1`,
+      [questionSetId]
+    );
+
+    if (!questionSet) {
+      return respond(res, false, undefined, "Question set not found", 404);
+    }
+
+    const totalQuestions = Math.min(10, questionSet.question_count); // Max 10 questions per game
+    const minQuestions = 3; // Minimum for testing
 
     const questions = await dbQuery<{ id: number }>(
       `SELECT id FROM questions 
-       WHERE set_id = $1 
+       WHERE set_id = $1 AND is_active = true
        ORDER BY RANDOM() 
        LIMIT $2`,
       [questionSetId, totalQuestions]
     );
 
-    if (questions.length < totalQuestions) {
+    if (questions.length < minQuestions) {
       return respond(
         res,
         false,
         undefined,
-        `Not enough questions in set (need ${totalQuestions}, found ${questions.length})`,
+        `Not enough questions in set (need at least ${minQuestions}, found ${questions.length})`,
         400
       );
     }
@@ -484,6 +784,7 @@ async function handleStart(
     const questionIds = questions.map((q) => q.id);
     const firstQuestionId = questionIds[0];
     const firstPlayerId = players[0].id;
+    const actualTotalQuestions = questions.length; // Use actual count
 
     // Create game session
     await queryOne(
@@ -492,7 +793,13 @@ async function handleStart(
         round_number, question_ids, total_questions)
        VALUES ($1, $2, 0, $3, 1, $4, $5)
        RETURNING *`,
-      [body.roomId, firstQuestionId, firstPlayerId, questionIds, totalQuestions]
+      [
+        body.roomId,
+        firstQuestionId,
+        firstPlayerId,
+        questionIds,
+        actualTotalQuestions,
+      ]
     );
 
     // Update room state
@@ -506,7 +813,7 @@ async function handleStart(
     );
 
     console.log(
-      `[Rooms] Game started in room ${room.code} with ${players.length} players`
+      `[Rooms] Game started in room ${room.code} with ${players.length} players, set ${questionSetId} (${actualTotalQuestions} questions), host role: ${userRole}`
     );
 
     respond(res, true, {
@@ -576,7 +883,8 @@ async function handleState(
     if (room.state === "playing") {
       const session = await queryOne(
         `SELECT ms.*, 
-                q.question_text, 
+                q.question_en, 
+                q.question_hu,
                 q.category,
                 rp.nickname as current_player_nickname
          FROM multiplayer_sessions ms
@@ -587,19 +895,44 @@ async function handleState(
       );
 
       if (session) {
+        // Get recent answers for current question (for HUMBUG mechanic)
+        const recentAnswers = await dbQuery(
+          `SELECT pa.*, rp.nickname as player_nickname
+           FROM player_answers pa
+           JOIN room_players rp ON pa.player_id = rp.id
+           WHERE pa.session_id = $1 
+           AND pa.question_id = $2
+           ORDER BY pa.submitted_at DESC
+           LIMIT 10`,
+          [session.id, session.current_question_id]
+        );
+
         gameState = {
           currentQuestionIndex: session.current_question_index,
           totalQuestions: session.total_questions,
           roundNumber: session.round_number,
-          currentQuestion: session.question_text
+          currentQuestion: session.question_en
             ? {
                 id: session.current_question_id,
-                text: session.question_text,
+                textEn: session.question_en,
+                textHu: session.question_hu,
                 category: session.category,
               }
             : null,
           currentTurnPlayerId: session.current_turn_player_id,
           currentPlayerNickname: session.current_player_nickname,
+          humbugDeadline: session.humbug_deadline,
+          lastHumbugEvent: session.last_humbug_event, // Broadcast HUMBUG results to all players
+          recentAnswers: recentAnswers.map((a: any) => ({
+            answerId: a.id,
+            playerNickname: a.player_nickname,
+            answerText: a.answer_text,
+            isCorrect: a.is_correct,
+            pointsEarned: a.points_earned,
+            submittedAt: a.submitted_at,
+            revealed: a.revealed,
+            humbugCalledBy: a.humbug_called_by,
+          })),
         };
       }
     }
@@ -669,12 +1002,22 @@ async function handleAnswer(
       return respond(res, false, undefined, "Not in this room", 404);
     }
 
-    // Get game session
+    // Get game session with all accepted answers
     const session = await queryOne<any>(
-      `SELECT ms.*, q.allowed_answers 
+      `SELECT ms.*, 
+              COALESCE(
+                json_agg(DISTINCT a.answer_en) FILTER (WHERE a.answer_en IS NOT NULL),
+                '[]'::json
+              ) as answers_en,
+              COALESCE(
+                json_agg(DISTINCT a.answer_hu) FILTER (WHERE a.answer_hu IS NOT NULL),
+                '[]'::json
+              ) as answers_hu
        FROM multiplayer_sessions ms
        LEFT JOIN questions q ON ms.current_question_id = q.id
-       WHERE ms.room_id = $1`,
+       LEFT JOIN answers a ON a.question_id = q.id
+       WHERE ms.room_id = $1
+       GROUP BY ms.id`,
       [body.roomId]
     );
 
@@ -687,20 +1030,22 @@ async function handleAnswer(
       return respond(res, false, undefined, "Not your turn", 403);
     }
 
-    // Check answer (exact match for MVP, case-insensitive)
-    const allowedAnswers: string[] = session.allowed_answers || [];
-    const normalizedAnswer = body.answer.toLowerCase().trim();
-    const isCorrect = allowedAnswers.some(
-      (allowed: string) => allowed.toLowerCase().trim() === normalizedAnswer
-    );
+    // Combine all allowed answers (both languages)
+    const allowedAnswers: string[] = [
+      ...(session.answers_en || []),
+      ...(session.answers_hu || []),
+    ].filter(Boolean);
+
+    // Check answer with fuzzy matching (tolerates typos, missing articles, etc.)
+    const isCorrect = fuzzyMatchAnswer(body.answer, allowedAnswers);
 
     const pointsEarned = isCorrect ? 10 : 0;
 
-    // Record answer
-    await queryOne(
+    // Record answer (revealed = FALSE, awaiting HUMBUG challenge)
+    const answer = await queryOne(
       `INSERT INTO player_answers 
-       (session_id, player_id, question_id, answer_text, is_correct, points_earned, round_number)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       (session_id, player_id, question_id, answer_text, is_correct, points_earned, round_number, revealed)
+       VALUES ($1::INTEGER, $2::INTEGER, $3::INTEGER, $4::TEXT, $5::BOOLEAN, $6::INTEGER, $7::INTEGER, FALSE)
        RETURNING *`,
       [
         session.id,
@@ -713,31 +1058,63 @@ async function handleAnswer(
       ]
     );
 
-    // Update player stats
+    // Set HUMBUG deadline (30 seconds from now)
+    const humbugDeadline = new Date(Date.now() + 30000); // 30 seconds
+    await execute(
+      `UPDATE multiplayer_sessions 
+       SET last_answer_at = NOW(), humbug_deadline = $1
+       WHERE id = $2`,
+      [humbugDeadline, session.id]
+    );
+
+    // Update player stats ONLY if correct (wrong answers wait for HUMBUG or timeout)
     if (isCorrect) {
       await execute(
-        `UPDATE room_players SET score = score + $1 WHERE id = $2`,
+        `UPDATE room_players SET score = score + $1::INTEGER WHERE id = $2`,
         [pointsEarned, player.id]
       );
-    } else {
-      await execute(`UPDATE room_players SET lives = lives - 1 WHERE id = $2`, [
-        player.id,
-      ]);
     }
+    // If wrong answer, life will be deducted ONLY after:
+    // 1. HUMBUG is called and confirms wrong answer, OR
+    // 2. 30-second timer expires without HUMBUG
 
-    // Touch room
+    // Auto-advance to next player's turn (turn rotation)
+    const allPlayers = await dbQuery<RoomPlayer>(
+      `SELECT * FROM room_players WHERE room_id = $1 ORDER BY joined_at ASC`,
+      [body.roomId]
+    );
+
+    const currentPlayerIndex = allPlayers.findIndex(
+      (p) => p.id === session.current_turn_player_id
+    );
+    const nextPlayerIndex = (currentPlayerIndex + 1) % allPlayers.length;
+    const nextPlayerId = allPlayers[nextPlayerIndex].id;
+
+    // Update turn to next player
+    await execute(
+      `UPDATE multiplayer_sessions 
+       SET current_turn_player_id = $1, last_updated = NOW()
+       WHERE room_id = $2`,
+      [nextPlayerId, body.roomId]
+    );
+
+    // Touch room (bumps state_version for polling)
     await touchRoom(body.roomId);
 
     console.log(
-      `[Rooms] Player ${player.id} answered "${body.answer}" - ${
+      `[Rooms] Player ${player.nickname} answered "${body.answer}" - ${
         isCorrect ? "CORRECT" : "WRONG"
+      } (revealed=FALSE, awaiting HUMBUG) | Next turn: ${
+        allPlayers[nextPlayerIndex].nickname
       }`
     );
 
     respond(res, true, {
       correct: isCorrect,
       pointsEarned,
-      livesRemaining: isCorrect ? player.lives : player.lives - 1,
+      livesRemaining: player.lives, // Lives unchanged - penalty only after HUMBUG or timeout
+      nextPlayer: allPlayers[nextPlayerIndex].nickname,
+      awaitingHumbug: true, // Flag to indicate 30-second HUMBUG window is active
     });
   } catch (error: any) {
     console.error("[Rooms] Answer error:", error);
@@ -843,6 +1220,7 @@ async function handleNext(
            current_question_id = $2,
            current_turn_player_id = $3,
            round_number = $4,
+           last_humbug_event = NULL,
            last_updated = NOW()
        WHERE id = $5`,
       [nextQuestionIndex, nextQuestionId, nextPlayer.id, newRound, session.id]
@@ -863,6 +1241,176 @@ async function handleNext(
     });
   } catch (error: any) {
     console.error("[Rooms] Next error:", error);
+    respond(res, false, undefined, error.message, 500);
+  }
+}
+
+/**
+ * Handle HUMBUG call - challenge the previous answer
+ */
+async function handleHumbug(
+  req: VercelRequest,
+  res: VercelResponse,
+  sessionId: string
+): Promise<void> {
+  try {
+    const body = HumbugSchema.parse(req.body);
+
+    // Get challenger (current player) - session_id is directly in room_players
+    const challenger = await queryOne<RoomPlayer>(
+      `SELECT * FROM room_players 
+       WHERE session_id = $1 AND room_id = $2`,
+      [sessionId, body.roomId]
+    );
+
+    if (!challenger) {
+      return respond(res, false, undefined, "Player not found in room", 403);
+    }
+
+    // Get the answer being challenged
+    const answer = await queryOne<PlayerAnswer>(
+      `SELECT pa.*, rp.nickname as answerer_nickname
+       FROM player_answers pa
+       INNER JOIN room_players rp ON pa.player_id = rp.id
+       WHERE pa.id = $1`,
+      [body.answerId]
+    );
+
+    if (!answer) {
+      return respond(res, false, undefined, "Answer not found", 404);
+    }
+
+    // Get session to check timer
+    const session = await queryOne<GameSession>(
+      `SELECT * FROM multiplayer_sessions WHERE room_id = $1`,
+      [body.roomId]
+    );
+
+    if (!session) {
+      return respond(res, false, undefined, "Game session not found", 404);
+    }
+
+    // Check if HUMBUG timer has expired
+    const now = new Date();
+    const deadline = session.humbug_deadline
+      ? new Date(session.humbug_deadline)
+      : null;
+
+    if (!deadline || now > deadline) {
+      return respond(
+        res,
+        false,
+        undefined,
+        "HUMBUG timer expired (30 seconds passed)",
+        400
+      );
+    }
+
+    // Check if already revealed
+    if (answer.revealed) {
+      return respond(
+        res,
+        false,
+        undefined,
+        "This answer has already been revealed",
+        400
+      );
+    }
+
+    // Check if challenger is the answerer (can't HUMBUG yourself)
+    if (challenger.id === answer.player_id) {
+      return respond(
+        res,
+        false,
+        undefined,
+        "You cannot HUMBUG your own answer",
+        400
+      );
+    }
+
+    // Reveal the answer and record who called HUMBUG
+    await execute(
+      `UPDATE player_answers 
+       SET revealed = TRUE, humbug_called_by = $1
+       WHERE id = $2`,
+      [challenger.id, answer.id]
+    );
+
+    // Apply penalty based on answer correctness
+    let penaltyTarget: "challenger" | "answerer";
+    let penaltyPlayerId: number;
+    let penaltyPlayerName: string;
+    const answererName = answer.answerer_nickname || "Unknown";
+
+    if (answer.is_correct) {
+      // Answer was CORRECT - challenger was wrong, loses 1 life
+      penaltyTarget = "challenger";
+      penaltyPlayerId = challenger.id;
+      penaltyPlayerName = challenger.nickname;
+
+      await execute(`UPDATE room_players SET lives = lives - 1 WHERE id = $1`, [
+        challenger.id,
+      ]);
+
+      console.log(
+        `[Rooms] HUMBUG: ${challenger.nickname} challenged CORRECT answer by ${answererName} - CHALLENGER loses 1 life`
+      );
+    } else {
+      // Answer was WRONG - challenger was right, answerer loses 1 life
+      penaltyTarget = "answerer";
+      penaltyPlayerId = answer.player_id;
+      penaltyPlayerName = answererName;
+
+      await execute(`UPDATE room_players SET lives = lives - 1 WHERE id = $1`, [
+        answer.player_id,
+      ]);
+
+      console.log(
+        `[Rooms] HUMBUG: ${challenger.nickname} challenged WRONG answer by ${answererName} - ANSWERER loses 1 life`
+      );
+    }
+
+    // Check if penalty caused elimination
+    const penalizedPlayer = await queryOne<RoomPlayer>(
+      `SELECT * FROM room_players WHERE id = $1`,
+      [penaltyPlayerId]
+    );
+
+    const eliminated = penalizedPlayer && penalizedPlayer.lives <= 0;
+
+    if (eliminated) {
+      console.log(`[Rooms] Player ${penaltyPlayerName} ELIMINATED (0 lives)`);
+    }
+
+    // Store HUMBUG event in session for broadcasting to all players
+    const humbugEvent = {
+      answerId: answer.id,
+      challengerId: challenger.id,
+      challengerName: challenger.nickname,
+      answererId: answer.player_id,
+      answererName,
+      answerText: answer.answer_text,
+      answerWasCorrect: answer.is_correct,
+      penaltyTarget,
+      penaltyPlayerName,
+      eliminated,
+      livesRemaining: penalizedPlayer?.lives || 0,
+      timestamp: new Date().toISOString(),
+    };
+
+    await execute(
+      `UPDATE multiplayer_sessions 
+       SET last_humbug_event = $1
+       WHERE room_id = $2`,
+      [JSON.stringify(humbugEvent), body.roomId]
+    );
+
+    // Touch room to bump state_version
+    await touchRoom(body.roomId);
+
+    respond(res, true, humbugEvent);
+  } catch (error: any) {
+    console.error("[Rooms] HUMBUG error:", error);
     respond(res, false, undefined, error.message, 500);
   }
 }

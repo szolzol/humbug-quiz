@@ -23,20 +23,32 @@ if (!DATABASE_URL) {
 }
 
 // Use Pool for parameterized queries (not template literals)
-const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
+// Lazy initialization to prevent crashes if env var missing
+let pool: Pool | null = null;
+let sql: ReturnType<typeof neon> | null = null;
 
-// Keep sql for simple template literal queries if needed
-export const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
-
-/**
- * Helper to check if database is configured
- */
-function ensureDatabaseConfigured(): void {
-  if (!DATABASE_URL || !pool) {
+function getPool(): Pool {
+  if (!DATABASE_URL) {
     throw new Error(
-      "Database not configured. DATABASE_URL or POSTGRES_POSTGRES_URL environment variable is required"
+      "Database not configured. DATABASE_URL or POSTGRES_POSTGRES_URL required"
     );
   }
+  if (!pool) {
+    pool = new Pool({ connectionString: DATABASE_URL });
+  }
+  return pool;
+}
+
+function getSql(): ReturnType<typeof neon> {
+  if (!DATABASE_URL) {
+    throw new Error(
+      "Database not configured. DATABASE_URL or POSTGRES_POSTGRES_URL required"
+    );
+  }
+  if (!sql) {
+    sql = neon(DATABASE_URL);
+  }
+  return sql;
 }
 
 /**
@@ -46,11 +58,11 @@ export async function query<T = any>(
   sqlQuery: string,
   params: any[] = []
 ): Promise<T[]> {
-  ensureDatabaseConfigured();
+  const pool = getPool();
 
   try {
     const startTime = Date.now();
-    const result = await pool!.query(sqlQuery, params);
+    const result = await pool.query(sqlQuery, params);
     const duration = Date.now() - startTime;
 
     // Log slow queries (>500ms)
@@ -77,9 +89,9 @@ export async function query<T = any>(
 export async function transaction<T>(
   callback: (client: any) => Promise<T>
 ): Promise<T> {
-  ensureDatabaseConfigured();
+  const pool = getPool();
 
-  const client = await pool!.connect();
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
     const result = await callback(client);
@@ -112,9 +124,9 @@ export async function execute(
   sqlQuery: string,
   params: any[] = []
 ): Promise<number> {
-  ensureDatabaseConfigured();
+  const pool = getPool();
 
-  const result = await pool!.query(sqlQuery, params);
+  const result = await pool.query(sqlQuery, params);
   return result.rowCount || 0;
 }
 
@@ -122,8 +134,6 @@ export async function execute(
  * Generate a unique 6-character room code
  */
 export async function generateUniqueRoomCode(): Promise<string> {
-  ensureDatabaseConfigured();
-
   const MAX_ATTEMPTS = 10;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {

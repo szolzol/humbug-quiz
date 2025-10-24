@@ -1,450 +1,875 @@
-# 🎲 HUMBUG! - Quiz Party Game
+# 🎲 HUMBUG! - Quiz Party Game# 🎲 HUMBUG! - Quiz Party Game
 
-![HUMBUG! Banner](./src/assets/images/humbug-mood.png)
+![HUMBUG! Banner](./src/assets/images/humbug-mood.png)![HUMBUG! Banner](./src/assets/images/humbug-mood.png)
 
-**FAKE IT TILL YOU WIN IT**
+**FAKE IT TILL YOU WIN IT\*\***FAKE IT TILL YOU WIN IT\*\*
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://humbug.hu)
-[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38bdf8)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://humbug.hu)[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://humbug.hu)
 
-> A captivating, interactive web application for HUMBUG! - an experimental quiz party game that combines trivia knowledge, strategic thinking, and psychological bluffing. This landing page serves as both a showcase and a game master companion tool.
+[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
+
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38bdf8)](https://tailwindcss.com/)[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38bdf8)](https://tailwindcss.com/)
+
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+
+> An interactive web application for HUMBUG! - a quiz party game that combines trivia knowledge, strategic bluffing, and psychological gameplay. Features online multiplayer, premium content, and a comprehensive admin panel.> A captivating, interactive web application for HUMBUG! - an experimental quiz party game that combines trivia knowledge, strategic thinking, and psychological bluffing. This landing page serves as both a showcase and a game master companion tool.
 
 ---
 
-## 📖 Table of Contents
+## 📖 Table of Contents## 📖 Table of Contents
 
-- [Overview](#-overview)
-- [Game Concept](#-game-concept)
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Development](#-development)
-- [Multiplayer Architecture](#-multiplayer-architecture)
-- [Admin Panel](#-admin-panel)
-- [Design Philosophy](#-design-philosophy)
+- [Overview](#-overview)- [Overview](#-overview)
+
+- [Key Features](#-key-features)- [Game Concept](#-game-concept)
+
+- [Technology Stack](#-technology-stack)- [Key Features](#-key-features)
+
+- [Project Structure](#-project-structure)- [Technology Stack](#-technology-stack)
+
+- [Installation](#-installation)- [Project Structure](#-project-structure)
+
+- [Development](#-development)- [Installation](#-installation)
+
+- [Architecture](#-architecture)- [Development](#-development)
+
+- [Deployment](#-deployment)- [Multiplayer Architecture](#-multiplayer-architecture)
+
+- [Contributing](#-contributing)- [Admin Panel](#-admin-panel)
+
+- [License](#-license)- [Design Philosophy](#-design-philosophy)
+
 - [Internationalization](#-internationalization)
-- [Progressive Web App](#-progressive-web-app)
+
+---- [Progressive Web App](#-progressive-web-app)
+
 - [Deployment](#-deployment)
-- [Credits](#-credits)
+
+## 🎯 Overview- [Credits](#-credits)
+
 - [License](#-license)
 
+**HUMBUG!** is an innovative quiz party game for 3-8 players that puts a unique twist on traditional trivia games. This web application provides an interactive platform with:
+
 ---
 
-## 🎯 Overview
+- 🎮 **Real-time Multiplayer** - Play online with friends
 
-**HUMBUG!** is an innovative quiz party game designed for 3-8 players (age 12+) that puts a unique twist on traditional trivia games. This web application provides:
+- 🔐 **Google OAuth Authentication** - Secure login for premium features## 🎯 Overview
 
-- � **Real-time Multiplayer** - Online gameplay with 2-10 players, polling-based architecture
-- �🎵 **Background Music Player** - Looping theme music with smart controls
-- 🎤 **Interactive Audio Rules** - Complete game explanations in Hungarian and English
+- 📦 **Multiple Quiz Packs** - Question sets with role-based access control
+
+- 🎨 **Dynamic Skinning System** - Themed card designs (Standard, Premium, Fire)**HUMBUG!** is an innovative quiz party game designed for 3-8 players (age 12+) that puts a unique twist on traditional trivia games. This web application provides:
+
+- 👑 **Admin Panel** - Comprehensive content management
+
+- 🌐 **Bilingual Support** - Full Hungarian/English localization- � **Real-time Multiplayer** - Online gameplay with 2-10 players, polling-based architecture
+
+- 📱 **Progressive Web App** - Installable, works offline- �🎵 **Background Music Player** - Looping theme music with smart controls
+
+- ♿ **Accessibility Features** - WCAG 2.1 AA compliant- 🎤 **Interactive Audio Rules** - Complete game explanations in Hungarian and English
+
 - 🃏 **Complete Question Database** - 28 quiz questions across 6 diverse categories
-- 📦 **Multiple Quiz Packs** - FREE (4), International (18), Hungarian (6) question packs with role-based access
+
+---- 📦 **Multiple Quiz Packs** - FREE (4), International (18), Hungarian (6) question packs with role-based access
+
 - 🔐 **Google OAuth Authentication** - Secure login for premium content access
-- 👑 **Admin Panel** - Comprehensive content management system
+
+## ✨ Key Features- 👑 **Admin Panel** - Comprehensive content management system
+
 - � **Fuzzy Answer Matching** - Tolerant answer validation with typo correction
-- �🎨 **Game Show Aesthetics** - "Who Wants to be a Millionaire" inspired design
+
+### 🎪 Game Features- �🎨 **Game Show Aesthetics** - "Who Wants to be a Millionaire" inspired design
+
 - 🌐 **Bilingual Support** - Full Hungarian/English localization
-- 📱 **Fully Responsive** - Mobile-first design that works on all devices
-- ♿ **Accessibility Features** - Keyboard navigation, ARIA labels, screen reader support
-- 🗄️ **PostgreSQL Database** - Neon serverless database for question storage and multiplayer state
-- 🚀 **Vercel Deployment** - Production-ready deployment with automatic CI/CD
+
+- **Interactive Question Cards** - Flip animations with multiple themed skins- 📱 **Fully Responsive** - Mobile-first design that works on all devices
+
+- **Category Filtering** - Browse questions by category- ♿ **Accessibility Features** - Keyboard navigation, ARIA labels, screen reader support
+
+- **Audio Player** - Background music and audio rule explanations- 🗄️ **PostgreSQL Database** - Neon serverless database for question storage and multiplayer state
+
+- **Answer Validation** - Fuzzy matching for typo tolerance- 🚀 **Vercel Deployment** - Production-ready deployment with automatic CI/CD
+
+- **Multiplayer Mode** - Real-time gameplay with polling-based architecture
 
 ---
+
+### 🔐 Authentication & Access Control
 
 ## 🎮 Game Concept
 
-### Core Mechanics
+- **Google OAuth 2.0** - Fast login with `select_account` prompt for returning users
 
-HUMBUG! transforms traditional quiz games by introducing a **bluffing element**. Players take turns answering open-ended questions with multiple correct answers. The catch? You can bluff with a wrong answer, hoping others won't challenge you.
+- **Role-Based Access** - Free, Premium, Admin, and Creator roles### Core Mechanics
 
-**When someone calls "HUMBUG!" on your answer:**
+- **Pack Access Filtering** - Dynamic content filtering based on user role
 
-- ✅ **You were right** → The challenger loses a life
-- ❌ **You were wrong** → You lose a life
-- 🎯 **Successful challenge** → The challenger earns a "pass" token
+- **Session Management** - JWT tokens with 7-day expiry in httpOnly cookiesHUMBUG! transforms traditional quiz games by introducing a **bluffing element**. Players take turns answering open-ended questions with multiple correct answers. The catch? You can bluff with a wrong answer, hoping others won't challenge you.
+
+### 📦 Question Pack System**When someone calls "HUMBUG!" on your answer:**
+
+- **Multiple Packs** - Free, International, Hungarian, Horror-themed special sets- ✅ **You were right** → The challenger loses a life
+
+- **Access Levels** - `free`, `premium`, `admin_only` pack visibility- ❌ **You were wrong** → You lose a life
+
+- **Dynamic Skins** - Each pack can have custom theme (standard/premium/fire)- 🎯 **Successful challenge** → The challenger earns a "pass" token
+
+- **VIP Badge** - Special badge for admin-only packs in pack selector
 
 The game continues until only one player remains "alive" - requiring both knowledge and psychological insight to win.
 
+### 🎨 Skinning System
+
 ### What Makes HUMBUG! Unique
 
+Three beautifully designed themes:
+
 - **Knowledge + Psychology**: Success requires both trivia knowledge AND the ability to read opponents
-- **Strategic Depth**: Decide when to bluff, when to challenge, and when to pass
-- **Social Dynamics**: Creates memorable moments of tension, laughter, and surprise
-- **Quick to Learn**: 5-minute rule explanation, yet endlessly replayable
+
+- **Standard** - Classic yellow HUMBUG! theme- **Strategic Depth**: Decide when to bluff, when to challenge, and when to pass
+
+- **Premium** - Purple-gold theme with shimmer effects- **Social Dynamics**: Creates memorable moments of tension, laughter, and surprise
+
+- **Fire** - Red inferno theme with glow effects- **Quick to Learn**: 5-minute rule explanation, yet endlessly replayable
+
 - **No Equipment Needed**: Just this web app and your wits!
 
----
+All skins feature:
 
-## ✨ Key Features
+- Dynamic gradient backgrounds---
+
+- Shimmer/glow animations (premium & fire)
+
+- Consistent "HUMBUG!" watermarks## ✨ Key Features
+
+- Matching pack selector styling
 
 ### 🎪 Hero Section
 
+### 👑 Admin Panel
+
 - Dramatic entrance with smooth fade-in animations and custom easing curves
-- "Who Wants to be a Millionaire" inspired golden gradient theme
+
+Comprehensive dashboard for content management:- "Who Wants to be a Millionaire" inspired golden gradient theme
+
 - Background image positioned at 40% from top for optimal visual impact
-- Interactive CTA button with hover effects (scales, border highlight)
-- Language switcher in top-right corner (Hungarian 🇭🇺 / English 🇬🇧)
 
-### 📋 Interactive Game Rules
+- **User Management** - Role assignment, user profiles, activity tracking- Interactive CTA button with hover effects (scales, border highlight)
 
-- **6 comprehensive rule sections**:
+- **Question Pack CRUD** - Create, edit, publish, and organize packs- Language switcher in top-right corner (Hungarian 🇭🇺 / English 🇬🇧)
+
+- **Question Management** - Add/edit questions with multiple answers
+
+- **Analytics Dashboard** - Stats, charts, and activity logs### 📋 Interactive Game Rules
+
+- **Activity Logging** - Full audit trail of admin actions
+
+- **Skin Editor** - Assign skins to packs via dropdown- **6 comprehensive rule sections**:
+
   1. **Preparation** - No equipment needed
-  2. **Starting the Game** - Game master role and question format
-  3. **Players' Answers** - Mandatory answers and bluffing mechanics
-  4. **The "Humbug!"** - Challenge mechanics
-  5. **Victory and Defeat** - Lives, passes, and winning conditions
-  6. **Alternative Game Mode** - Multi-challenge variant for larger groups
+
+--- 2. **Starting the Game** - Game master role and question format
+
+3. **Players' Answers** - Mandatory answers and bluffing mechanics
+
+## 🛠️ Technology Stack 4. **The "Humbug!"** - Challenge mechanics
+
+5. **Victory and Defeat** - Lives, passes, and winning conditions
+
+### Frontend 6. **Alternative Game Mode** - Multi-challenge variant for larger groups
+
 - **Audio narration** available in both Hungarian and English
-- **Custom audio player** with:
-  - Play/pause controls
-  - Seekable progress bar
-  - Volume control with mute button
-  - Time display (current/total)
-  - Accessible keyboard controls
+
+- **React 18.3** - UI framework with hooks- **Custom audio player** with:
+
+- **TypeScript 5.5** - Type-safe development - Play/pause controls
+
+- **Vite** - Fast build tool and dev server - Seekable progress bar
+
+- **Tailwind CSS 4.1** - Utility-first styling - Volume control with mute button
+
+- **Framer Motion** - Smooth animations - Time display (current/total)
+
+- **shadcn/ui** - Accessible component library - Accessible keyboard controls
+
+- **i18next** - Internationalization
 
 ### 🎵 Background Music Player
 
+### Backend
+
 - Looping HUMBUG! main theme for ambiance
-- Smart controls that appear on hover or when playing
-- Default 30% volume for non-intrusive background atmosphere
-- Volume slider with percentage display
-- Animated music note icon when playing
+
+- **Vercel Serverless Functions** - API endpoints- Smart controls that appear on hover or when playing
+
+- **PostgreSQL (Neon)** - Serverless database- Default 30% volume for non-intrusive background atmosphere
+
+- **JWT** - Authentication tokens- Volume slider with percentage display
+
+- **Google OAuth 2.0** - User authentication- Animated music note icon when playing
+
 - Status messages: "Now Playing..." / "Click to set the mood"
+
+### DevOps
 
 ### 🃏 Question Card Gallery
 
-- **22+ complete questions** across 15 categories:
-  - Tourism, Technology, Culture & History, Entertainment
+- **Vercel** - Hosting and deployment
+
+- **Git** - Version control (main → production, master → live)- **22+ complete questions** across 15 categories:
+
+- **pnpm** - Package management - Tourism, Technology, Culture & History, Entertainment
+
   - Gastronomy, Sports, Travel, and more
-- **Interactive flip cards** with smooth 3D rotation animation
+
+---- **Interactive flip cards** with smooth 3D rotation animation
+
 - **Answer management system**:
-  - Click answers to mark them as "used" (green highlighting)
-  - Visual counter showing selected/total format (e.g., "3/15")
-  - Persistent state via localStorage
-- **Smart layout system**: Automatically adjusts columns (1-4) based on answer count
-- **Source attribution**: Clickable links to Wikipedia, IMDb, and other authoritative sources
-- **Diagonal watermark**: "HUMBUG!" text on card backs for brand recognition
-- **Game master helper text**: "Game master? Click for answers!"
 
-### 🎨 Design Features
+## 📁 Project Structure - Click answers to mark them as "used" (green highlighting)
 
-- **Typography**: Space Grotesk font family (self-hosted for network compatibility)
-  - 5 weights available: Light (300), Regular (400), Medium (500), SemiBold (600), Bold (700)
-- **Color Scheme**: Deep navy background with golden yellow accents
-  - Primary: Deep Navy `oklch(0.15 0.1 240)` - Authority and intelligence
-  - Accent: Rich Gold `oklch(0.75 0.15 85)` - Highlights and success states
-  - Bright Gold: `oklch(0.85 0.18 90)` - High-energy CTAs
-- **Animations**:
-  - Studio lighting effects with animated radial gradients
-  - Scroll-triggered entrance animations
-  - Smooth card flips and hover states
-  - Floating decorative elements
-- **Responsive Design**:
-  - Mobile: Single column, touch-friendly controls (44px minimum)
-  - Tablet: 2-column grid, optimized spacing
-  - Desktop: Multi-column layouts, enhanced animations
+- Visual counter showing selected/total format (e.g., "3/15")
 
-### 🌐 Internationalization
+````- Persistent state via localStorage
 
-- **Full bilingual support** (Hungarian 🇭🇺 / English 🇬🇧)
-- **Language switcher** in hero section header
-- **Persistent language preference** stored in localStorage
-- **Complete translations**
-- **Localized formatting**: Number formats, dates, etc.
-- **Automatic language detection** based on browser preferences
+humbug-quiz/- **Smart layout system**: Automatically adjusts columns (1-4) based on answer count
 
-### 📱 Progressive Web App (PWA)
+├── api/                      # Vercel serverless functions- **Source attribution**: Clickable links to Wikipedia, IMDb, and other authoritative sources
 
-- **Offline Support**: App works without internet after first visit
-- **Installable**: Add to home screen on mobile/desktop
-- **Automatic Updates**: Hourly checks for new versions
-- **Smart Caching**: Cache-first strategy with network fallback
-- **Service Worker**: Version-controlled asset caching
-- **Update Notifications**: User-friendly prompts for new versions
-- **Manifest**: Full PWA configuration with icons and theme colors
+│   ├── admin.ts             # Unified admin API endpoint- **Diagonal watermark**: "HUMBUG!" text on card backs for brand recognition
 
----
+│   ├── question-sets.ts     # Question packs CRUD- **Game master helper text**: "Game master? Click for answers!"
 
-## 🛠️ Technology Stack
+│   ├── auth/                # OAuth authentication
 
-### Core Technologies
+│   │   ├── google.ts        # OAuth initiation### 🎨 Design Features
 
-| Technology        | Version | Purpose                 |
-| ----------------- | ------- | ----------------------- |
-| **React**         | 18.3.1  | UI Component Framework  |
-| **TypeScript**    | 5.5.3   | Static Type Safety      |
-| **Vite**          | 6.3.6   | Build Tool & Dev Server |
-| **Tailwind CSS**  | 4.1.11  | Utility-First Styling   |
-| **Framer Motion** | 12.0.0  | Animation Library       |
+│   │   ├── callback.ts      # OAuth callback handler
 
-### UI Components & Libraries
+│   │   ├── session.ts       # Session validation- **Typography**: Space Grotesk font family (self-hosted for network compatibility)
 
-- **Radix UI**: Accessible, unstyled component primitives
-  - `@radix-ui/react-dropdown-menu` - Dropdown menus
-  - `@radix-ui/react-dialog` - Modal dialogs
-  - `@radix-ui/react-tabs` - Tab navigation
-  - `@radix-ui/react-separator` - Visual dividers
-- **Phosphor Icons**: Modern, clean icon library (Play, Pause, MusicNotes, etc.)
+│   │   └── logout.ts        # Logout handler  - 5 weights available: Light (300), Regular (400), Medium (500), SemiBold (600), Bold (700)
+
+│   └── ...- **Color Scheme**: Deep navy background with golden yellow accents
+
+├── src/                     # React application source  - Primary: Deep Navy `oklch(0.15 0.1 240)` - Authority and intelligence
+
+│   ├── components/          # React components  - Accent: Rich Gold `oklch(0.75 0.15 85)` - Highlights and success states
+
+│   │   ├── admin/          # Admin panel components  - Bright Gold: `oklch(0.85 0.18 90)` - High-energy CTAs
+
+│   │   │   ├── AdminDashboard.tsx- **Animations**:
+
+│   │   │   ├── PackEditDialog.tsx  - Studio lighting effects with animated radial gradients
+
+│   │   │   └── UserManagementPanel.tsx  - Scroll-triggered entrance animations
+
+│   │   ├── ui/             # shadcn/ui components  - Smooth card flips and hover states
+
+│   │   ├── QuestionCard.tsx  - Floating decorative elements
+
+│   │   ├── QuestionPackSelector.tsx- **Responsive Design**:
+
+│   │   ├── AudioPlayer.tsx  - Mobile: Single column, touch-friendly controls (44px minimum)
+
+│   │   └── ...  - Tablet: 2-column grid, optimized spacing
+
+│   ├── context/            # React context providers  - Desktop: Multi-column layouts, enhanced animations
+
+│   │   └── AuthContext.tsx # Authentication state
+
+│   ├── hooks/              # Custom React hooks### 🌐 Internationalization
+
+│   │   ├── useAuth.ts      # Auth hook
+
+│   │   └── use-mobile.ts   # Mobile detection- **Full bilingual support** (Hungarian 🇭🇺 / English 🇬🇧)
+
+│   ├── lib/                # Utility functions- **Language switcher** in hero section header
+
+│   │   └── utils.ts        # Helper functions- **Persistent language preference** stored in localStorage
+
+│   ├── locales/            # i18n translations- **Complete translations**
+
+│   │   ├── en.json         # English translations- **Localized formatting**: Number formats, dates, etc.
+
+│   │   └── hu.json         # Hungarian translations- **Automatic language detection** based on browser preferences
+
+│   ├── App.tsx             # Main app component
+
+│   └── main.tsx            # App entry point### 📱 Progressive Web App (PWA)
+
+├── database/               # Database migration scripts
+
+│   └── migrations/         # SQL migration files- **Offline Support**: App works without internet after first visit
+
+├── public/                 # Static assets- **Installable**: Add to home screen on mobile/desktop
+
+│   ├── fonts/              # Self-hosted fonts- **Automatic Updates**: Hourly checks for new versions
+
+│   ├── manifest.json       # PWA manifest- **Smart Caching**: Cache-first strategy with network fallback
+
+│   └── sw.js               # Service worker- **Service Worker**: Version-controlled asset caching
+
+├── scripts/                # Database & maintenance scripts- **Update Notifications**: User-friendly prompts for new versions
+
+│   ├── add-horror-*.cjs    # Horror pack scripts- **Manifest**: Full PWA configuration with icons and theme colors
+
+│   ├── run-*.js            # Migration runners
+
+│   ├── check-*.js          # Validation scripts---
+
+│   └── test-*.js           # Test utilities
+
+├── legacy/                 # Archived files## 🛠️ Technology Stack
+
+│   ├── docs/               # Old documentation
+
+│   │   ├── GOOGLE_OAUTH_SETUP.md### Core Technologies
+
+│   │   ├── MULTIPLAYER_*.md
+
+│   │   └── ...| Technology        | Version | Purpose                 |
+
+│   ├── database-migrations/| ----------------- | ------- | ----------------------- |
+
+│   ├── fix-docs/| **React**         | 18.3.1  | UI Component Framework  |
+
+│   └── ...| **TypeScript**    | 5.5.3   | Static Type Safety      |
+
+├── test/                   # Test files & utilities| **Vite**          | 6.3.6   | Build Tool & Dev Server |
+
+├── docs/                   # Current documentation| **Tailwind CSS**  | 4.1.11  | Utility-First Styling   |
+
+├── .github/                # GitHub configuration| **Framer Motion** | 12.0.0  | Animation Library       |
+
+│   └── instructions/       # AI agent instructions
+
+│       └── agents.md.instructions.md### UI Components & Libraries
+
+├── vite.config.ts          # Vite configuration
+
+├── vercel.json             # Vercel deployment config- **Radix UI**: Accessible, unstyled component primitives
+
+├── tailwind.config.js      # Tailwind configuration  - `@radix-ui/react-dropdown-menu` - Dropdown menus
+
+├── tsconfig.json           # TypeScript configuration  - `@radix-ui/react-dialog` - Modal dialogs
+
+├── package.json            # Dependencies  - `@radix-ui/react-tabs` - Tab navigation
+
+└── README.md               # This file  - `@radix-ui/react-separator` - Visual dividers
+
+```- **Phosphor Icons**: Modern, clean icon library (Play, Pause, MusicNotes, etc.)
+
 - **Class Variance Authority (CVA)**: Type-safe component variant management
-- **Tailwind Merge**: Intelligent class merging to prevent conflicts
+
+---- **Tailwind Merge**: Intelligent class merging to prevent conflicts
+
 - **clsx**: Conditional className utility
+
+## 🚀 Installation
 
 ### Internationalization
 
+### Prerequisites
+
 - **i18next** (24.2.1): Core internationalization framework
-- **react-i18next** (15.2.3): React-specific i18n bindings
-- **i18next-browser-languagedetector** (8.0.2): Automatic language detection
 
-### Development Tools
+- **Node.js** 18+ (LTS recommended)- **react-i18next** (15.2.3): React-specific i18n bindings
 
-- **ESLint**: Code quality and consistency enforcement
+- **pnpm** 8+ (or npm/yarn)- **i18next-browser-languagedetector** (8.0.2): Automatic language detection
+
+- **PostgreSQL database** (Neon recommended)
+
+- **Google OAuth credentials** (for authentication)### Development Tools
+
+
+
+### Setup- **ESLint**: Code quality and consistency enforcement
+
 - **TypeScript Compiler**: Static type checking
-- **Vite Plugin React**: Fast refresh and React optimizations
+
+1. **Clone the repository**- **Vite Plugin React**: Fast refresh and React optimizations
+
 - **PostCSS**: CSS processing and optimization
 
-### Fonts
+   ```bash
 
-- **Space Grotesk**: Self-hosted game show typography
+   git clone https://github.com/szolzol/humbug-quiz.git### Fonts
+
+   cd humbug-quiz
+
+   ```- **Space Grotesk**: Self-hosted game show typography
+
   - Weights: 300 (Light), 400 (Regular), 500 (Medium), 600 (SemiBold), 700 (Bold)
-  - Format: TTF (TrueType Font)
+
+2. **Install dependencies**  - Format: TTF (TrueType Font)
+
   - Location: `public/fonts/`
-  - Purpose: Network compatibility (works on restricted networks without external CDN)
 
-### Backend & Database
+   ```bash  - Purpose: Network compatibility (works on restricted networks without external CDN)
 
-- **Neon PostgreSQL**: Serverless PostgreSQL database
+   pnpm install
+
+   ```### Backend & Database
+
+
+
+3. **Configure environment variables**- **Neon PostgreSQL**: Serverless PostgreSQL database
+
   - `@neondatabase/serverless` (0.10.6): Serverless-optimized database client
-  - Stores users, questions, question sets, admin activity logs, and **multiplayer game state**
+
+   Create `.env` file in the root:  - Stores users, questions, question sets, admin activity logs, and **multiplayer game state**
+
   - Connection pooling for optimal performance
-  - **Multiplayer tables**: game_rooms, room_players, game_sessions, player_answers, humbug_events
-- **Vercel Serverless Functions**: Unified API architecture (7/12 functions used)
-  - `/api/rooms.ts`: **Unified multiplayer endpoint** (create, join, leave, start, state, answer, next, humbug, available-sets)
+
+   ```env  - **Multiplayer tables**: game_rooms, room_players, game_sessions, player_answers, humbug_events
+
+   # Database- **Vercel Serverless Functions**: Unified API architecture (7/12 functions used)
+
+   POSTGRES_POSTGRES_URL=postgresql://user:pass@host/db  - `/api/rooms.ts`: **Unified multiplayer endpoint** (create, join, leave, start, state, answer, next, humbug, available-sets)
+
   - `/api/admin.ts`: Unified admin endpoint (dashboard, users, questions, packs, activity logs)
-  - `/api/auth/*`: OAuth authentication flow (4 endpoints: google, callback, session, logout)
-  - `/api/questions/[slug].ts`: Question pack data
-  - `/api/question-sets.ts`: Pack listing
+
+   # Google OAuth  - `/api/auth/*`: OAuth authentication flow (4 endpoints: google, callback, session, logout)
+
+   GOOGLE_CLIENT_ID=your_client_id  - `/api/questions/[slug].ts`: Question pack data
+
+   GOOGLE_CLIENT_SECRET=your_client_secret  - `/api/question-sets.ts`: Pack listing
+
 - **JWT Authentication**: Secure token-based authentication
-  - `jsonwebtoken` (9.0.2): JWT token creation and validation
-  - `cookie` (1.0.2): HTTP-only cookie management
-  - 7-day session expiration
+
+   # JWT Secret  - `jsonwebtoken` (9.0.2): JWT token creation and validation
+
+   JWT_SECRET=your_random_secret_key_here  - `cookie` (1.0.2): HTTP-only cookie management
+
+   ```  - 7-day session expiration
+
   - Role-based access control (free, premium, admin, creator)
-  - **Profile integration**: Auto-populate nickname from JWT token in multiplayer
+
+4. **Run database migrations**  - **Profile integration**: Auto-populate nickname from JWT token in multiplayer
+
 - **Session Management**: Stateless HTTP sessions for multiplayer
-  - 64-character hex session IDs (256-bit entropy)
-  - HTTP-only cookies with SameSite protection
-  - No authentication required for guest play
 
----
+   ```bash  - 64-character hex session IDs (256-bit entropy)
 
-## 🎮 Multiplayer Architecture
+   node database/migrations/001_initial_schema.js  - HTTP-only cookies with SameSite protection
 
-### Overview
+   node database/migrations/002_add_roles.js  - No authentication required for guest play
 
-The HUMBUG! multiplayer system enables **real-time online quiz games** with 2-10 players. Built with a **polling-based architecture** optimized for Vercel's serverless platform, it supports the full HUMBUG game mechanics including turn-based answering, HUMBUG challenges, lives, and winner determination.
+   node database/migrations/003_add_multiplayer.js
 
-### Key Features
+   node database/migrations/004_add_admin_activity_log.js---
 
-- ✅ **Real-time Gameplay** - 120 requests/minute/IP polling rate for smooth updates
+   node database/migrations/005_add_skin_column.js
+
+   ```## 🎮 Multiplayer Architecture
+
+
+
+5. **Start development server**### Overview
+
+
+
+   ```bashThe HUMBUG! multiplayer system enables **real-time online quiz games** with 2-10 players. Built with a **polling-based architecture** optimized for Vercel's serverless platform, it supports the full HUMBUG game mechanics including turn-based answering, HUMBUG challenges, lives, and winner determination.
+
+   pnpm dev
+
+   ```### Key Features
+
+
+
+   Visit `http://localhost:5173`- ✅ **Real-time Gameplay** - 120 requests/minute/IP polling rate for smooth updates
+
 - ✅ **Session-based Authentication** - No account required (guest play supported)
-- ✅ **JWT Profile Integration** - Auto-populate nickname from user profiles
+
+---- ✅ **JWT Profile Integration** - Auto-populate nickname from user profiles
+
 - ✅ **Role-based Question Packs** - Free/Premium/Admin access levels
-- ✅ **Fuzzy Answer Matching** - Tolerance for typos and formatting variations
+
+## 🔧 Development- ✅ **Fuzzy Answer Matching** - Tolerance for typos and formatting variations
+
 - ✅ **HUMBUG Challenge Mechanic** - Challenge wrong answers, earn passes
-- ✅ **Lives System** - 3 lives per player, last survivor wins
+
+### Available Scripts- ✅ **Lives System** - 3 lives per player, last survivor wins
+
 - ✅ **State Synchronization** - ETag-based 304 responses for bandwidth efficiency
-- ✅ **Room Management** - 6-character room codes, auto-expiry after 24h
-- ✅ **Comprehensive Event Log** - All game actions tracked with timestamps
 
-### Architecture Design
+```bash- ✅ **Room Management** - 6-character room codes, auto-expiry after 24h
 
-#### Polling-Based Real-time Updates
+pnpm dev          # Start dev server (with API proxying)- ✅ **Comprehensive Event Log** - All game actions tracked with timestamps
 
-Unlike WebSocket-based architectures, the multiplayer system uses **HTTP polling** optimized for serverless environments:
+pnpm build        # Build for production
 
-```typescript
-// Client polling interval: 3 seconds
-// Rate limit: 120 requests/minute/IP
-// ETag optimization: 304 Not Modified for unchanged state
+pnpm preview      # Preview production build### Architecture Design
+
+pnpm lint         # Run ESLint
+
+```#### Polling-Based Real-time Updates
+
+
+
+### Development WorkflowUnlike WebSocket-based architectures, the multiplayer system uses **HTTP polling** optimized for serverless environments:
+
+
+
+1. **Main Branch** - Pre-production testing```typescript
+
+2. **Master Branch** - Production live site// Client polling interval: 3 seconds
+
+3. Always test on dev server before building// Rate limit: 120 requests/minute/IP
+
+4. Update translations in both `en.json` and `hu.json`// ETag optimization: 304 Not Modified for unchanged state
+
+5. Check `.github/instructions/agents.md.instructions.md` for guidelines
 
 // Polling flow:
-1. Client: GET /api/rooms?action=state&roomId={uuid}
+
+### Testing1. Client: GET /api/rooms?action=state&roomId={uuid}
+
 2. Server: Check state_version against If-None-Match header
-3. If unchanged: Return 304 Not Modified (no body)
-4. If changed: Return full game state with new ETag
-```
+
+- Test mobile on actual devices (not just emulators)3. If unchanged: Return 304 Not Modified (no body)
+
+- Check PWA features on local network: `pnpm dev --host`4. If changed: Return full game state with new ETag
+
+- Validate accessibility with screen readers```
+
+- Test OAuth flow in incognito mode
 
 **Benefits:**
 
+---
+
 - ✅ Serverless-friendly (no persistent connections)
-- ✅ Automatic reconnection (stateless HTTP)
+
+## 🏗️ Architecture- ✅ Automatic reconnection (stateless HTTP)
+
 - ✅ Bandwidth efficient (ETag 304 responses)
-- ✅ Simple debugging (standard HTTP requests)
+
+### Authentication Flow- ✅ Simple debugging (standard HTTP requests)
+
 - ✅ Works through firewalls/proxies
 
-#### Unified API Endpoint
+````
 
-To stay within Vercel's **12 serverless functions limit** (Hobby tier), all multiplayer operations use a **single endpoint** with action-based routing:
+1. User clicks "Sign in with Google"#### Unified API Endpoint
 
-```typescript
-// Single endpoint: /api/rooms
-// Actions: create, join, leave, start, state, answer, next, humbug, available-sets
+2. Redirect to /api/auth/google
 
-// Example requests:
-POST /api/rooms?action=create          // Create new room
+3. Google OAuth consent (prompt: 'select_account')To stay within Vercel's **12 serverless functions limit** (Hobby tier), all multiplayer operations use a **single endpoint** with action-based routing:
+
+4. Callback to /api/auth/callback
+
+5. Exchange code for user info```typescript
+
+6. Save/update user in database, fetch role// Single endpoint: /api/rooms
+
+7. Create JWT token (userId, email, name, nickname, picture, role)// Actions: create, join, leave, start, state, answer, next, humbug, available-sets
+
+8. Set httpOnly cookie (7-day expiry)
+
+9. Redirect to app with ?auth=success// Example requests:
+
+````POST /api/rooms?action=create          // Create new room
+
 POST /api/rooms?action=join            // Join existing room
-GET  /api/rooms?action=state           // Get current game state
+
+### Database SchemaGET  /api/rooms?action=state           // Get current game state
+
 POST /api/rooms?action=answer          // Submit answer
-POST /api/rooms?action=humbug          // Challenge answer
+
+**Key Tables:**POST /api/rooms?action=humbug          // Challenge answer
+
 POST /api/rooms?action=next            // Next question
-GET  /api/rooms?action=available-sets  // Get accessible question packs
-```
 
-**Function Count:**
+- `users` - User profiles with rolesGET  /api/rooms?action=available-sets  // Get accessible question packs
 
-- `/api/rooms.ts` - 1 function (all multiplayer operations)
+- `question_sets` - Question packs with access levels and skins```
+
+- `questions` - Individual questions (bilingual)
+
+- `answers` - Multiple correct answers per question**Function Count:**
+
+- `admin_activity_log` - Audit trail for admin actions
+
+- `game_sessions` - Multiplayer game state- `/api/rooms.ts` - 1 function (all multiplayer operations)
+
 - `/api/admin.ts` - 1 function (all admin operations)
-- `/api/auth/*` - 4 functions (OAuth flow)
+
+### Role-Based Access Control- `/api/auth/*` - 4 functions (OAuth flow)
+
 - `/api/questions/[slug].ts` - Dynamic route
-- **Total: ~7 functions** (well under 12 limit)
 
-### Database Schema
+| Role      | Access                                      |- **Total: ~7 functions** (well under 12 limit)
 
-#### Core Tables
+| --------- | ------------------------------------------- |
+
+| `free`    | Free packs only                             |### Database Schema
+
+| `premium` | Free + Premium packs                        |
+
+| `admin`   | All packs including admin_only + dashboard  |#### Core Tables
+
+| `creator` | All packs including admin_only + dashboard  |
 
 ```sql
--- Rooms: Game lobby and settings
+
+### Skinning System-- Rooms: Game lobby and settings
+
 CREATE TABLE game_rooms (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+Centralized configuration in `src/components/QuestionCard.tsx`:  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   code CHAR(6) UNIQUE NOT NULL,         -- Join code (e.g., "INFOLE")
-  host_player_id UUID NOT NULL,         -- First player becomes host
-  max_players INT DEFAULT 10,
-  state VARCHAR(20) DEFAULT 'waiting',  -- waiting | in_progress | finished
-  state_version INT DEFAULT 0,          -- Incremented on every state change
-  question_set_id INT,                  -- Which pack is being played
-  current_question_index INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+
+```typescript  host_player_id UUID NOT NULL,         -- First player becomes host
+
+const SKIN_STYLES = {  max_players INT DEFAULT 10,
+
+  standard: { front: {...}, back: {...}, shimmer: false },  state VARCHAR(20) DEFAULT 'waiting',  -- waiting | in_progress | finished
+
+  premium: { front: {...}, back: {...}, shimmer: true, shimmerColor: "via-purple-400/10" },  state_version INT DEFAULT 0,          -- Incremented on every state change
+
+  fire: { front: {...}, back: {...}, shimmer: true, shimmerColor: "via-red-400/10" }  question_set_id INT,                  -- Which pack is being played
+
+};  current_question_index INT DEFAULT 0,
+
+```  created_at TIMESTAMPTZ DEFAULT NOW(),
+
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '24 hours'
+
+Admins assign skins via dropdown in `PackEditDialog`, stored in database.  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '24 hours'
+
 );
+
+---
 
 -- Players: Participants in a room
-CREATE TABLE room_players (
+
+## 🚀 DeploymentCREATE TABLE room_players (
+
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_id UUID REFERENCES game_rooms(id) ON DELETE CASCADE,
+
+### Vercel Deployment  room_id UUID REFERENCES game_rooms(id) ON DELETE CASCADE,
+
   session_id VARCHAR(255) NOT NULL,     -- Browser session cookie
-  nickname VARCHAR(50) NOT NULL,
+
+1. **Connect Repository**  nickname VARCHAR(50) NOT NULL,
+
   lives INT DEFAULT 3,
-  passes INT DEFAULT 0,                 -- Earned by successful HUMBUG challenges
-  is_eliminated BOOLEAN DEFAULT FALSE,
+
+   - Link GitHub repo to Vercel  passes INT DEFAULT 0,                 -- Earned by successful HUMBUG challenges
+
+   - Configure project settings  is_eliminated BOOLEAN DEFAULT FALSE,
+
   join_order INT NOT NULL,              -- Determines turn order
-  joined_at TIMESTAMPTZ DEFAULT NOW()
+
+2. **Environment Variables**  joined_at TIMESTAMPTZ DEFAULT NOW()
+
 );
+
+   Add in Vercel dashboard:
 
 -- Active Sessions: Current game state
-CREATE TABLE game_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_id UUID UNIQUE REFERENCES game_rooms(id) ON DELETE CASCADE,
-  question_set_id INT NOT NULL,
+
+   - `POSTGRES_POSTGRES_URL`CREATE TABLE game_sessions (
+
+   - `GOOGLE_CLIENT_ID`  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+   - `GOOGLE_CLIENT_SECRET`  room_id UUID UNIQUE REFERENCES game_rooms(id) ON DELETE CASCADE,
+
+   - `JWT_SECRET`  question_set_id INT NOT NULL,
+
   questions_ids INT[] NOT NULL,         -- Array of question IDs for this game
-  current_question_index INT DEFAULT 0,
+
+3. **Deploy**  current_question_index INT DEFAULT 0,
+
   current_turn_player_id UUID,          -- Whose turn to answer
-  pending_answer_id UUID,               -- Answer awaiting HUMBUG challenge
-  started_at TIMESTAMPTZ DEFAULT NOW()
-);
+
+   ```bash  pending_answer_id UUID,               -- Answer awaiting HUMBUG challenge
+
+   git push origin main      # Deploy to staging  started_at TIMESTAMPTZ DEFAULT NOW()
+
+   git push origin master    # Deploy to production);
+
+````
 
 -- Player Answers: Submitted answers and challenges
-CREATE TABLE player_answers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID REFERENCES game_sessions(id) ON DELETE CASCADE,
-  player_id UUID REFERENCES room_players(id) ON DELETE CASCADE,
-  question_id INT NOT NULL,
-  answer_text TEXT NOT NULL,
-  is_correct BOOLEAN,                   -- Null until checked/challenged
-  was_challenged BOOLEAN DEFAULT FALSE,
-  challenger_id UUID,                   -- Who called HUMBUG
-  challenge_successful BOOLEAN,         -- Did challenger guess correctly?
-  submitted_at TIMESTAMPTZ DEFAULT NOW()
+
+4. **Google OAuth Configuration**CREATE TABLE player_answers (
+
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+Add authorized URIs in Google Cloud Console: session_id UUID REFERENCES game_sessions(id) ON DELETE CASCADE,
+
+- `https://humbug.hu` player_id UUID REFERENCES room_players(id) ON DELETE CASCADE,
+
+- `https://www.humbug.hu` question_id INT NOT NULL,
+
+- Redirect URIs: `https://humbug.hu/api/auth/callback`, etc. answer_text TEXT NOT NULL,
+
+is_correct BOOLEAN, -- Null until checked/challenged
+
+### Production Checklist was_challenged BOOLEAN DEFAULT FALSE,
+
+challenger_id UUID, -- Who called HUMBUG
+
+- [ ] All environment variables configured challenge_successful BOOLEAN, -- Did challenger guess correctly?
+
+- [ ] Database migrations applied submitted_at TIMESTAMPTZ DEFAULT NOW()
+
+- [ ] Google OAuth URIs updated);
+
+- [ ] Admin user created in database
+
+- [ ] PWA manifest and service worker tested-- Event Log: Complete game history
+
+- [ ] Translations complete in both languagesCREATE TABLE humbug_events (
+
+- [ ] All console.log statements removed id SERIAL PRIMARY KEY,
+
+- [ ] Error tracking configured (optional) room_id UUID REFERENCES game_rooms(id) ON DELETE CASCADE,
+
+  event_type VARCHAR(50) NOT NULL, -- join, leave, answer, humbug, etc.
+
+--- player_id UUID,
+
+data JSONB, -- Event-specific payload
+
+## 🤝 Contributing created_at TIMESTAMPTZ DEFAULT NOW()
+
 );
 
--- Event Log: Complete game history
-CREATE TABLE humbug_events (
-  id SERIAL PRIMARY KEY,
-  room_id UUID REFERENCES game_rooms(id) ON DELETE CASCADE,
-  event_type VARCHAR(50) NOT NULL,      -- join, leave, answer, humbug, etc.
-  player_id UUID,
-  data JSONB,                           -- Event-specific payload
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
+### Development Guidelines```
 
-#### State Transitions
+1. Read `.github/instructions/agents.md.instructions.md` for project conventions#### State Transitions
 
-```
-ROOM LIFECYCLE:
-1. waiting → in_progress (handleStart)
-2. in_progress → finished (last player standing)
-3. finished → [auto-delete after 24h]
+2. Follow existing code patterns and component structure
 
-TURN FLOW:
+3. Test on mobile devices before submitting PRs```
+
+4. Update translations in both `en.json` and `hu.json`ROOM LIFECYCLE:
+
+5. Document new features in agents guide1. waiting → in_progress (handleStart)
+
+6. Clean up console.log statements2. in_progress → finished (last player standing)
+
+7. Use parameterized queries for database operations3. finished → [auto-delete after 24h]
+
+### Submitting ChangesTURN FLOW:
+
 1. Player submits answer → pending_answer_id set
-2. Other players can call HUMBUG → challenge resolved
-3. Next turn → current_turn_player_id updates
-4. All answered → handleNext advances question
-```
+
+1. Create feature branch: `git checkout -b feature/your-feature`2. Other players can call HUMBUG → challenge resolved
+
+1. Make changes and test thoroughly3. Next turn → current_turn_player_id updates
+
+1. Commit with descriptive message: `git commit -m "feat: add new skin system"`4. All answered → handleNext advances question
+
+1. Push to branch: `git push origin feature/your-feature````
+
+1. Create Pull Request to `main` branch
 
 ### API Actions
 
+---
+
 #### 1. Create Room (`POST /api/rooms?action=create`)
 
+## 📄 License
+
 **Request:**
 
-```json
-{
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+````json
+
+---{
+
   "maxPlayers": 10,
-  "questionSetId": 1 // Optional: defaults to first available
+
+## 🙏 Credits  "questionSetId": 1 // Optional: defaults to first available
+
 }
-```
 
-**Response:**
+### Development```
 
-```json
+
+
+- **Zoltan Szolnoki** - Lead Developer & Game Designer**Response:**
+
+
+
+### Technologies```json
+
 {
-  "success": true,
-  "data": {
-    "roomId": "uuid-here",
-    "code": "INFOLE",
-    "playerId": "uuid-here",
-    "isHost": true
-  }
+
+- [React](https://reactjs.org/) - UI framework  "success": true,
+
+- [TypeScript](https://www.typescriptlang.org/) - Type safety  "data": {
+
+- [Tailwind CSS](https://tailwindcss.com/) - Styling    "roomId": "uuid-here",
+
+- [shadcn/ui](https://ui.shadcn.com/) - Component library    "code": "INFOLE",
+
+- [Framer Motion](https://www.framer.com/motion/) - Animations    "playerId": "uuid-here",
+
+- [Neon](https://neon.tech/) - Serverless PostgreSQL    "isHost": true
+
+- [Vercel](https://vercel.com/) - Hosting platform  }
+
 }
-```
 
-**Backend Logic:**
+### Assets```
 
-1. Generate unique 6-character room code (A-Z0-9)
+
+
+- **Space Grotesk Font** - Self-hosted for reliability**Backend Logic:**
+
+- **Phosphor Icons** - Icon library
+
+- Background images and audio files - Custom created1. Generate unique 6-character room code (A-Z0-9)
+
 2. Create session cookie if not exists
-3. Insert game_rooms row
-4. Add host as first room_player
-5. Log "room_created" event
 
-#### 2. Join Room (`POST /api/rooms?action=join`)
+---3. Insert game_rooms row
+
+4. Add host as first room_player
+
+## 📞 Contact5. Log "room_created" event
+
+
+
+- **Website**: [humbug.hu](https://humbug.hu)#### 2. Join Room (`POST /api/rooms?action=join`)
+
+- **GitHub**: [@szolzol](https://github.com/szolzol)
 
 **Request:**
 
+---
+
 ```json
-{
+
+<div align="center">{
+
   "code": "INFOLE",
-  "nickname": "Player2" // Optional if authenticated
+
+**Made with ❤️ by Zoltan Szolnoki**  "nickname": "Player2" // Optional if authenticated
+
 }
-```
 
-**Response:**
+_If you enjoy HUMBUG!, please consider starring the repository!_```
 
-```json
+
+
+⭐ [Star on GitHub](https://github.com/szolzol/humbug-quiz)**Response:**
+
+
+
+</div>```json
+
 {
   "success": true,
   "data": {
@@ -456,7 +881,7 @@ TURN FLOW:
     "userRole": "premium"
   }
 }
-```
+````
 
 **Backend Logic:**
 

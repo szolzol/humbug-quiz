@@ -9,7 +9,225 @@ This document contains important learnings, considerations, and best practices d
 - NEVER interrupt a running dev server, always check background terminals for running servers and run any commands in a new terminal window
 - Always expose local dev server on the local network (using `--host` flag) to test PWA and service worker features
 - Always update README.MD file after key changes
-- Buildelni nem kell, tesztelni a dev server indításával tesztelj..
+- Test changes using the dev server (`npm run dev`) - building is only needed for production
+
+## 📁 Project Structure
+
+### Root Directory Organization
+
+```
+humbug-quiz/
+├── api/                    # Vercel serverless functions
+│   ├── admin.ts           # Unified admin API endpoint
+│   ├── question-sets.ts   # Question packs CRUD
+│   ├── auth/              # OAuth authentication
+│   └── ...
+├── src/                   # React application source
+│   ├── components/        # React components
+│   │   ├── admin/        # Admin panel components
+│   │   └── ui/           # shadcn/ui components
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # Utility functions
+│   ├── locales/          # i18n translations (en.json, hu.json)
+│   └── ...
+├── database/             # Database migration scripts
+├── public/               # Static assets (fonts, images)
+├── scripts/              # Database & maintenance scripts
+│   ├── *.cjs            # Horror pack scripts
+│   ├── run-*.js         # Migration runners
+│   ├── check-*.js       # Validation scripts
+│   └── test-*.js        # Test utilities
+├── legacy/               # Archived files
+│   ├── docs/            # Old documentation & planning
+│   ├── database-migrations/
+│   ├── fix-docs/
+│   └── ...
+├── test/                 # Test files & utilities
+├── docs/                 # Current documentation
+└── README.md            # Main project documentation
+```
+
+### Key Files
+
+- `vite.config.ts` - Vite configuration with dev server API proxying
+- `vercel.json` - Vercel deployment configuration
+- `runtime.config.json` - Runtime environment variables
+- `tsconfig.json` - TypeScript configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+
+## 🏗️ Current Architecture
+
+### Authentication System
+
+**Google OAuth 2.0 Implementation**:
+
+```
+User Flow:
+1. User clicks "Sign in with Google"
+2. Frontend redirects to /api/auth/google
+3. Google OAuth consent screen (prompt: 'select_account' for fast returning user login)
+4. Callback to /api/auth/callback with authorization code
+5. Exchange code for access token & fetch user info
+6. Save/update user in database, fetch role & nickname
+7. Create JWT token with user data (userId, email, name, nickname, picture, role)
+8. Set httpOnly cookie (auth_token, 7 days expiry)
+9. Redirect to app with ?auth=success
+```
+
+**Session Management**:
+
+- JWT stored in httpOnly cookie (secure, sameSite: 'lax')
+- Frontend checks /api/auth/session for auth state
+- AuthContext provides: isAuthenticated, user, loading, logout
+- Token expires after 7 days (auto logout)
+
+**Role-Based Access Control**:
+
+- `free` - Default role, access to free packs only
+- `premium` - Access to free + premium packs
+- `admin` - Full access including admin_only packs
+- `creator` - Full access including admin_only packs
+
+### Question Pack System
+
+**Database Schema** (PostgreSQL via Neon):
+
+```sql
+-- question_sets table
+CREATE TABLE question_sets (
+  id SERIAL PRIMARY KEY,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  name_en TEXT NOT NULL,
+  name_hu TEXT NOT NULL,
+  description_en TEXT,
+  description_hu TEXT,
+  access_level VARCHAR(20) DEFAULT 'free', -- 'free', 'premium', 'admin_only'
+  pack_type VARCHAR(20) DEFAULT 'general',
+  skin VARCHAR(20) DEFAULT 'standard', -- 'standard', 'premium', 'fire'
+  is_active BOOLEAN DEFAULT true,
+  is_published BOOLEAN DEFAULT false,
+  display_order INTEGER DEFAULT 0,
+  question_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- questions table
+CREATE TABLE questions (
+  id SERIAL PRIMARY KEY,
+  set_id INTEGER REFERENCES question_sets(id) ON DELETE CASCADE,
+  question_en TEXT NOT NULL,
+  question_hu TEXT NOT NULL,
+  category VARCHAR(100),
+  difficulty INTEGER DEFAULT 1,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- answers table
+CREATE TABLE answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+  answer_en TEXT NOT NULL,
+  answer_hu TEXT NOT NULL,
+  order_index INTEGER DEFAULT 0
+);
+```
+
+**Pack Filtering by Role**:
+
+- API endpoint: `/api/question-sets`
+- Reads JWT from cookie, fetches user role from database
+- Filters packs based on access_level and user role
+- Admin/creator see all, premium see free+premium, free see only free
+
+### Skinning System
+
+**Centralized Configuration** (`src/components/QuestionCard.tsx`):
+
+```typescript
+const SKIN_STYLES = {
+  standard: {
+    front: { gradient, border, text, watermark... },
+    back: { gradient, border, text, button... },
+    shimmer: false,
+    shimmerColor: ""
+  },
+  premium: {
+    front: { gradient: "bg-gradient-to-br from-black via-purple-950 to-black", ... },
+    back: { ... },
+    shimmer: true,
+    shimmerColor: "via-purple-400/10"
+  },
+  fire: {
+    front: { gradient: "bg-gradient-to-br from-black via-red-950 to-black", ... },
+    back: { ... },
+    shimmer: true,
+    shimmerColor: "via-red-400/10"
+  }
+};
+```
+
+**Pack Selector Skins** (`src/components/QuestionPackSelector.tsx`):
+
+- PACK_SELECTOR_SKINS configuration matches card skins
+- Each skin defines: background, border, text, radio, badge styles
+- VIP badge (👑 VIP) shown for admin_only packs
+
+**Admin Skin Editor**:
+
+- PackEditDialog allows admins to select skin via dropdown
+- Skins stored in database, applied dynamically
+- All watermarks display "HUMBUG!" for branding consistency
+
+### Admin Panel
+
+**Unified API Endpoint**: `/api/admin.ts`
+
+- Single serverless function for all admin operations
+- Role validation via `validateAdminSession()` helper
+- Activity logging for audit trail
+- Operations: users CRUD, packs CRUD, questions CRUD, analytics
+
+**Admin Components**:
+
+- `AdminDashboard.tsx` - Main dashboard with stats & charts
+- `PackEditDialog.tsx` - Pack editor with skin selector
+- `UserManagementPanel.tsx` - User role management
+- All protected by role check in AuthContext
+
+**Activity Logging**:
+
+- Every admin action logged to `admin_activity_log` table
+- Includes: admin_id, action_type, entity_type, entity_id, details, IP, timestamp
+- Visible in admin dashboard for audit purposes
+
+### Database Connection Management
+
+**Critical Pattern**:
+
+```typescript
+let sql;
+try {
+  const { neon } = await import("@neondatabase/serverless");
+  sql = neon(process.env.POSTGRES_POSTGRES_URL!);
+
+  // Perform queries...
+  const result = await sql`SELECT * FROM ...`;
+} catch (error) {
+  console.error("Error:", error);
+} finally {
+  // Neon serverless auto-manages connections, no manual closing needed
+}
+```
+
+**Important Notes**:
+
+- Always use parameterized queries (`sql\`SELECT \* FROM users WHERE id = ${userId}\``)
+- Never use string concatenation (SQL injection risk!)
+- Neon serverless handles connection pooling automatically
+- Check `process.env.POSTGRES_POSTGRES_URL` exists before querying
+
+---
 
 ## 📱 Mobile & Responsive Design
 
@@ -1318,18 +1536,32 @@ When asking for help:
 
 <div align="center">
 
-**Last Updated**: January 2025
+**Last Updated**: October 2025
 
 **Project Status:**
 
-- ✅ Core game functionality complete
-- ✅ Google OAuth authentication working
+- ✅ Core quiz game functionality complete
+- ✅ Google OAuth authentication (fast returning user login)
+- ✅ Role-based access control (free/premium/admin/creator)
+- ✅ Question pack system with dynamic filtering
+- ✅ Skinning system (standard/premium/fire themes)
 - ✅ Admin panel with full CRUD operations
 - ✅ Activity logging and audit trail
 - ✅ Dashboard analytics with charts
-- ✅ 7/12 Vercel functions used (5 remaining)
-- ✅ Console logs cleaned up
-- ✅ Production-ready deployment
+- ✅ VIP badge for admin-only packs
+- ✅ PWA support with offline functionality
+- ✅ i18n support (English & Hungarian)
+- ✅ Organized project structure (scripts/, legacy/)
+- ✅ Production-ready deployment on Vercel
+
+**Architecture Highlights:**
+
+- JWT-based authentication with httpOnly cookies
+- PostgreSQL (Neon) with parameterized queries
+- Centralized skin configuration system
+- Unified admin API endpoint
+- React + TypeScript + Vite + Tailwind CSS
+- shadcn/ui components + Framer Motion animations
 
 _This document should be updated as the project evolves_
 

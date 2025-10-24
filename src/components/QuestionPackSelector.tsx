@@ -42,6 +42,19 @@ const PACK_SELECTOR_SKINS = {
       "bg-gradient-to-r from-purple-500 to-amber-500 text-white border-none",
     shimmer: true,
   },
+  fire: {
+    background:
+      "bg-gradient-to-br from-black via-red-950 to-black border-red-500/50 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20",
+    backgroundSelected: "border-red-400 shadow-lg shadow-red-500/30",
+    border: "border-red-500/50",
+    text: "text-red-100",
+    textMuted: "text-red-300",
+    radio: "border-red-400 text-red-400",
+    badge: "bg-red-900/50 text-red-200 border-red-500/30",
+    premiumBadge:
+      "bg-gradient-to-r from-red-500 to-amber-500 text-white border-none",
+    shimmer: true,
+  },
 } as const;
 
 interface QuestionPack {
@@ -165,6 +178,7 @@ export function QuestionPackSelector({
             .filter((pack) => pack.is_active)
             .map((pack) => {
               const isPremium = pack.access_level === "premium";
+              const isAdminOnly = pack.access_level === "admin_only";
               const skin =
                 PACK_SELECTOR_SKINS[pack.skin || "standard"] ||
                 PACK_SELECTOR_SKINS.standard;
@@ -214,6 +228,13 @@ export function QuestionPackSelector({
                           variant="outline"
                           className={`text-xs ${skin.premiumBadge}`}>
                           ✨ Premium
+                        </Badge>
+                      )}
+                      {isAdminOnly && (
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-gradient-to-r from-violet-600 to-purple-600 text-white border-none">
+                          👑 VIP
                         </Badge>
                       )}
                     </Label>

@@ -100,6 +100,11 @@ const SKIN_TYPES = [
     label: "💜 Premium",
     description: "Purple-gold horror theme with shimmer effects",
   },
+  {
+    value: "fire",
+    label: "🔥 Fire",
+    description: "Red inferno theme with glow effects",
+  },
 ];
 
 export function PackEditDialog({

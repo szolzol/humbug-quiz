@@ -20,7 +20,7 @@ interface QuizQuestion {
 interface QuestionCardProps {
   question: QuizQuestion;
   index: number;
-  packSkin?: "standard" | "premium";
+  packSkin?: "standard" | "premium" | "fire";
 }
 
 // Helper functions for localStorage (no longer language-specific)
@@ -106,6 +106,7 @@ const SKIN_STYLES = {
       watermarkText: "HUMBUG!",
     },
     shimmer: false,
+    shimmerColor: "",
   },
   premium: {
     front: {
@@ -131,6 +132,32 @@ const SKIN_STYLES = {
       watermarkText: "HORROR! 👻",
     },
     shimmer: true,
+    shimmerColor: "via-purple-400/10",
+  },
+  fire: {
+    front: {
+      gradient: "bg-gradient-to-br from-black via-red-950 to-black",
+      border: "border-red-500/50",
+      watermark: "text-red-500/[0.07]",
+      text: "text-red-100",
+      textMuted: "text-red-200/80",
+      categoryText: "text-red-300/90",
+      watermarkText: "FIRE! 🔥",
+    },
+    back: {
+      gradient: "bg-gradient-to-br from-black via-red-950 to-black",
+      border: "border-red-500/50",
+      watermark: "text-red-500/[0.05]",
+      text: "text-red-100",
+      textMuted: "text-red-200/90",
+      textLight: "text-red-300/70",
+      button: "bg-red-950/50 hover:bg-red-900/50 border border-red-500/20",
+      buttonSelected: "bg-red-500/30 border border-red-400/50",
+      borderColor: "border-red-500/30",
+      watermarkText: "FIRE! 🔥",
+    },
+    shimmer: true,
+    shimmerColor: "via-red-400/10",
   },
 } as const;
 
@@ -449,7 +476,9 @@ export function QuestionCard({ question, index, packSkin }: QuestionCardProps) {
           {/* Shimmer effect for certain skins */}
           {skin.shimmer && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
+              <div
+                className={`absolute inset-0 bg-gradient-to-r from-transparent ${skin.shimmerColor} to-transparent animate-shimmer`}
+              />
             </div>
           )}
 
@@ -537,7 +566,9 @@ export function QuestionCard({ question, index, packSkin }: QuestionCardProps) {
           {/* Shimmer effect for certain skins */}
           {skin.shimmer && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
+              <div
+                className={`absolute inset-0 bg-gradient-to-r from-transparent ${skin.shimmerColor} to-transparent animate-shimmer`}
+              />
             </div>
           )}
 

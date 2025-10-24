@@ -54,7 +54,7 @@ export function LanguageSwitcher() {
                 ? "bg-primary/10 text-primary"
                 : "text-foreground"
             }`}>
-            🇬🇧 English
+            English
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => changeLanguage("hu")}
@@ -63,7 +63,7 @@ export function LanguageSwitcher() {
                 ? "bg-primary/10 text-primary"
                 : "text-foreground"
             }`}>
-            🇭🇺 Magyar
+            Magyar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

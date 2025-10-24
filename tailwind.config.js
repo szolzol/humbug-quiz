@@ -114,9 +114,20 @@ const defaultTheme = {
         "0%": { transform: "translateX(-100%)" },
         "100%": { transform: "translateX(100%)" },
       },
+      "mystique-blue": {
+        "0%, 100%": {
+          opacity: "0.3",
+          backgroundPosition: "0% 50%",
+        },
+        "50%": {
+          opacity: "0.5",
+          backgroundPosition: "100% 50%",
+        },
+      },
     },
     animation: {
       shimmer: "shimmer 3s infinite",
+      "mystique-blue": "mystique-blue 8s ease-in-out infinite",
     },
   },
   spacing: {

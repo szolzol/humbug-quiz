@@ -471,6 +471,15 @@ function App() {
               }
             `}
           </style>
+          {/* Mystique Animated Deep Dark Blue Hue Overlay */}
+          <div
+            className="absolute inset-0 animate-mystique-blue"
+            style={{
+              background:
+                "linear-gradient(45deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.3), rgba(15, 23, 42, 0.4))",
+              backgroundSize: "200% 200%",
+            }}
+          />
           {/* Blue Overlay on top of image - stronger on mobile, lighter on desktop */}
           <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/75 to-blue-950/80 sm:from-blue-950/10 sm:via-blue-950/40 sm:to-blue-950/50" />
           {/* Gradual fade to dark blue background - stronger fade for darker sections */}

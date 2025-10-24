@@ -32,7 +32,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   googleAuthUrl.searchParams.append("response_type", "code");
   googleAuthUrl.searchParams.append("scope", "openid email profile");
   googleAuthUrl.searchParams.append("access_type", "offline");
-  googleAuthUrl.searchParams.append("prompt", "consent");
+  // Use 'select_account' instead of 'consent' to allow faster login for returning users
+  googleAuthUrl.searchParams.append("prompt", "select_account");
 
   // Redirect to Google
   res.redirect(302, googleAuthUrl.toString());

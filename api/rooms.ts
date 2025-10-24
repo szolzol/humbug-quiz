@@ -37,7 +37,7 @@ import {
   RoomPlayer,
   GameSession,
   PlayerAnswer,
-} from "./db-multiplayer";
+} from "./_db-multiplayer.js";
 console.log("[ROOMS] Imported db-multiplayer");
 
 // Standardized response format

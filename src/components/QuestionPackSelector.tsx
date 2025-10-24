@@ -188,7 +188,7 @@ export function QuestionPackSelector({
                   key={pack.slug}
                   className={`
                 relative flex items-start space-x-3 rounded-lg border p-4 
-                transition-all duration-300 cursor-pointer w-full max-w-full
+                transition-all duration-300 cursor-pointer w-full max-w-full overflow-hidden
                 ${skin.background}
                 ${
                   currentPack === pack.slug
@@ -207,13 +207,13 @@ export function QuestionPackSelector({
                   <RadioGroupItem
                     value={pack.slug}
                     id={pack.slug}
-                    className={`mt-1 ${skin.radio}`}
+                    className={`mt-1 flex-shrink-0 ${skin.radio}`}
                   />
-                  <div className="flex-1 space-y-1">
+                  <div className="flex-1 space-y-1 min-w-0">
                     <Label
                       htmlFor={pack.slug}
-                      className={`flex items-center gap-2 font-semibold cursor-pointer ${skin.text}`}>
-                      {getPackName(pack)}
+                      className={`flex items-center gap-2 font-semibold cursor-pointer flex-wrap ${skin.text}`}>
+                      <span className="break-words">{getPackName(pack)}</span>
                       {pack.slug === "horror-tagen-special" && (
                         <span className="text-lg">👻</span>
                       )}
@@ -238,7 +238,7 @@ export function QuestionPackSelector({
                         </Badge>
                       )}
                     </Label>
-                    <p className={`text-sm ${skin.textMuted}`}>
+                    <p className={`text-sm break-words ${skin.textMuted}`}>
                       {getPackDescription(pack)}
                     </p>
                   </div>

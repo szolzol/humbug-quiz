@@ -272,7 +272,7 @@ export function QuestionPackSelector({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[75vw] sm:w-[400px] md:w-[540px] p-6 pt-12">
+        className="w-[75vw] sm:w-[400px] md:w-[540px] p-6 pt-12 overflow-y-auto">
         {/* Question Packs Section */}
         <div className="space-y-4">
           <SheetHeader>
@@ -288,7 +288,7 @@ export function QuestionPackSelector({
           </SheetHeader>
 
           {/* Question Packs List */}
-          <div className="pt-2">{renderPackList()}</div>
+          <div className="pt-2 overflow-hidden">{renderPackList()}</div>
         </div>
       </SheetContent>
     </Sheet>

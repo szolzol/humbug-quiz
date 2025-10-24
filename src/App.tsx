@@ -28,37 +28,51 @@ import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
-// Enhanced Studio Light Animation - dramatic yellow spotlights
+// Enhanced Studio Light Animation - dramatic yellow spotlights with more dynamic movement
 const studioLights = [
   {
     gradients: [
-      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
-      "radial-gradient(circle at 80% 30%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
-      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
-      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
+      "radial-gradient(circle at 80% 30%, rgba(234, 179, 8, 0.5) 0%, rgba(234, 179, 8, 0.25) 25%, transparent 50%)",
+      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.4) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 10% 85%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
     ],
-    duration: 15,
+    duration: 12,
     delay: 0,
   },
   {
     gradients: [
-      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
-      "radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
-      "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
-      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.12) 25%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
+      "radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.2) 25%, transparent 50%)",
+      "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.15) 25%, transparent 50%)",
+      "radial-gradient(circle at 85% 75%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
     ],
-    duration: 18,
-    delay: 3,
+    duration: 14,
+    delay: 2,
   },
   {
     gradients: [
-      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
-      "radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
-      "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
-      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.25) 0%, rgba(234, 179, 8, 0.1) 30%, transparent 55%)",
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
+      "radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.4) 0%, rgba(234, 179, 8, 0.18) 30%, transparent 55%)",
+      "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.3) 0%, rgba(234, 179, 8, 0.12) 30%, transparent 55%)",
+      "radial-gradient(circle at 75% 25%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
     ],
-    duration: 20,
-    delay: 6,
+    duration: 16,
+    delay: 5,
+  },
+  {
+    gradients: [
+      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
+      "radial-gradient(circle at 95% 50%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.12) 35%, transparent 60%)",
+      "radial-gradient(circle at 25% 25%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
+      "radial-gradient(circle at 65% 10%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.12) 35%, transparent 60%)",
+      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
+    ],
+    duration: 18,
+    delay: 8,
   },
 ];
 
@@ -440,8 +454,8 @@ function App() {
         />
       </div>
 
-      {/* LAYER 1: Deep Blue Base Background - Darker for mobile */}
-      <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-950 -z-50" />
+      {/* LAYER 1: Deep Blue Base Background - Almost black */}
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-black -z-50" />
 
       {/* LAYER 2: Studio Light Animations - Dramatic Yellow Spotlights */}
       {studioLights.map((light, index) => (

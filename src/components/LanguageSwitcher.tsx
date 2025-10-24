@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
           <Button
             size="sm"
             variant="outline"
-            className="bg-background/90 backdrop-blur-sm hover:bg-background border-2 border-primary/20 hover:border-primary/40 font-bold shadow-lg transition-all duration-300 hover:scale-105">
+            className="h-9 bg-background/90 backdrop-blur-sm hover:bg-background border-2 border-primary/20 hover:border-primary/40 font-bold shadow-lg transition-all duration-300 hover:scale-105">
             <Globe className="mr-1.5 h-4 w-4" weight="bold" />
             <span className="text-sm text-foreground">
               {i18n.language === "hu" ? "HU" : "EN"}

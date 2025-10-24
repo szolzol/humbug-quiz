@@ -25,7 +25,7 @@ import {
 } from "@phosphor-icons/react";
 import gameRulesAudioHu from "@/assets/audio/humbug-rules.mp3";
 import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
-import humbugMoodImage from "@/assets/images/humbug-mood.png";
+import humbugMoodImage from "@/assets/images/humbug-mood - mobile.png";
 import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
 // Enhanced Studio Light Animation - dramatic yellow spotlights with more dynamic movement and higher visibility

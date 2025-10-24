@@ -3,7 +3,7 @@
  * Entry point for creating or joining multiplayer game rooms
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -20,14 +20,25 @@ import { Users, Plus, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LoginButton } from "@/components/LoginButton";
+import { useAuth } from "@/hooks/useAuth";
 
 export function MultiplayerPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [roomCode, setRoomCode] = useState("");
   const [nickname, setNickname] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+
+  // Auto-populate nickname from user profile
+  useEffect(() => {
+    if (user) {
+      // Priority: user.nickname > user.name > empty
+      const defaultNickname = user.nickname || user.name || "";
+      setNickname(defaultNickname);
+    }
+  }, [user]);
 
   const handleCreateRoom = async () => {
     if (!nickname.trim()) {
@@ -199,19 +210,47 @@ export function MultiplayerPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="create-nickname">
-                      {t("multiplayer.yourNickname", "Your Nickname")}
+                    <Label
+                      htmlFor="create-nickname"
+                      className="flex items-center justify-between">
+                      <span>
+                        {t("multiplayer.yourNickname", "Your Nickname")}
+                      </span>
+                      <a
+                        href="/profile"
+                        className="text-xs text-primary hover:underline"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate("/profile");
+                        }}>
+                        {t("multiplayer.editProfile", "Edit Profile")}
+                      </a>
                     </Label>
                     <Input
                       id="create-nickname"
-                      placeholder={t(
-                        "multiplayer.enterNickname",
-                        "Enter your nickname"
-                      )}
+                      placeholder={
+                        user
+                          ? t(
+                              "multiplayer.autoFilledNickname",
+                              "Auto-filled from profile"
+                            )
+                          : t(
+                              "multiplayer.pleaseLogin",
+                              "Please login to set nickname"
+                            )
+                      }
                       value={nickname}
-                      onChange={(e) => setNickname(e.target.value)}
-                      maxLength={50}
+                      disabled
+                      className="bg-muted cursor-not-allowed"
                     />
+                    {!user && (
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "multiplayer.loginRequired",
+                          "Login to automatically use your profile nickname"
+                        )}
+                      </p>
+                    )}
                   </div>
                   <Button
                     onClick={handleCreateRoom}
@@ -261,19 +300,47 @@ export function MultiplayerPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="join-nickname">
-                      {t("multiplayer.yourNickname", "Your Nickname")}
+                    <Label
+                      htmlFor="join-nickname"
+                      className="flex items-center justify-between">
+                      <span>
+                        {t("multiplayer.yourNickname", "Your Nickname")}
+                      </span>
+                      <a
+                        href="/profile"
+                        className="text-xs text-primary hover:underline"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate("/profile");
+                        }}>
+                        {t("multiplayer.editProfile", "Edit Profile")}
+                      </a>
                     </Label>
                     <Input
                       id="join-nickname"
-                      placeholder={t(
-                        "multiplayer.enterNickname",
-                        "Enter your nickname"
-                      )}
+                      placeholder={
+                        user
+                          ? t(
+                              "multiplayer.autoFilledNickname",
+                              "Auto-filled from profile"
+                            )
+                          : t(
+                              "multiplayer.pleaseLogin",
+                              "Please login to set nickname"
+                            )
+                      }
                       value={nickname}
-                      onChange={(e) => setNickname(e.target.value)}
-                      maxLength={50}
+                      disabled
+                      className="bg-muted cursor-not-allowed"
                     />
+                    {!user && (
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "multiplayer.loginRequired",
+                          "Login to automatically use your profile nickname"
+                        )}
+                      </p>
+                    )}
                   </div>
                   <Button
                     onClick={handleJoinRoom}

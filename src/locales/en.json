@@ -277,7 +277,11 @@
         "joining": "Joining...",
         "fillAllFields": "Please fill in all fields",
         "howToPlay": "How to Play",
-        "instructions": "Create a room to get a unique code, share it with friends. Take turns answering questions. Challenge wrong answers with HUMBUG to earn passes and eliminate opponents!"
+        "instructions": "Create a room to get a unique code, share it with friends. Take turns answering questions. Challenge wrong answers with HUMBUG to earn passes and eliminate opponents!",
+        "editProfile": "Edit Profile",
+        "autoFilledNickname": "Auto-filled from profile",
+        "pleaseLogin": "Please login to set nickname",
+        "loginRequired": "Login to automatically use your profile nickname"
     },
     "common": {
         "back": "Back"

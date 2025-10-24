@@ -275,7 +275,11 @@
         "joining": "Csatlakozás...",
         "fillAllFields": "Kérlek töltsd ki az összes mezőt",
         "howToPlay": "Hogyan játsszuk",
-        "instructions": "Hozz létre szobát és kapsz egy egyedi kódot, oszd meg barátaiddal. Felváltva válaszoljatok a kérdésekre. Kérdőjelezd meg a rossz válaszokat HUMBUG-gal hogy passzokat szerezz és kikapcsold az ellenfeleket!"
+        "instructions": "Hozz létre szobát és kapsz egy egyedi kódot, oszd meg barátaiddal. Felváltva válaszoljatok a kérdésekre. Kérdőjelezd meg a rossz válaszokat HUMBUG-gal hogy passzokat szerezz és kikapcsold az ellenfeleket!",
+        "editProfile": "Profil szerkesztése",
+        "autoFilledNickname": "Automatikusan kitöltve a profilodból",
+        "pleaseLogin": "Kérlek jelentkezz be a becenév megadásához",
+        "loginRequired": "Jelentkezz be hogy automatikusan használhasd a profil becenevedet"
     },
     "common": {
         "back": "Vissza"

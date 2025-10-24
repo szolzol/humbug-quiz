@@ -468,11 +468,20 @@ async function handleCreate(
     return respond(res, false, undefined, "Method not allowed", 405);
   }
 
-  const body = CreateRoomSchema.parse(req.body);
-
   try {
+    // Parse request body
+    const body = CreateRoomSchema.parse(req.body);
+
+    console.log("[Rooms] Create room request:", {
+      sessionId,
+      body,
+      hasDbUrl: !!process.env.DATABASE_URL,
+      hasPostgresUrl: !!process.env.POSTGRES_POSTGRES_URL,
+    });
+
     // Generate unique room code
     const code = await generateUniqueRoomCode();
+    console.log("[Rooms] Generated room code:", code);
 
     // Set expiration to 4 hours from now (UTC)
     const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
@@ -502,7 +511,14 @@ async function handleCreate(
     });
   } catch (error: any) {
     console.error("[Rooms] Create error:", error);
-    respond(res, false, undefined, error.message, 500);
+    console.error("[Rooms] Error stack:", error.stack);
+    respond(
+      res,
+      false,
+      undefined,
+      error.message || "Failed to create room",
+      500
+    );
   }
 }
 

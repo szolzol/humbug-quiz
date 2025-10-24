@@ -3,7 +3,8 @@
         "title": "HUMBUG!",
         "subtitle": "TÖRPÖLSZ VAGY BLÖFFÖLSZ",
         "description": "Egy kvízes partyjáték, ahol a tudás, a bátorság és a megtévesztés találkozik!",
-        "ctaButton": "Kezdjük a játékot!"
+        "ctaButton": "Kezdjük a játékot!",
+        "multiplayerButton": "Többjátékos"
     },
     "rules": {
         "audioTitle": "Hogyan játsszuk?",
@@ -259,5 +260,24 @@
             "title": "Változások",
             "content": "Fenntartjuk a jogot, hogy ezt az adatvédelmi tájékoztatót bármikor módosítsuk. A változásokról ezen az oldalon tájékoztatunk. Utolsó módosítás dátuma: 2025-10-16"
         }
+    },
+    "multiplayer": {
+        "title": "Többjátékos Mód",
+        "subtitle": "Hozz létre szobát vagy csatlakozz barátaidhoz egy kvíz csatához!",
+        "createRoom": "Szoba létrehozása",
+        "createRoomDesc": "Indíts új játékot és hívd meg barátaidat",
+        "joinRoom": "Csatlakozás szobához",
+        "joinRoomDesc": "Írj be egy szoba kódot hogy csatlakozz meglévő játékhoz",
+        "roomCode": "Szoba Kód",
+        "yourNickname": "Beceneved",
+        "enterNickname": "Írd be a beceneved",
+        "creating": "Létrehozás...",
+        "joining": "Csatlakozás...",
+        "fillAllFields": "Kérlek töltsd ki az összes mezőt",
+        "howToPlay": "Hogyan játsszuk",
+        "instructions": "Hozz létre szobát és kapsz egy egyedi kódot, oszd meg barátaiddal. Felváltva válaszoljatok a kérdésekre. Kérdőjelezd meg a rossz válaszokat HUMBUG-gal hogy passzokat szerezz és kikapcsold az ellenfeleket!"
+    },
+    "common": {
+        "back": "Vissza"
     }
 }

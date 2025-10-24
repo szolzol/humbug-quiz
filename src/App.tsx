@@ -1,6 +1,7 @@
 ﻿import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { QuestionCard } from "@/components/QuestionCard";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { CategoryFilter } from "@/components/CategoryFilter";
@@ -98,6 +99,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, login, refreshSession } = useAuth();
   const urlState = useUrlState();
+  const navigate = useNavigate();
 
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
@@ -564,7 +566,8 @@ function App() {
                   duration: 0.8,
                   delay: 1.2,
                   ease: [0.25, 0.1, 0.25, 1.0],
-                }}>
+                }}
+                className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 hover:!bg-none hover:!bg-transparent hover:border-2 hover:border-primary hover:text-white hover:shadow-2xl"
@@ -575,6 +578,15 @@ function App() {
                   }}>
                   <ArrowDown className="mr-2" size={24} weight="bold" />
                   {t("hero.ctaButton")}
+                </Button>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-primary text-primary font-bold text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 hover:bg-primary hover:text-primary-foreground"
+                  onClick={() => navigate("/multiplayer")}>
+                  <Users className="mr-2" size={24} weight="bold" />
+                  {t("hero.multiplayerButton", "Multiplayer")}
                 </Button>
               </motion.div>
             </div>

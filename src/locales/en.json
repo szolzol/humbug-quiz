@@ -3,7 +3,8 @@
         "title": "HUMBUG!",
         "subtitle": "KNOW IT TILL YOU BLUFF IT",
         "description": "A quiz party game where knowledge, courage, and deception collide!",
-        "ctaButton": "Let's Start Playing!"
+        "ctaButton": "Let's Start Playing!",
+        "multiplayerButton": "Multiplayer"
     },
     "rules": {
         "audioTitle": "How to Play?",
@@ -261,5 +262,24 @@
             "title": "Changes",
             "content": "We reserve the right to modify this privacy policy at any time. We will notify you of changes on this page. Last modified: 2025-10-16"
         }
+    },
+    "multiplayer": {
+        "title": "Multiplayer Mode",
+        "subtitle": "Create a room or join your friends for a quiz battle!",
+        "createRoom": "Create Room",
+        "createRoomDesc": "Start a new game and invite friends",
+        "joinRoom": "Join Room",
+        "joinRoomDesc": "Enter a room code to join an existing game",
+        "roomCode": "Room Code",
+        "yourNickname": "Your Nickname",
+        "enterNickname": "Enter your nickname",
+        "creating": "Creating...",
+        "joining": "Joining...",
+        "fillAllFields": "Please fill in all fields",
+        "howToPlay": "How to Play",
+        "instructions": "Create a room to get a unique code, share it with friends. Take turns answering questions. Challenge wrong answers with HUMBUG to earn passes and eliminate opponents!"
+    },
+    "common": {
+        "back": "Back"
     }
 }

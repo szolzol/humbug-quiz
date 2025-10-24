@@ -37,6 +37,7 @@ interface Pack {
   description_hu: string | null;
   access_level: string;
   pack_type: string;
+  skin?: string;
   is_active: boolean;
   is_published: boolean;
   display_order: number;
@@ -88,6 +89,19 @@ const ACCESS_LEVELS = [
   },
 ];
 
+const SKIN_TYPES = [
+  {
+    value: "standard",
+    label: "🟡 Standard",
+    description: "Classic yellow HUMBUG theme",
+  },
+  {
+    value: "premium",
+    label: "💜 Premium",
+    description: "Purple-gold horror theme with shimmer effects",
+  },
+];
+
 export function PackEditDialog({
   pack,
   open,
@@ -102,6 +116,7 @@ export function PackEditDialog({
   const [descriptionHu, setDescriptionHu] = useState("");
   const [packType, setPackType] = useState<string>("quiz");
   const [accessLevel, setAccessLevel] = useState<string>("free");
+  const [skin, setSkin] = useState<string>("standard");
   const [isActive, setIsActive] = useState(true);
   const [isPublished, setIsPublished] = useState(false);
   const [displayOrder, setDisplayOrder] = useState(0);
@@ -120,6 +135,7 @@ export function PackEditDialog({
       setDescriptionHu(pack.description_hu || "");
       setPackType(pack.pack_type);
       setAccessLevel(pack.access_level);
+      setSkin(pack.skin || "standard");
       setIsActive(pack.is_active);
       setIsPublished(pack.is_published);
       setDisplayOrder(pack.display_order);
@@ -133,6 +149,7 @@ export function PackEditDialog({
       setDescriptionHu("");
       setPackType("quiz");
       setAccessLevel("free");
+      setSkin("standard");
       setIsActive(true);
       setIsPublished(false);
       setDisplayOrder(0);
@@ -198,6 +215,7 @@ export function PackEditDialog({
         description_hu: descriptionHu || null,
         pack_type: packType,
         access_level: accessLevel,
+        skin: skin,
         is_active: isActive,
         is_published: isPublished,
         display_order: displayOrder,
@@ -365,6 +383,31 @@ export function PackEditDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Skin Type */}
+          <div className="space-y-2">
+            <Label htmlFor="skin">Visual Theme (Skin)</Label>
+            <Select value={skin} onValueChange={setSkin}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SKIN_TYPES.map((skinType) => (
+                  <SelectItem key={skinType.value} value={skinType.value}>
+                    <div className="flex flex-col items-start">
+                      <span>{skinType.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {skinType.description}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Controls the visual appearance of question cards and pack selector
+            </p>
           </div>
 
           {/* Display Order */}

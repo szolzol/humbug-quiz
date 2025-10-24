@@ -1004,6 +1004,7 @@ async function getPacksList(req: VercelRequest, res: VercelResponse) {
       description_hu: p.description_hu,
       access_level: p.access_level,
       pack_type: p.pack_type,
+      skin: p.skin || "standard",
       is_active: p.is_active,
       is_published: p.is_published,
       display_order: p.display_order,
@@ -1055,6 +1056,7 @@ async function updatePack(
       description_hu,
       pack_type,
       access_level,
+      skin,
       is_active,
       is_published,
       display_order,
@@ -1103,6 +1105,12 @@ async function updatePack(
     if (access_level !== undefined) {
       updates.push(`access_level = $${paramIndex}`);
       params.push(access_level);
+      paramIndex++;
+    }
+
+    if (skin !== undefined) {
+      updates.push(`skin = $${paramIndex}`);
+      params.push(skin);
       paramIndex++;
     }
 

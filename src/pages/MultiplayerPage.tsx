@@ -30,12 +30,56 @@ export function MultiplayerPage() {
   const [isJoining, setIsJoining] = useState(false);
 
   const handleCreateRoom = async () => {
+    if (!nickname.trim()) {
+      alert(t("multiplayer.fillAllFields", "Please fill in all fields"));
+      return;
+    }
+
     setIsCreating(true);
     try {
-      // TODO: Call API to create room
-      console.log("Creating room...");
+      const response = await fetch("/api/rooms?action=create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          maxPlayers: 10,
+          questionSetId: undefined, // Will use default/free pack
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to create room");
+      }
+
+      // Now join the room with nickname
+      const joinResponse = await fetch("/api/rooms?action=join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: data.data.code,
+          nickname: nickname.trim(),
+        }),
+      });
+
+      const joinData = await joinResponse.json();
+
+      if (!joinData.success) {
+        throw new Error(joinData.error || "Failed to join room");
+      }
+
+      // Navigate to lobby
+      navigate(`/multiplayer/lobby/${data.data.roomId}`);
     } catch (error) {
       console.error("Failed to create room:", error);
+      alert(
+        t(
+          "multiplayer.createFailed",
+          `Failed to create room: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        )
+      );
     } finally {
       setIsCreating(false);
     }
@@ -49,10 +93,33 @@ export function MultiplayerPage() {
 
     setIsJoining(true);
     try {
-      // TODO: Call API to join room
-      console.log("Joining room:", roomCode, "as", nickname);
+      const response = await fetch("/api/rooms?action=join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: roomCode.trim(),
+          nickname: nickname.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to join room");
+      }
+
+      // Navigate to lobby with roomId from response
+      navigate(`/multiplayer/lobby/${data.data.roomId}`);
     } catch (error) {
       console.error("Failed to join room:", error);
+      alert(
+        t(
+          "multiplayer.joinFailed",
+          `Failed to join room: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        )
+      );
     } finally {
       setIsJoining(false);
     }

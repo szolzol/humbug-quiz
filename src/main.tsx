@@ -14,6 +14,7 @@ import { PacksPage } from "./pages/PacksPage.tsx";
 import { ActivityPage } from "./pages/ActivityPage.tsx";
 import { SettingsPage } from "./pages/SettingsPage.tsx";
 import { MultiplayerPage } from "./pages/MultiplayerPage.tsx";
+import { GameLobbyPage } from "./pages/GameLobbyPage.tsx";
 import PlayerProfile from "./components/PlayerProfile.tsx";
 import "./i18n";
 
@@ -32,8 +33,12 @@ createRoot(document.getElementById("root")!).render(
           {/* Profile Route */}
           <Route path="/profile" element={<PlayerProfile />} />
 
-          {/* Multiplayer Route */}
+          {/* Multiplayer Routes */}
           <Route path="/multiplayer" element={<MultiplayerPage />} />
+          <Route
+            path="/multiplayer/lobby/:roomId"
+            element={<GameLobbyPage />}
+          />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>

@@ -9,11 +9,23 @@
  * - Session-based guest authentication (no account required)
  */
 
+console.log("[ROOMS] Module loading started");
+
 import { VercelRequest, VercelResponse } from "@vercel/node";
+console.log("[ROOMS] Imported @vercel/node");
+
 import { z } from "zod";
+console.log("[ROOMS] Imported zod");
+
 import cookie from "cookie";
+console.log("[ROOMS] Imported cookie");
+
 import jwt from "jsonwebtoken";
+console.log("[ROOMS] Imported jwt");
+
 import { randomBytes } from "crypto";
+console.log("[ROOMS] Imported crypto");
+
 import {
   query as dbQuery,
   queryOne,
@@ -26,6 +38,7 @@ import {
   GameSession,
   PlayerAnswer,
 } from "../lib/db-multiplayer";
+console.log("[ROOMS] Imported db-multiplayer");
 
 // Standardized response format
 interface ApiResponse<T = any> {
@@ -336,6 +349,13 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
+  console.log(
+    "[ROOMS] Handler started, method:",
+    req.method,
+    "query:",
+    req.query
+  );
+
   // CORS headers (for local development)
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");

@@ -11,15 +11,19 @@ const DATABASE_URL =
   process.env.DATABASE_URL || process.env.POSTGRES_POSTGRES_URL;
 
 if (!DATABASE_URL) {
-  console.error(
-    "[db-multiplayer] ERROR: DATABASE_URL or POSTGRES_POSTGRES_URL environment variable is required"
-  );
-  console.error(
-    "[db-multiplayer] Available env vars:",
-    Object.keys(process.env).filter(
-      (k) => k.includes("POSTGRES") || k.includes("DATABASE")
-    )
-  );
+  try {
+    console.error(
+      "[db-multiplayer] ERROR: DATABASE_URL or POSTGRES_POSTGRES_URL environment variable is required"
+    );
+    console.error(
+      "[db-multiplayer] Available env vars:",
+      Object.keys(process.env).filter(
+        (k) => k.includes("POSTGRES") || k.includes("DATABASE")
+      )
+    );
+  } catch (e) {
+    console.error("[db-multiplayer] Could not log env vars:", e);
+  }
 }
 
 // Use Pool for parameterized queries (not template literals)

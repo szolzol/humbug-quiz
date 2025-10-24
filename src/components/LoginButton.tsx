@@ -103,7 +103,7 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
           transition={{ duration: 0.3 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-2 py-2 rounded-lg bg-background/90 backdrop-blur-sm hover:bg-background border-2 border-primary/20 hover:border-primary/40 font-bold shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          className="h-9 flex items-center gap-2 px-2 py-2 rounded-lg bg-background/90 backdrop-blur-sm hover:bg-background border-2 border-primary/20 hover:border-primary/40 font-bold shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
           <img
             src={user.picture}
             alt={user.name}

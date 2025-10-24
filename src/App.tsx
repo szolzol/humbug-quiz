@@ -28,48 +28,48 @@ import gameRulesAudioEn from "@/assets/audio/humbug-rules-en.mp3";
 import humbugMoodImage from "@/assets/images/humbug-mood.png";
 import humbugMainTheme from "@/assets/audio/humbug_main_theme.mp3";
 
-// Enhanced Studio Light Animation - dramatic yellow spotlights with more dynamic movement
+// Enhanced Studio Light Animation - dramatic yellow spotlights with more dynamic movement and higher visibility
 const studioLights = [
   {
     gradients: [
-      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
-      "radial-gradient(circle at 80% 30%, rgba(234, 179, 8, 0.5) 0%, rgba(234, 179, 8, 0.25) 25%, transparent 50%)",
-      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.4) 0%, rgba(234, 179, 8, 0.15) 25%, transparent 50%)",
-      "radial-gradient(circle at 10% 85%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
-      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.2) 25%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.55) 0%, rgba(234, 179, 8, 0.28) 25%, transparent 50%)",
+      "radial-gradient(circle at 80% 30%, rgba(234, 179, 8, 0.6) 0%, rgba(234, 179, 8, 0.32) 25%, transparent 50%)",
+      "radial-gradient(circle at 50% 70%, rgba(234, 179, 8, 0.5) 0%, rgba(234, 179, 8, 0.25) 25%, transparent 50%)",
+      "radial-gradient(circle at 10% 85%, rgba(234, 179, 8, 0.55) 0%, rgba(234, 179, 8, 0.28) 25%, transparent 50%)",
+      "radial-gradient(circle at 20% 20%, rgba(234, 179, 8, 0.55) 0%, rgba(234, 179, 8, 0.28) 25%, transparent 50%)",
     ],
     duration: 12,
     delay: 0,
   },
   {
     gradients: [
-      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
-      "radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.2) 25%, transparent 50%)",
-      "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.15) 25%, transparent 50%)",
-      "radial-gradient(circle at 85% 75%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
-      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 25%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.5) 0%, rgba(251, 191, 36, 0.25) 25%, transparent 50%)",
+      "radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.55) 0%, rgba(251, 191, 36, 0.28) 25%, transparent 50%)",
+      "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.22) 25%, transparent 50%)",
+      "radial-gradient(circle at 85% 75%, rgba(251, 191, 36, 0.5) 0%, rgba(251, 191, 36, 0.25) 25%, transparent 50%)",
+      "radial-gradient(circle at 70% 60%, rgba(251, 191, 36, 0.5) 0%, rgba(251, 191, 36, 0.25) 25%, transparent 50%)",
     ],
     duration: 14,
     delay: 2,
   },
   {
     gradients: [
-      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
-      "radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.4) 0%, rgba(234, 179, 8, 0.18) 30%, transparent 55%)",
-      "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.3) 0%, rgba(234, 179, 8, 0.12) 30%, transparent 55%)",
-      "radial-gradient(circle at 75% 25%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
-      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.35) 0%, rgba(234, 179, 8, 0.15) 30%, transparent 55%)",
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.22) 30%, transparent 55%)",
+      "radial-gradient(circle at 10% 15%, rgba(234, 179, 8, 0.5) 0%, rgba(234, 179, 8, 0.25) 30%, transparent 55%)",
+      "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.4) 0%, rgba(234, 179, 8, 0.18) 30%, transparent 55%)",
+      "radial-gradient(circle at 75% 25%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.22) 30%, transparent 55%)",
+      "radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.45) 0%, rgba(234, 179, 8, 0.22) 30%, transparent 55%)",
     ],
     duration: 16,
     delay: 5,
   },
   {
     gradients: [
-      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
-      "radial-gradient(circle at 95% 50%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.12) 35%, transparent 60%)",
-      "radial-gradient(circle at 25% 25%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
-      "radial-gradient(circle at 65% 10%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.12) 35%, transparent 60%)",
-      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 35%, transparent 60%)",
+      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 35%, transparent 60%)",
+      "radial-gradient(circle at 95% 50%, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.2) 35%, transparent 60%)",
+      "radial-gradient(circle at 25% 25%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 35%, transparent 60%)",
+      "radial-gradient(circle at 65% 10%, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.2) 35%, transparent 60%)",
+      "radial-gradient(circle at 40% 90%, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.18) 35%, transparent 60%)",
     ],
     duration: 18,
     delay: 8,
@@ -454,8 +454,8 @@ function App() {
         />
       </div>
 
-      {/* LAYER 1: Deep Blue Base Background - Almost black */}
-      <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-black -z-50" />
+      {/* LAYER 1: Deep Background - Pure black for Android */}
+      <div className="fixed inset-0 bg-black -z-50" />
 
       {/* LAYER 2: Studio Light Animations - Dramatic Yellow Spotlights */}
       {studioLights.map((light, index) => (
@@ -495,13 +495,13 @@ function App() {
             }}
           />
           {/* Blue Overlay on top of image - stronger on mobile, lighter on desktop */}
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/75 to-blue-950/80 sm:from-blue-950/10 sm:via-blue-950/40 sm:to-blue-950/50" />
-          {/* Gradual fade to dark blue background - stronger fade for darker sections */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/75 to-black sm:from-blue-950/10 sm:via-blue-950/40 sm:to-blue-950/50" />
+          {/* Gradual fade to pure black background - stronger fade for darker sections */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.3) 15%, rgba(2, 6, 23, 0.6) 30%, rgba(2, 6, 23, 0.75) 45%, rgba(2, 6, 23, 0.9) 60%, rgba(2, 6, 23, 0.97) 75%, rgb(2, 6, 23) 90%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 15%, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0.75) 45%, rgba(0, 0, 0, 0.9) 60%, rgba(0, 0, 0, 0.97) 75%, rgb(0, 0, 0) 90%)",
             }}
           />
         </div>

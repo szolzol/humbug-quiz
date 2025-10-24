@@ -188,7 +188,7 @@ export function QuestionPackSelector({
                   key={pack.slug}
                   className={`
                 relative flex items-start space-x-3 rounded-lg border p-4 
-                transition-all duration-300 cursor-pointer
+                transition-all duration-300 cursor-pointer w-full max-w-full
                 ${skin.background}
                 ${
                   currentPack === pack.slug
@@ -288,7 +288,9 @@ export function QuestionPackSelector({
           </SheetHeader>
 
           {/* Question Packs List */}
-          <div className="pt-2 overflow-hidden">{renderPackList()}</div>
+          <div className="pt-2 overflow-hidden max-w-full">
+            {renderPackList()}
+          </div>
         </div>
       </SheetContent>
     </Sheet>

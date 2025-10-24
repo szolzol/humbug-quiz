@@ -494,14 +494,14 @@ function App() {
               backgroundSize: "200% 200%",
             }}
           />
-          {/* Blue Overlay on top of image - stronger on mobile, lighter on desktop */}
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/75 to-black sm:from-blue-950/10 sm:via-blue-950/40 sm:to-blue-950/50" />
-          {/* Gradual fade to pure black background - stronger fade for darker sections */}
+          {/* Blue Overlay on top of image - darker bottom for smooth transition */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/60 via-blue-950/80 to-slate-950 sm:from-blue-950/10 sm:via-blue-950/50 sm:to-slate-950" />
+          {/* Gradual fade to pure black background - darker in middle sections */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 15%, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0.75) 45%, rgba(0, 0, 0, 0.9) 60%, rgba(0, 0, 0, 0.97) 75%, rgb(0, 0, 0) 90%)",
+                "linear-gradient(to bottom, transparent 0%, transparent 15%, rgba(0, 0, 0, 0.2) 30%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.7) 60%, rgba(0, 0, 0, 0.85) 75%, rgba(0, 0, 0, 0.95) 90%, rgb(0, 0, 0) 100%)",
             }}
           />
         </div>

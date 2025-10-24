@@ -915,7 +915,7 @@ async function handleState(
     );
 
     // Get game session if playing
-    let gameState = null;
+    let gameState: any = null;
     if (room.state === "playing") {
       const session = await queryOne(
         `SELECT ms.*, 

@@ -20,7 +20,7 @@ interface QuizQuestion {
 interface QuestionCardProps {
   question: QuizQuestion;
   index: number;
-  packSlug?: string;
+  packSkin?: "standard" | "premium";
 }
 
 // Helper functions for localStorage (no longer language-specific)
@@ -81,12 +81,65 @@ const setStoredAnswers = (questionId: string, answers: Set<number>) => {
   }
 };
 
-export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
+// Skin configuration - easily extensible for new skins
+const SKIN_STYLES = {
+  standard: {
+    front: {
+      gradient: "bg-gradient-to-br from-primary via-primary/90 to-primary/80",
+      border: "border-accent",
+      watermark: "text-primary-foreground/[0.07]",
+      text: "text-primary-foreground",
+      textMuted: "text-primary-foreground/80",
+      categoryText: "text-primary-foreground/80",
+      watermarkText: "HUMBUG!",
+    },
+    back: {
+      gradient: "bg-card",
+      border: "border-border",
+      watermark: "text-card-foreground/[0.05]",
+      text: "text-card-foreground",
+      textMuted: "text-card-foreground/80",
+      textLight: "text-muted-foreground",
+      button: "bg-muted hover:bg-muted/80",
+      buttonSelected: "bg-green-500/30 border border-green-500/50",
+      borderColor: "border-border",
+      watermarkText: "HUMBUG!",
+    },
+    shimmer: false,
+  },
+  premium: {
+    front: {
+      gradient: "bg-gradient-to-br from-black via-purple-950 to-black",
+      border: "border-purple-500/50",
+      watermark: "text-purple-500/[0.07]",
+      text: "text-purple-100",
+      textMuted: "text-purple-200/80",
+      categoryText: "text-purple-300/90",
+      watermarkText: "HORROR! 👻",
+    },
+    back: {
+      gradient: "bg-gradient-to-br from-black via-purple-950 to-black",
+      border: "border-purple-500/50",
+      watermark: "text-purple-500/[0.05]",
+      text: "text-purple-100",
+      textMuted: "text-purple-200/90",
+      textLight: "text-purple-300/70",
+      button:
+        "bg-purple-950/50 hover:bg-purple-900/50 border border-purple-500/20",
+      buttonSelected: "bg-purple-500/30 border border-purple-400/50",
+      borderColor: "border-purple-500/30",
+      watermarkText: "HORROR! 👻",
+    },
+    shimmer: true,
+  },
+} as const;
+
+export function QuestionCard({ question, index, packSkin }: QuestionCardProps) {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
 
-  // Check if this is the Horror Tagen pack
-  const isHorrorPack = packSlug === "horror-tagen-special";
+  // Get skin styles (default to standard if not found)
+  const skin = SKIN_STYLES[packSkin || "standard"] || SKIN_STYLES.standard;
 
   const [isFlipped, setIsFlipped] = useState(() =>
     getStoredFlipState(question.id)
@@ -391,43 +444,31 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
 
         {/* Front of card */}
         <Card
-          className={`absolute inset-0 w-full h-full backface-hidden border-2 shadow-xl overflow-hidden ${
-            isHorrorPack
-              ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50"
-              : "bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-accent"
-          }`}
+          className={`absolute inset-0 w-full h-full backface-hidden border-2 shadow-xl overflow-hidden ${skin.front.gradient} ${skin.front.border}`}
           style={{ pointerEvents: isFlipped ? "none" : "auto" }}>
-          {/* Premium shimmer for Horror pack */}
-          {isHorrorPack && (
+          {/* Shimmer effect for certain skins */}
+          {skin.shimmer && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
             </div>
           )}
 
-          {/* Diagonal HUMBUG! Watermark */}
+          {/* Diagonal Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
-              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${
-                isHorrorPack
-                  ? "text-purple-500/[0.07]"
-                  : "text-primary-foreground/[0.07]"
-              }`}
+              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${skin.front.watermark}`}
               style={{
                 transform: "rotate(-45deg)",
                 fontFamily: "Space Grotesk, sans-serif",
               }}>
-              {isHorrorPack ? "HORROR! 👻" : "HUMBUG!"}
+              {skin.front.watermarkText}
             </div>
           </div>
 
           <CardContent className="flex flex-col justify-between h-full p-4 md:p-6 relative z-10">
             {/* Top section with flip instruction and arrow - aligned with button */}
             <div
-              className={`flex items-center justify-end pr-14 md:pr-16 text-xs sm:text-sm md:text-base ${
-                isHorrorPack
-                  ? "text-purple-200/80"
-                  : "text-primary-foreground/80"
-              }`}>
+              className={`flex items-center justify-end pr-14 md:pr-16 text-xs sm:text-sm md:text-base ${skin.front.textMuted}`}>
               <div className="flex items-center gap-1.5 max-w-full">
                 <span className="font-medium text-right break-words md:whitespace-nowrap">
                   {t("questions.flipCard")}
@@ -452,20 +493,14 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
               </div>
             </div>
 
-            {/* Center section with question */}
-            <div className="flex-1 flex flex-col justify-center items-center text-center">
+            <div
+              className={`flex-1 flex flex-col justify-center items-center text-center`}>
               <div
-                className={`!text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide ${
-                  isHorrorPack
-                    ? "text-purple-300/90"
-                    : "text-primary-foreground/80"
-                }`}>
+                className={`!text-base md:!text-lg font-bold mb-3 md:mb-4 uppercase tracking-wide ${skin.front.categoryText}`}>
                 {question.category}
               </div>
               <h3
-                className={`font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4 ${
-                  isHorrorPack ? "text-purple-100" : "text-primary-foreground"
-                }`}>
+                className={`font-bold !text-xl md:!text-2xl leading-tight px-2 md:px-4 ${skin.front.text}`}>
                 {question.question}
               </h3>
             </div>
@@ -473,22 +508,13 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
             {/* Bottom section with answer count and source */}
             <div className="text-center space-y-1">
               <div
-                className={`text-base md:text-base font-medium ${
-                  isHorrorPack
-                    ? "text-purple-200/80"
-                    : "text-primary-foreground/80"
-                }`}>
+                className={`text-base md:text-base font-medium ${skin.front.textMuted}`}>
                 {t("questions.totalAnswers", {
                   count: question.answers.length,
                 })}
               </div>
               {question.sourceUrl && (
-                <div
-                  className={`text-sm ${
-                    isHorrorPack
-                      ? "text-purple-300/60"
-                      : "text-primary-foreground/60"
-                  }`}>
+                <div className={`text-sm ${skin.front.textMuted}`}>
                   <span>Source: </span>
                   <a
                     href={question.sourceUrl}
@@ -506,32 +532,24 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
 
         {/* Back of card */}
         <Card
-          className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 border-2 shadow-xl overflow-hidden ${
-            isHorrorPack
-              ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50"
-              : "bg-card border-border"
-          }`}
+          className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 border-2 shadow-xl overflow-hidden ${skin.back.gradient} ${skin.back.border}`}
           style={{ pointerEvents: isFlipped ? "auto" : "none" }}>
-          {/* Premium shimmer for Horror pack */}
-          {isHorrorPack && (
+          {/* Shimmer effect for certain skins */}
+          {skin.shimmer && (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
             </div>
           )}
 
-          {/* Diagonal HUMBUG! Watermark */}
+          {/* Diagonal Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <div
-              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${
-                isHorrorPack
-                  ? "text-purple-500/[0.05]"
-                  : "text-card-foreground/[0.05]"
-              }`}
+              className={`font-black text-[6rem] md:text-[10rem] tracking-tighter whitespace-nowrap select-none ${skin.back.watermark}`}
               style={{
                 transform: "rotate(-45deg)",
                 fontFamily: "Space Grotesk, sans-serif",
               }}>
-              {isHorrorPack ? "HORROR! 👻" : "HUMBUG!"}
+              {skin.back.watermarkText}
             </div>
           </div>
 
@@ -539,9 +557,7 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
             className="flex flex-col h-full p-3 md:p-4 relative z-10"
             onClick={(e) => e.stopPropagation()}>
             <div
-              className={`!text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center ${
-                isHorrorPack ? "text-purple-200/90" : "text-card-foreground/80"
-              }`}>
+              className={`!text-sm md:!text-base font-bold mb-2 uppercase tracking-wide text-center ${skin.back.textMuted}`}>
               {t("questions.correctAnswers")}
               <span className="ml-2 text-xs md:text-sm font-normal">
                 ({selectedAnswers.size} / {question.answers.length})
@@ -562,37 +578,24 @@ export function QuestionCard({ question, index, packSlug }: QuestionCardProps) {
                   key={answerIndex}
                   className={`rounded-md px-2 md:px-2.5 py-1.5 md:py-2 text-center text-xs md:text-[11px] cursor-pointer transition-all duration-200 w-full ${
                     selectedAnswers.has(answerIndex)
-                      ? isHorrorPack
-                        ? "bg-purple-500/30 border border-purple-400/50"
-                        : "bg-green-500/30 border border-green-500/50"
-                      : isHorrorPack
-                      ? "bg-purple-950/50 hover:bg-purple-900/50 border border-purple-500/20"
-                      : "bg-muted hover:bg-muted/80"
+                      ? skin.back.buttonSelected
+                      : skin.back.button
                   }`}
                   onClick={(e) => handleAnswerClick(e, answerIndex)}>
-                  <span
-                    className={`font-medium ${
-                      isHorrorPack ? "text-purple-100" : "text-card-foreground"
-                    }`}>
+                  <span className={`font-medium ${skin.back.text}`}>
                     {answer}
                   </span>
                 </button>
               ))}
             </div>
             <div
-              className={`mt-2 text-[10px] md:text-xs text-center leading-tight ${
-                isHorrorPack ? "text-purple-300/70" : "text-muted-foreground"
-              }`}>
+              className={`mt-2 text-[10px] md:text-xs text-center leading-tight ${skin.back.textLight}`}>
               {t("questions.clickToMark")}
             </div>
 
             {/* Action buttons: RESET, FINISHED, Thumbs Up/Down */}
             <div
-              className={`mt-3 pt-3 flex justify-between items-center gap-2 ${
-                isHorrorPack
-                  ? "border-t border-purple-500/30"
-                  : "border-t border-border"
-              }`}>
+              className={`mt-3 pt-3 flex justify-between items-center gap-2 border-t ${skin.back.borderColor}`}>
               {/* Left side: RESET and FINISHED */}
               <div className="flex gap-2">
                 <button

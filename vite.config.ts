@@ -2741,6 +2741,7 @@ function apiRoutesPlugin(): PluginOption {
 
             const authToken = cookies.auth_token;
             let isAuthenticated = false;
+            let userRole = "free";
 
             if (authToken) {
               try {
@@ -2749,23 +2750,45 @@ function apiRoutesPlugin(): PluginOption {
                   Buffer.from(authToken, "base64").toString()
                 );
                 isAuthenticated = sessionData.exp >= Date.now();
+
+                // Fetch user role if authenticated
+                if (isAuthenticated && sessionData.userId) {
+                  const userResult = await sql`
+                    SELECT role FROM users WHERE id = ${sessionData.userId}
+                  `;
+                  if (userResult.length > 0) {
+                    userRole = userResult[0].role;
+                  }
+                }
               } catch (e) {
                 // Invalid token
                 isAuthenticated = false;
               }
             }
 
-            // Fetch question sets based on authentication
+            // Fetch question sets based on authentication and role
             let questionSets;
-            if (isAuthenticated) {
-              // Authenticated: Show ALL packs (free, premium, admin_only)
+            if (userRole === "admin" || userRole === "creator") {
+              // Admin/Creator: Show ALL packs including admin_only
               questionSets = await sql`
                 SELECT 
                   id, slug, name_en, name_hu, description_en, description_hu,
-                  access_level, is_active, is_published, cover_image_url, icon_url,
+                  access_level, skin, is_active, is_published, cover_image_url, icon_url,
                   display_order, question_count, total_plays, metadata
                 FROM question_sets
                 WHERE is_active = true AND is_published = true
+                ORDER BY display_order ASC, created_at ASC
+              `;
+            } else if (isAuthenticated) {
+              // Premium users: Show free + premium (exclude admin_only)
+              questionSets = await sql`
+                SELECT 
+                  id, slug, name_en, name_hu, description_en, description_hu,
+                  access_level, skin, is_active, is_published, cover_image_url, icon_url,
+                  display_order, question_count, total_plays, metadata
+                FROM question_sets
+                WHERE is_active = true AND is_published = true
+                  AND access_level IN ('free', 'premium')
                 ORDER BY display_order ASC, created_at ASC
               `;
             } else {
@@ -2773,7 +2796,7 @@ function apiRoutesPlugin(): PluginOption {
               questionSets = await sql`
                 SELECT 
                   id, slug, name_en, name_hu, description_en, description_hu,
-                  access_level, is_active, is_published, cover_image_url, icon_url,
+                  access_level, skin, is_active, is_published, cover_image_url, icon_url,
                   display_order, question_count, total_plays, metadata
                 FROM question_sets
                 WHERE is_active = true AND is_published = true

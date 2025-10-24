@@ -61,11 +61,11 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fetch question sets based on authentication status
+    // Fetch question sets based on authentication status and user role
     let questionSets;
 
-    if (isAuthenticated) {
-      // Authenticated users: Show ALL packs (free, premium, admin_only)
+    if (userRole === "admin" || userRole === "creator") {
+      // Admin/Creator: Show ALL packs including admin_only
       questionSets = await sql`
         SELECT 
           id,
@@ -75,6 +75,7 @@ export async function GET(request: Request) {
           description_en,
           description_hu,
           access_level,
+          skin,
           is_active,
           is_published,
           cover_image_url,
@@ -88,6 +89,32 @@ export async function GET(request: Request) {
           AND is_published = true
         ORDER BY display_order ASC, created_at ASC
       `;
+    } else if (isAuthenticated) {
+      // Premium users: Show free + premium (exclude admin_only)
+      questionSets = await sql`
+        SELECT 
+          id,
+          slug,
+          name_en,
+          name_hu,
+          description_en,
+          description_hu,
+          access_level,
+          skin,
+          is_active,
+          is_published,
+          cover_image_url,
+          icon_url,
+          display_order,
+          question_count,
+          total_plays,
+          metadata
+        FROM question_sets
+        WHERE is_active = true 
+          AND is_published = true
+          AND access_level IN ('free', 'premium')
+        ORDER BY display_order ASC, created_at ASC
+      `;
     } else {
       // Unauthenticated users: Show only free packs
       questionSets = await sql`
@@ -99,6 +126,7 @@ export async function GET(request: Request) {
           description_en,
           description_hu,
           access_level,
+          skin,
           is_active,
           is_published,
           cover_image_url,

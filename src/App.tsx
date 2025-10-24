@@ -98,6 +98,12 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialState.categories
   );
+  const [packs, setPacks] = useState<
+    Array<{
+      slug: string;
+      skin?: "standard" | "premium";
+    }>
+  >([]);
 
   // Ensure unauthenticated users start with free pack on mount
   useEffect(() => {
@@ -275,6 +281,35 @@ function App() {
     }>
   >([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
+
+  // Load packs from API to get skin information
+  useEffect(() => {
+    const fetchPacks = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const response = await fetch(`${origin}/api/question-sets`, {
+          credentials: "same-origin",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.questionSets) {
+            setPacks(
+              data.questionSets.map((p: any) => ({
+                slug: p.slug,
+                skin: p.skin || "standard",
+              }))
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch packs:", error);
+      }
+    };
+
+    fetchPacks();
+  }, [isAuthenticated]); // Refetch when auth status changes
 
   // Load questions from API when pack changes
   useEffect(() => {
@@ -719,7 +754,7 @@ function App() {
                     key={`${selectedPack}-${question.id}`}
                     question={question}
                     index={index}
-                    packSlug={selectedPack}
+                    packSkin={packs.find((p) => p.slug === selectedPack)?.skin}
                   />
                 ))
               )}

@@ -26,6 +26,7 @@ interface QuestionPack {
   question_count: number;
   is_active: boolean;
   access_level: "free" | "premium" | "admin_only";
+  skin?: "standard" | "premium";
 }
 
 interface QuestionPackSelectorProps {
@@ -136,7 +137,7 @@ export function QuestionPackSelector({
             .filter((pack) => pack.is_active)
             .map((pack) => {
               const isPremium = pack.access_level === "premium";
-              const isHorrorPack = pack.slug === "horror-tagen-special";
+              const isPremiumSkin = pack.skin === "premium";
 
               return (
                 <div
@@ -145,7 +146,7 @@ export function QuestionPackSelector({
                 relative flex items-start space-x-3 rounded-lg border p-4 
                 transition-all duration-300 cursor-pointer
                 ${
-                  isHorrorPack
+                  isPremiumSkin
                     ? "bg-gradient-to-br from-black via-purple-950 to-black border-purple-500/50 hover:border-purple-400/70 hover:shadow-lg hover:shadow-purple-500/20"
                     : isPremium
                     ? "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border-amber-300 dark:border-amber-700/50 hover:shadow-md hover:shadow-amber-500/10"
@@ -153,15 +154,15 @@ export function QuestionPackSelector({
                 }
                 ${
                   currentPack === pack.slug
-                    ? isHorrorPack
+                    ? isPremiumSkin
                       ? "border-purple-400 shadow-lg shadow-purple-500/30"
                       : "border-primary bg-primary/5"
                     : "border-border"
                 }
               `}
                   onClick={() => handlePackSelect(pack.slug)}>
-                  {/* Premium shimmer effect for Horror pack */}
-                  {isHorrorPack && (
+                  {/* Premium shimmer effect */}
+                  {isPremiumSkin && (
                     <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-shimmer" />
                     </div>
@@ -171,7 +172,7 @@ export function QuestionPackSelector({
                     value={pack.slug}
                     id={pack.slug}
                     className={`mt-1 ${
-                      isHorrorPack
+                      isPremiumSkin
                         ? "border-purple-400 text-purple-400"
                         : isPremium
                         ? "border-amber-500 text-amber-500"
@@ -182,18 +183,20 @@ export function QuestionPackSelector({
                     <Label
                       htmlFor={pack.slug}
                       className={`flex items-center gap-2 font-semibold cursor-pointer ${
-                        isHorrorPack
+                        isPremiumSkin
                           ? "text-purple-100"
                           : isPremium
                           ? "text-amber-900 dark:text-amber-100"
                           : ""
                       }`}>
                       {getPackName(pack)}
-                      {isHorrorPack && <span className="text-lg">👻</span>}
+                      {pack.slug === "horror-tagen-special" && (
+                        <span className="text-lg">👻</span>
+                      )}
                       <Badge
                         variant="secondary"
                         className={`text-xs ${
-                          isHorrorPack
+                          isPremiumSkin
                             ? "bg-purple-900/50 text-purple-200 border-purple-500/30"
                             : isPremium
                             ? "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"
@@ -206,7 +209,7 @@ export function QuestionPackSelector({
                         <Badge
                           variant="outline"
                           className={`text-xs ${
-                            isHorrorPack
+                            isPremiumSkin
                               ? "bg-gradient-to-r from-purple-500 to-amber-500 text-white border-none"
                               : "bg-amber-500 text-white border-amber-500"
                           }`}>
@@ -216,7 +219,7 @@ export function QuestionPackSelector({
                     </Label>
                     <p
                       className={`text-sm ${
-                        isHorrorPack
+                        isPremiumSkin
                           ? "text-purple-300"
                           : isPremium
                           ? "text-amber-700 dark:text-amber-300"

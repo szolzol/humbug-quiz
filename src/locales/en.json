@@ -128,7 +128,8 @@
         "ctaDescription": "Sign in with your Google account to access exclusive content and save your progress",
         "benefit1": "Access premium question packs",
         "benefit2": "Save your game progress",
-        "benefit3": "Personalized experience"
+        "benefit3": "Personalized experience",
+        "trustBadge": "Secure sign-in with Google"
     },
     "profile": {
         "title": "Player Profile",

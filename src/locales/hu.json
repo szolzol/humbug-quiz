@@ -131,7 +131,8 @@
         "ctaDescription": "Fedezd fel az összes feladványt belépés után!",
         "benefit1": "Prémium kérdéscsomagok elérése",
         "benefit2": "Játékállás mentése",
-        "benefit3": "Személyre szabott élmény"
+        "benefit3": "Személyre szabott élmény",
+        "trustBadge": "Biztonságos bejelentkezés Google-lal"
     },
     "profile": {
         "title": "Játékos Profil",

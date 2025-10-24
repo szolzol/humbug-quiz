@@ -101,7 +101,7 @@ function App() {
   const [packs, setPacks] = useState<
     Array<{
       slug: string;
-      skin?: "standard" | "premium";
+      skin?: "standard" | "premium" | "fire";
     }>
   >([]);
 

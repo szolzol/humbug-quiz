@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowsClockwise, ArrowUpRight } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
@@ -166,7 +166,11 @@ export function QuestionCard({ question, index, packSkin }: QuestionCardProps) {
   const { isAuthenticated, user } = useAuth();
 
   // Get skin styles (default to standard if not found)
-  const skin = SKIN_STYLES[packSkin || "standard"] || SKIN_STYLES.standard;
+  // Use useMemo to ensure skin updates when packSkin prop changes
+  const skin = useMemo(
+    () => SKIN_STYLES[packSkin || "standard"] || SKIN_STYLES.standard,
+    [packSkin]
+  );
 
   const [isFlipped, setIsFlipped] = useState(() =>
     getStoredFlipState(question.id)

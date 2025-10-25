@@ -294,7 +294,11 @@
         "leaving": "Leaving...",
         "leaveRoom": "Leave Room",
         "failedToStart": "Failed to start game",
-        "errorLoadingRoom": "Error loading room"
+        "errorLoadingRoom": "Error loading room",
+        "typeYourAnswer": "Type your answer...",
+        "submitting": "Submitting...",
+        "submitAnswer": "Submit Answer",
+        "recentAnswers": "Recent Answers"
     },
     "common": {
         "back": "Back",

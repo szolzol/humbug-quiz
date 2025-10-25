@@ -11,6 +11,7 @@ import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Crown, Users, Copy, Check, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { GamePlay } from "./GamePlay";
 
 interface GameLobbyProps {
   roomId: string;
@@ -109,32 +110,18 @@ export function GameLobby({ roomId, code }: GameLobbyProps) {
   const canStart =
     isHost && players.length >= 2 && players.length <= room.maxPlayers;
 
-  // If game has started, show game view instead of lobby
+  // If game has started, show game play view
   if (room.state === "playing") {
     return (
-      <div className="container mx-auto p-4 max-w-2xl">
-        <Card className="p-6 text-center">
-          <h2 className="text-2xl font-bold text-green-600 mb-4">
-            🎮 Game Started!
-          </h2>
-          <p className="text-gray-600 mb-4">
-            The game has begun. Game play UI coming soon...
-          </p>
-          <div className="space-y-2">
-            <p>
-              <strong>Players:</strong> {players.length}
-            </p>
-            <p>
-              <strong>Current Question:</strong>{" "}
-              {state.gameState?.currentQuestionIndex || 0} /{" "}
-              {state.gameState?.totalQuestions || 0}
-            </p>
-            <p>
-              <strong>Round:</strong> {state.gameState?.roundNumber || 1}
-            </p>
-          </div>
-        </Card>
-      </div>
+      <GamePlay
+        roomState={state}
+        onSubmitAnswer={async (answer) => {
+          await actions.submitAnswer(roomId, answer);
+        }}
+        onCallHumbug={async (answerId) => {
+          await actions.callHumbug(roomId, answerId);
+        }}
+      />
     );
   }
 

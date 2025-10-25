@@ -292,7 +292,11 @@
         "leaving": "Kilépés...",
         "leaveRoom": "Szoba Elhagyása",
         "failedToStart": "Nem sikerült elindítani a játékot",
-        "errorLoadingRoom": "Hiba történt a szoba betöltésekor"
+        "errorLoadingRoom": "Hiba történt a szoba betöltésekor",
+        "typeYourAnswer": "Írd be a választ...",
+        "submitting": "Küldés...",
+        "submitAnswer": "Válasz Beküldése",
+        "recentAnswers": "Legutóbbi Válaszok"
     },
     "common": {
         "back": "Vissza",

@@ -18,8 +18,20 @@ export interface Player {
 
 export interface GameQuestion {
   id: number;
-  text: string;
+  textEn: string;
+  textHu: string;
   category: string;
+}
+
+export interface RecentAnswer {
+  answerId: number;
+  playerNickname: string;
+  answerText: string;
+  isCorrect: boolean;
+  pointsEarned: number;
+  submittedAt: string;
+  revealed: boolean;
+  humbugCalledBy: number | null;
 }
 
 export interface GameState {
@@ -29,6 +41,7 @@ export interface GameState {
   currentQuestion: GameQuestion | null;
   currentTurnPlayerId: number;
   currentPlayerNickname: string;
+  recentAnswers?: RecentAnswer[];
 }
 
 export interface RoomState {
@@ -323,6 +336,7 @@ export function useGameRoom(options: UseGameRoomOptions) {
 
   const submitAnswer = useCallback(
     async (answerRoomId: string, answer: string) => {
+      lastActivityRef.current = Date.now(); // Reset activity on user action
       try {
         const response = await fetch("/api/rooms?action=answer", {
           method: "POST",
@@ -343,6 +357,36 @@ export function useGameRoom(options: UseGameRoomOptions) {
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("Failed to submit answer");
+        setError(error);
+        throw error;
+      }
+    },
+    [refresh]
+  );
+
+  const callHumbug = useCallback(
+    async (humbugRoomId: string, answerId: number) => {
+      lastActivityRef.current = Date.now(); // Reset activity on user action
+      try {
+        const response = await fetch("/api/rooms?action=humbug", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomId: humbugRoomId, answerId }),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "Failed to call HUMBUG");
+        }
+
+        // Immediate refresh to show updated state
+        await refresh();
+
+        return data.data;
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to call HUMBUG");
         setError(error);
         throw error;
       }
@@ -396,6 +440,7 @@ export function useGameRoom(options: UseGameRoomOptions) {
       leaveRoom,
       startGame,
       submitAnswer,
+      callHumbug,
       nextQuestion,
     },
   };

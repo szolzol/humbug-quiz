@@ -98,7 +98,7 @@ export function GameLobby({ roomId, code }: GameLobbyProps) {
       <Card className="p-6 text-center">
         <h1 className="text-2xl font-bold mb-2">{t("multiplayer.gameRoom")}</h1>
         <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="text-4xl font-mono font-bold tracking-wider bg-gray-100 px-6 py-3 rounded-lg">
+          <div className="text-4xl font-mono font-bold tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-6 py-3 rounded-lg">
             {code}
           </div>
           <Button
@@ -136,12 +136,14 @@ export function GameLobby({ roomId, code }: GameLobbyProps) {
               key={player.id}
               className={`flex items-center justify-between p-3 rounded-lg border ${
                 player.isCurrentPlayer
-                  ? "bg-blue-50 border-blue-300"
-                  : "bg-gray-50 border-gray-200"
+                  ? "bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700"
+                  : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
               }`}>
               <div className="flex items-center gap-3">
                 {player.isHost && <Crown className="h-5 w-5 text-yellow-500" />}
-                <span className="font-medium">{player.nickname}</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  {player.nickname}
+                </span>
                 {player.isCurrentPlayer && (
                   <Badge variant="default" className="text-xs">
                     {t("common.you")}

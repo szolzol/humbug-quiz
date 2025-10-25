@@ -279,7 +279,20 @@
         "editProfile": "Profil szerkesztése",
         "autoFilledNickname": "Automatikusan kitöltve a profilodból",
         "pleaseLogin": "Kérlek jelentkezz be a becenév megadásához",
-        "loginRequired": "Jelentkezz be hogy automatikusan használhasd a profil becenevedet"
+        "loginRequired": "Jelentkezz be hogy automatikusan használhasd a profil becenevedet",
+        "gameRoom": "Játékszoba",
+        "shareCodeWithFriends": "Oszd meg ezt a kódot barátaiddal hogy csatlakozhassanak!",
+        "players": "Játékosok",
+        "waitingToStart": "Várakozás az indításra",
+        "needMinPlayers": "Legalább {{min}} játékos szükséges az indításhoz",
+        "hostControls": "Házigazda Vezérlők",
+        "starting": "Indítás...",
+        "startGame": "Játék Indítása",
+        "waitingForPlayers": "Várakozás további játékosokra...",
+        "leaving": "Kilépés...",
+        "leaveRoom": "Szoba Elhagyása",
+        "failedToStart": "Nem sikerült elindítani a játékot",
+        "errorLoadingRoom": "Hiba történt a szoba betöltésekor"
     },
     "common": {
         "back": "Vissza"

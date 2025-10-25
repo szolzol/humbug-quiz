@@ -281,7 +281,20 @@
         "editProfile": "Edit Profile",
         "autoFilledNickname": "Auto-filled from profile",
         "pleaseLogin": "Please login to set nickname",
-        "loginRequired": "Login to automatically use your profile nickname"
+        "loginRequired": "Login to automatically use your profile nickname",
+        "gameRoom": "Game Room",
+        "shareCodeWithFriends": "Share this code with your friends to join!",
+        "players": "Players",
+        "waitingToStart": "Waiting to start",
+        "needMinPlayers": "Need at least {{min}} players to start",
+        "hostControls": "Host Controls",
+        "starting": "Starting...",
+        "startGame": "Start Game",
+        "waitingForPlayers": "Waiting for more players...",
+        "leaving": "Leaving...",
+        "leaveRoom": "Leave Room",
+        "failedToStart": "Failed to start game",
+        "errorLoadingRoom": "Error loading room"
     },
     "common": {
         "back": "Back"

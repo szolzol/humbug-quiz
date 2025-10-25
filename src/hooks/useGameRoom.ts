@@ -75,6 +75,10 @@ export function useGameRoom(options: UseGameRoomOptions) {
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isPollingRef = useRef(false);
 
+  // Track last activity for auto-stop polling
+  const lastActivityRef = useRef<number>(Date.now());
+  const INACTIVITY_TIMEOUT = 60000; // 1 minute
+
   const fetchState = useCallback(async () => {
     if (!roomId && !code) {
       return;
@@ -135,8 +139,32 @@ export function useGameRoom(options: UseGameRoomOptions) {
     if (isPollingRef.current) return;
 
     isPollingRef.current = true;
+    lastActivityRef.current = Date.now(); // Reset activity timer
 
     const poll = async () => {
+      // Check for inactivity timeout
+      const timeSinceLastActivity = Date.now() - lastActivityRef.current;
+      if (timeSinceLastActivity > INACTIVITY_TIMEOUT) {
+        console.log("[useGameRoom] Stopping polling due to inactivity");
+        stopPolling();
+        // Optionally leave room
+        if (roomId) {
+          try {
+            await fetch("/api/rooms?action=leave", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ roomId }),
+            });
+          } catch (err) {
+            console.error(
+              "[useGameRoom] Failed to leave room on inactivity:",
+              err
+            );
+          }
+        }
+        return;
+      }
+
       await fetchState();
 
       // Schedule next poll
@@ -147,7 +175,7 @@ export function useGameRoom(options: UseGameRoomOptions) {
 
     // Initial fetch
     poll();
-  }, [fetchState, pollingInterval]);
+  }, [fetchState, pollingInterval, roomId]);
 
   // Stop polling
   const stopPolling = useCallback(() => {
@@ -255,6 +283,7 @@ export function useGameRoom(options: UseGameRoomOptions) {
 
   const startGame = useCallback(
     async (startRoomId: string, questionSetId?: number) => {
+      lastActivityRef.current = Date.now(); // Reset activity on user action
       try {
         const response = await fetch("/api/rooms?action=start", {
           method: "POST",
@@ -347,6 +376,10 @@ export function useGameRoom(options: UseGameRoomOptions) {
     refresh,
     startPolling,
     stopPolling,
+    // Function to reset activity timer (call on user interactions)
+    resetActivity: () => {
+      lastActivityRef.current = Date.now();
+    },
     actions: {
       createRoom,
       joinRoom,

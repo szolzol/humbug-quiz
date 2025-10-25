@@ -297,6 +297,8 @@
         "errorLoadingRoom": "Error loading room"
     },
     "common": {
-        "back": "Back"
+        "back": "Back",
+        "backToHome": "Back to Home",
+        "you": "You"
     }
 }

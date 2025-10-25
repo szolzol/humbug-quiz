@@ -284,24 +284,34 @@ export function useGameRoom(options: UseGameRoomOptions) {
   const startGame = useCallback(
     async (startRoomId: string, questionSetId?: number) => {
       lastActivityRef.current = Date.now(); // Reset activity on user action
+      console.log("[useGameRoom] startGame called", {
+        startRoomId,
+        questionSetId,
+      });
+
       try {
+        console.log("[useGameRoom] Sending POST to /api/rooms?action=start");
         const response = await fetch("/api/rooms?action=start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ roomId: startRoomId, questionSetId }),
         });
 
+        console.log("[useGameRoom] Response status:", response.status);
         const data = await response.json();
+        console.log("[useGameRoom] Response data:", data);
 
         if (!data.success) {
           throw new Error(data.error || "Failed to start game");
         }
 
         // Immediate refresh to show game state
+        console.log("[useGameRoom] Refreshing state after start");
         await refresh();
 
         return data.data;
       } catch (err) {
+        console.error("[useGameRoom] Error in startGame:", err);
         const error =
           err instanceof Error ? err : new Error("Failed to start game");
         setError(error);

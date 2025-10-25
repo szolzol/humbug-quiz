@@ -295,6 +295,8 @@
         "errorLoadingRoom": "Hiba történt a szoba betöltésekor"
     },
     "common": {
-        "back": "Vissza"
+        "back": "Vissza",
+        "backToHome": "Vissza a főoldalra",
+        "you": "Te"
     }
 }

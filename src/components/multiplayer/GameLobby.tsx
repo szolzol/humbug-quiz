@@ -37,14 +37,31 @@ export function GameLobby({ roomId, code }: GameLobbyProps) {
   };
 
   const handleStartGame = async () => {
-    if (!state?.currentPlayer?.isHost) return;
+    console.log("[GameLobby] handleStartGame called", {
+      isHost: state?.currentPlayer?.isHost,
+      roomId,
+      roomState: state?.room?.state,
+      starting,
+    });
+
+    if (!state?.currentPlayer?.isHost) {
+      console.log("[GameLobby] Not host, aborting");
+      return;
+    }
+
+    if (starting) {
+      console.log("[GameLobby] Already starting, aborting");
+      return;
+    }
 
     setStarting(true);
     try {
+      console.log("[GameLobby] Calling actions.startGame with roomId:", roomId);
       await actions.startGame(roomId);
+      console.log("[GameLobby] Successfully started game");
       // Navigate to game view (state will update via polling)
     } catch (err) {
-      console.error("Failed to start game:", err);
+      console.error("[GameLobby] Failed to start game:", err);
       alert(t("multiplayer.failedToStart"));
     } finally {
       setStarting(false);
@@ -91,6 +108,52 @@ export function GameLobby({ roomId, code }: GameLobbyProps) {
   const isHost = currentPlayer?.isHost || false;
   const canStart =
     isHost && players.length >= 2 && players.length <= room.maxPlayers;
+
+  // If game has started, show game view instead of lobby
+  if (room.state === "playing") {
+    return (
+      <div className="container mx-auto p-4 max-w-2xl">
+        <Card className="p-6 text-center">
+          <h2 className="text-2xl font-bold text-green-600 mb-4">
+            🎮 Game Started!
+          </h2>
+          <p className="text-gray-600 mb-4">
+            The game has begun. Game play UI coming soon...
+          </p>
+          <div className="space-y-2">
+            <p>
+              <strong>Players:</strong> {players.length}
+            </p>
+            <p>
+              <strong>Current Question:</strong>{" "}
+              {state.gameState?.currentQuestionIndex || 0} /{" "}
+              {state.gameState?.totalQuestions || 0}
+            </p>
+            <p>
+              <strong>Round:</strong> {state.gameState?.roundNumber || 1}
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // If game finished, show results
+  if (room.state === "finished") {
+    return (
+      <div className="container mx-auto p-4 max-w-2xl">
+        <Card className="p-6 text-center">
+          <h2 className="text-2xl font-bold text-blue-600 mb-4">
+            🏆 Game Finished!
+          </h2>
+          <p className="text-gray-600 mb-4">Results screen coming soon...</p>
+          <Button onClick={() => navigate("/")}>
+            {t("common.backToHome")}
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-2xl space-y-4">

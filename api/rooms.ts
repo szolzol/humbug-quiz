@@ -707,11 +707,15 @@ async function handleStart(
   res: VercelResponse,
   sessionId: string
 ): Promise<void> {
+  console.log("[handleStart] Started, sessionId:", sessionId);
+
   if (req.method !== "POST") {
     return respond(res, false, undefined, "Method not allowed", 405);
   }
 
+  console.log("[handleStart] Request body:", req.body);
   const body = StartGameSchema.parse(req.body);
+  console.log("[handleStart] Parsed body:", body);
 
   try {
     // Get room and verify host
@@ -719,6 +723,13 @@ async function handleStart(
       `SELECT * FROM game_rooms WHERE id = $1`,
       [body.roomId]
     );
+
+    console.log("[handleStart] Room found:", {
+      id: room?.id,
+      state: room?.state,
+      host_session_id: room?.host_session_id,
+      sessionIdMatch: room?.host_session_id === sessionId,
+    });
 
     if (!room) {
       return respond(res, false, undefined, "Room not found", 404);
@@ -735,6 +746,10 @@ async function handleStart(
     }
 
     if (room.state !== "lobby") {
+      console.log(
+        "[handleStart] ERROR: Room state is not lobby, current state:",
+        room.state
+      );
       return respond(res, false, undefined, "Game already started", 400);
     }
 
